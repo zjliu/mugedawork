@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <link href="styles/style.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- 导航栏 -->
+    <script type="text/template" id="navigate">
+        <div class="left_btn"><%= leftLabel %></div>
+        <div class="title_btn"><%= title %></div>
+        <div class="right_btn"><%= rightLabel %></div>
+    </script>
+
+    <!-- 编辑界面的外框架 -->
+    <script type="text/template" id="custom_layout">
+        <div class="frame">
+            <div class="navigate"></div>
+            <div class="workspace">
+                <div class="workShow"></div>
+                <div class="workBtn">
+                     <div class="writeBtn"></div>
+                     <div class="speakBtn"></div>
+                </div>
+                <div class="panel">
+                    <!--工具栏-->
+                    <div class="tools">
+                        <div class="delIcon selected"></div>
+                        <div class="addIcon"></div>
+                    </div>
+                    <!-- 页面缩略图的外框架 -->
+                    <div class="preview">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <!-- 编辑界面预览缩略图页面的每个项的模板 -->
+    <script type="text/template" id="preview_page_item">
+        <div>
+            <img src="<%= thumb %>"  width="100" />
+        </div>
+    </script>
+
+    <!-- 样式界面的外框架 -->
+    <script type="text/template" id="style_layout">
+        <div class="frame">
+            <div class="navigate"></div>
+            <div class="toolbar"><span>样式分类</span></div>
+            <div class="style_list">
+                <!-- 这里显示一组样式 -->
+            </div>
+            <div class="style_catalog">
+                <!-- 这里显示样式的分类 -->
+            </div>
+        </div>
+    </script>
+
+    <!-- 样式分类单相的模板 -->
+    <script type="text/template" id="style_catalog_item">
+        <div class="style_catalog_item">
+            <div class="catalog_img"><img src="<%= thumb %>" width="10" /></div>
+            <div class="catalog_title"><%= title %></div>
+            <div class="catalog_dest"><%= description %></div>
+        </div>
+    </script>
+
+    <!-- 样式单项的模板 -->
+    <script type="text/template" id="style_page_item">
+        <div class="style_catalog_item">
+            <!--<div><img src="<%= thumb %>" width="10" /></div>-->
+            <div class="cataLogImg"><img src="images/cat.png"/></div>
+            <p><%= title %></p>
+        </div>
+    </script>
+
+    <!-- 编辑转发的表单 -->
+    <script type="text/template" id="weixin_form">
+        <div class="frame weixin_frame">
+            <div class="navigate"></div>
+            <div class="weixin_tip">请在这里定制微卡转发时显示的标题等信息</div>
+            <div class="form">
+                <label>转发标题:</label><input type="text"></input><br /><br />
+                <label class='form_area_dest'>转发描述:</label><textarea rows=4></textarea><br /><br />
+                <label class='form_thumb_lb'>缩略图:</label><div class="thumb"></div>
+            </div>
+        </div>
+    </script>
+
+    <script src="scripts/zepto.min.js"></script>
+    <script src="scripts/underscore-min.js"></script>
+    <script src="scripts/backbone-min.js"></script>
+    <script src="scripts/backbone.touch.min.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/router.js"></script>
+    <script src="scripts/v_edit.js"></script>
+    <script src="scripts/v_navigate.js"></script>
+    <script src="scripts/v_style_list.js"></script>
+    <script src="scripts/v_weixin_form.js"></script>
+    <script src="scripts/main.js"></script>
+
+    <script>
+    	window.onload=function (){ 
+    		setTimeout(function(){ 
+    			$('.style_list').append($('.style_list').html());
+    			$('.style_list').append($('.style_list').html());    			
+    		},1000);
+    	}
+    </script>
+
+</body>
+</html>
