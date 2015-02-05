@@ -56,10 +56,26 @@ html,body{width:100%;height:100%;}
 .frame h2{ 
     margin:0 18px;
 	color:#484848;
-	font-size: 20px;
+	font-size: 22px;
 	border-bottom: 1px solid #dfdfdf;
     position:relative;
     z-index:1;
+    text-align: center;
+    line-height: 70px;
+    position: relative;
+}
+
+.frame h2 span{ 
+	position: absolute;
+	right: 0;
+	bottom: 10px;
+	font-size: 12px;
+	line-height: 25px;
+	background-color: #f36523;
+	width: 60px;
+	border-radius: 5px;
+	color: #fff;
+	font-weight: normal;
 }
 
 .frame h2:after{ 
@@ -72,28 +88,6 @@ html,body{width:100%;height:100%;}
     background-color:#fff;
 }
 
-.frame h2 span{ 
-	display: block;
-	width: 64px;
-	line-height: 60px;
-	position: relative;
-}
-
-.frame h2 span:after{ 
-	content: '';
-	position: absolute;
-	bottom: -1px;
-	width: 100%;
-	height: 2px;
-	display: block;
-	background-color:#fa891f;
-	background: -webkit-gradient(linear,left center,right center,from(#fa891f),to(#f85451));
-	background: -webkit-linear-gradient(left,#fa891f,#f85451);
-    background:-moz-linear-gradient(left,#fa891f,#f85451);
-    background:-o-linear-gradient(left,#fa891f,#f85451);
-    background:linear-gradient(left,#fa891f,#f85451);
-}
-
 .frame .container{ 
     position:absolute;
     left:0;
@@ -103,68 +97,90 @@ html,body{width:100%;height:100%;}
     overflow-x:hidden;
     overflow-y:auto;
     margin:0 18px;
+    padding-top: 12px;
 }
 
 .frame .container section{ 
-	background-color: #f5f5f5;
-	margin-top: 7px;
-	padding: 6px;
+	background-color: #fff;
 	overflow: hidden;
 	position: relative;
     font-size:14px;
+    width: 48%;
+    float: left;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -o-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+    box-sizing:border-box;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -o-border-radius: 4px; 
+    border-radius: 4px;
+    margin: 7px 1% 0px;
+    border:1px solid #eaeaea;
 }
-.frame .container section > p { 
-    line-height:20px;
-    padding:10px 120px 0px 0px;
-} 
+.frame .container>figure{ 
+	border-bottom:1px solid #eaeaea;	
+	padding-bottom: 10px;
+}
+.frame .container section>figure p{ 
+	padding: 0px 5px;
+	line-height: 14px;
+	font-size: 12px;
+	color:#626262;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-webkit-line-clamp:2;
+	-webkit-box-orient: vertical; 
+	display: -moz-box;
+	display: -webkit-box;
+	display: box;
+	margin: 10px 0;
+}
 
 .frame .container .message_title{ 
 	overflow: hidden;
-    padding-right:10px;
+    margin: 10px 0;
 }
 
 .frame .container .message_title figure{ 
 	float: left;
-	width: 43px;
-	height: 43px;
-    margin:5px 0px 0px 5px;
+	width: 30px;
+	height: 30px;
+    margin:5px 0px 0px 10px;
 }
 
 .frame .container .message_title figure img{ 
-	width: 43px;
-	height: 43px;
-	border-radius: 22px;
+	width: 30px;
+	height: 30px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	-o-border-radius: 10px;
+	border-radius: 10px;
 }
 .frame .container .message_title p{ 
-    width:100%;
+	line-height: 14px;
+    font-size:14px;
+    overflow: hidden;
+    padding-left: 5px;
 }
+
 .frame .container .message_title p.message_name{ 
-	padding:0 120px 0px 55px;
-	line-height: 20px;
-    font-size:16px;
-    font-weight:bold;
-    margin-top:6px;
+	margin-top: 7px;
+	font-weight:bold;
 }
 
 .frame .container .message_title p.message_time { 
-    padding:0 120px 0px 55px;
     color:#a3a3a3;
     font-size:12px;
     line-height:18px;
 }
 
-.frame .container .card_thumbnail{ 
-    padding-top:10px;
-	float: right;
-	width: 110px;
-    text-align:center;
-    background-color:#fff;
-    line-height:22px;
-}
-
-.frame .container .loadding_section{ 
+.frame .container .loading_section{ 
 	/*display: none;*/
+	width: 100%;
 	text-align: center;
+	border:none;
 }
 
 .frame .container::-webkit-scrollbar-track-piece{

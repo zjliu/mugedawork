@@ -2,7 +2,7 @@
 <html>
 <head lang="zh_cn">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
     <title></title>
     <link href="styles/style.css" rel="stylesheet" />
     <script src="scripts/underscore.js"></script>
@@ -10,33 +10,30 @@
 <body>
 	<script type="text/template" id="box_template">
 		<div class="frame">
-			<h2><span>留言墙</span></h2>
+			<h2>晒晒更健康<span>我也要晒</span></h2>
 			<div class='container' id="container"></div>
 		</div>
 	</script>
 	<script type="text/template" id="section_item">
 		<%_.each(data, function(item) {%>
 	        <section sid="<%=item.id%>">
-	            <div class="card_thumbnail">
-	                <figure>
-	                    <img width="64" height="73" src="<%=item.thumb%>" />
-	                </figure>
-	                <p><%=item.data%></p>
-	            </div>
+	        	<figure>
+                    <img width='100%' src="<%=item.thumb%>" />
+                    <p><%=item.message%></p>
+	            </figure>
 	            <div class="message_title">
 	                <figure>
-	                    <img width="43" height="43" src="<%=item.avatar%>" />
+	                    <img src="<%=item.avatar%>" />
 	                </figure>
 	                <p class="message_name"><%=item.name%></p>
 	                <p class="message_time"><%=item.time%></p>
 	            </div>
-	            <p><%=item.message%></p>
 	        </section>
         <%});%>
 	</script>
 	<script type="text/template" id="loading_template">
-		<section class='loadding_section'>
-			<img src='<%=ladding_img_url%>' width="16" height="16" >
+		<section class='loading_section'>
+			<img src='<%=loading_img_url%>' width="16" height="16" >
 		</section>
 	</script>
 

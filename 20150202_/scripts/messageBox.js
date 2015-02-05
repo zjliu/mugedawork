@@ -1,30 +1,25 @@
-HTMLElement.prototype.appendHTML = function(html) {
-    var divTemp = document.createElement("div"), nodes = null
-        // 文档片段，一次性append，提高性能
-        , fragment = document.createDocumentFragment();
+function GetHTMLFragment(html){ 
+    var divTemp = document.createElement("div"), 
+    	nodes = null,
+        fragment = document.createDocumentFragment();// 文档片段，一次性append，提高性能
+
     divTemp.innerHTML = html;
     nodes = divTemp.childNodes;
     for (var i=0, length=nodes.length; i<length; i+=1) {
        fragment.appendChild(nodes[i].cloneNode(true));
     }
+    return fragment;	
+}
+
+HTMLElement.prototype.appendHTML = function(html) {
+    var fragment = GetHTMLFragment(html);
     this.appendChild(fragment);
-    // 据说下面这样子世界会更清净
-    nodes = null;
     fragment = null;
 }
 
 HTMLElement.prototype.insertBeforeHTML = function(html,existingElement) {
-    var divTemp = document.createElement("div"), nodes = null
-        // 文档片段，一次性append，提高性能
-        , fragment = document.createDocumentFragment();
-    divTemp.innerHTML = html;
-    nodes = divTemp.childNodes;
-    for (var i=0, length=nodes.length; i<length; i+=1) {
-       fragment.appendChild(nodes[i].cloneNode(true));
-    }
+	var fragment = GetHTMLFragment(html);
     this.insertBefore(fragment,existingElement)
-    // 据说下面这样子世界会更清净
-    nodes = null;
     fragment = null;
 }
 
@@ -65,6 +60,7 @@ var AjaxUtil = {
 		for ( var pro in newOptions) {
 			this.options[pro] = newOptions[pro];
 		}
+		this.options['_'] = parseInt(Date.now()+Math.random()*100);
 	},
 	// 格式化请求参数
 	formateParameters : function() {
@@ -147,42 +143,21 @@ var AjaxUtil = {
 };
 
 var messageBox = (function(win){ 
-	/*
-	var item = {
-		'status':0,
-		'crid': 'xxxxxxxxxxxxxxx',
-		'title': '有你的每一秒',
-		'thumb':img,
-		'hashid':'xxxxxxxxxxxxxx',
-		'count':20,
-		'cpp':20,
-		'page':0,
-		'datas':[
-			{
-				'id':'79962',
-				'time':'5分钟之前',
-				'data':'生活中有你很美好！希望今 后你永远开心和快乐！',
-				'thumb': '用户上传图片缩略图地址信息',
-				'avatar':img,
-				'name':'sMall.ff',
-				'message':''
-			}
-		]
-	}
-	*/
-
+	/*---------------通用方法------------------*/
 	function G(id){ 
 		return document.getElementById(id);
 	}
 	function clone(data){ 
 		return JSON.parse(JSON.stringify(data));
 	}
+	//append模板代码到目标元素
 	function applyTemplate(data,templateId,el,isInsert){ 
 		var scriptTemplate = G(templateId).innerHTML,
 			compiled = _.template(scriptTemplate),
 			html = compiled(data);
 		el.appendHTML(html);
 	}
+	//insertBefore模板代码到目标元素
 	function applyInsertBeforeTemplate(data,templateId,el,existingElement){ 
 		var scriptTemplate = G(templateId).innerHTML,
 			compiled = _.template(scriptTemplate),
@@ -191,29 +166,42 @@ var messageBox = (function(win){
 	}
 
 
+	/*-------------------插件参数---------------*/
 	var opts={ 
-		//容器
+		//父容器
 		container:document.body,
+		//滚动容器选择器
+		rollContainerSelector:'.container',
 		//内容器（frame）模板Id
 		boxTemplateId:'box_template',
 		//子填充项（section）模板Id
 		itemTemplateId:'section_item',
 		//加载图标模板Id
 		loadingTemplateId:'loading_template',
+		//加载容器选择器
+		loadingContainerSelector:'.loading_section',
 		//获取数据接口，由外部回调提供
 		data_url_callback:function(pageIndex){ 
 		},
 		//ajax请求方式
 		ajaxType:'post',
 		//加载的图标
-		ladding_img_url:'images/list_loading.gif'
+		loading_img_url:'images/list_loading.gif',
+		//加载图标字段
+		loadingField:'loading_img_url',
+		//处理数据回调方法
+		dealAjaxData_callback:function(data){ 
+			return clone(data);
+		}
 	}
 
+	//加载状态枚举enum
 	var loadStatus = { 
 		loading:'loading',
 		loaded:'loaded'
 	};
 
+	//盒子对象
 	var msgBox = function(opt){ 
 		if(!win._){ 
 			console.log('need underscore.js');
@@ -228,20 +216,24 @@ var messageBox = (function(win){
 		//this.pageCount = this.opt.pageCount;
 		this.init();
 	}
+	//盒子原型
 	msgBox.prototype={ 
 		init:function(){ 
 			//添加内容器到父窗口
 			this.initBox();
+			//初使化事件
 			this.initEvent();
+			//显示加载图标
 			this.showLoading();
+			//加载第一次数据
 			this.queryNext();
 		},
 		initEvent:function(){ 
 			var self = this;
 				opt = self.opt,
-				container = self.container,
-				height = Math.max(container.scrollHeight,container.offsetHeight,container.clientHeight);
+				container = self.container;
 
+			//height = Math.max(container.scrollHeight,container.offsetHeight,container.clientHeight);
 			container.onscroll=function(){ 
 				if((this.scrollTop + this.offsetHeight - this.scrollHeight > -16) && self.status===loadStatus.loaded){ 
 					self.status = loadStatus.loading;
@@ -252,7 +244,8 @@ var messageBox = (function(win){
 		initBox:function(){ 
 			var opt=this.opt;
 			applyTemplate(null,opt.boxTemplateId,opt.container);
-			this.container = opt.container.querySelector('.container');
+			this.container = opt.container.querySelector(opt.rollContainerSelector);
+			if(!this.container) throw new Error("未找到滚动元素");
 		},
 		queryNext:function(){ 
 			var nextPage = this.pageIndex + 1;
@@ -266,15 +259,14 @@ var messageBox = (function(win){
 				urlData = opt.data_url_callback(pageIndex);
 
 			var data_url = urlData.url,
-				data_params = urlData.params,
-				_t = parseInt(Date.now()+Math.random()*100);
+				data_method = urlData.type,
+				data_params = urlData.data;
 
-			data_params['_t']=_t;
 			AjaxUtil.request({ 
 				url: data_url,
 				type:'json',
 				params:data_params,
-				method:'get',
+				method:data_method,
 				callback:function(data){ 
 					successCallback && successCallback(data);
 					self.pageIndex = self.pageIndex +1;
@@ -287,16 +279,17 @@ var messageBox = (function(win){
 		},
 		fillData:function(data){ 
 			var opt = this.opt;
-			var reData = this.dealData(data);
-			applyInsertBeforeTemplate({data:reData},opt.itemTemplateId,container,this.loadingEl);	
-		},
-		dealData:function (data){
-			return clone(data.datas);
+			var reData = opt.dealAjaxData_callback(data);
+			applyInsertBeforeTemplate({data:reData},opt.itemTemplateId,container,this.loadingEl);
 		},
 		showLoading:function(){
-			var opt = this.opt;
-			applyTemplate({'ladding_img_url':opt.ladding_img_url},opt.loadingTemplateId,container);	
-			this.loadingEl = this.container.querySelector('.loadding_section');
+			var opt = this.opt,
+				data = {};
+
+			data[opt.loadingField] =opt.loading_img_url;
+			applyTemplate(data,opt.loadingTemplateId,container);	
+			this.loadingEl = this.container.querySelector(opt.loadingContainerSelector);
+			if(!this.loadingEl) throw new Error("未找到loading元素");
 		},
 		proxy:function(func){ 
 			var self = this;
