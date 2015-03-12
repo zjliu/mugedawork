@@ -1,0 +1,199 @@
+﻿/*------------reset css start---------------*/
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+
+body { line-height: 1; }
+
+:focus { outline: 1; }
+
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary { display: block; }
+
+nav ul { list-style: none; }
+
+blockquote, q { quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after { content: ''; content: none; }
+
+a { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+
+ins { background-color: #ff9; color: #000; text-decoration: none; }
+
+mark { background-color: #ff9; color: #000; font-style: italic; font-weight: bold; }
+
+del { text-decoration: line-through; }
+
+abbr[title], dfn[title] { border-bottom: 1px dotted #000; cursor: help; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #cccccc; margin: 1em 0; padding: 0; }
+
+input, select { vertical-align: middle; }
+
+/*------------page css---------------*/
+html,body{width:100%;height:100%;}
+
+.frame { 
+    width:100%;
+	height:100%;
+	background-color: #fff;
+	font-size: 14px;
+    position:relative;
+    overflow:hidden;
+}
+.frame h2{ 
+    margin:0 18px;
+	color:#484848;
+	font-size: 22px;
+	border-bottom: 1px solid #dfdfdf;
+    position:relative;
+    z-index:1;
+    text-align: center;
+    line-height: 70px;
+    position: relative;
+}
+
+.frame h2 span{ 
+	position: absolute;
+	right: 0;
+	bottom: 10px;
+	font-size: 12px;
+	line-height: 25px;
+	background-color: #f36523;
+	width: 60px;
+	border-radius: 5px;
+	color: #fff;
+	font-weight: normal;
+}
+
+.frame h2:after{ 
+    content:'';
+    position:absolute;
+    display:block;
+    width:100%;
+    height:15px;
+    bottom:-16px;
+    background-color:#fff;
+}
+
+.frame .container{ 
+    position:absolute;
+    left:0;
+    right:0;
+    top:70px;
+    bottom:20px;
+    overflow-x:hidden;
+    overflow-y:auto;
+    margin:0 18px;
+    padding-top: 12px;
+}
+
+.frame .container section{ 
+	background-color: #fff;
+	overflow: hidden;
+	position: relative;
+    font-size:14px;
+    width: 48%;
+    float: left;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -o-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+    box-sizing:border-box;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -o-border-radius: 4px; 
+    border-radius: 4px;
+    margin: 7px 1% 0px;
+    border:1px solid #eaeaea;
+}
+.frame .container>figure{ 
+	border-bottom:1px solid #eaeaea;	
+	padding-bottom: 10px;
+}
+.frame .container section>figure p{ 
+	padding: 0px 5px;
+	line-height: 14px;
+	font-size: 12px;
+	color:#626262;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-webkit-line-clamp:2;
+	-webkit-box-orient: vertical; 
+	display: -moz-box;
+	display: -webkit-box;
+	display: box;
+	margin: 10px 0;
+}
+
+.frame .container .message_title{ 
+	overflow: hidden;
+    margin: 10px 0;
+}
+
+.frame .container .message_title figure{ 
+	float: left;
+	width: 30px;
+	height: 30px;
+    margin:5px 0px 0px 10px;
+}
+
+.frame .container .message_title figure img{ 
+	width: 30px;
+	height: 30px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	-o-border-radius: 10px;
+	border-radius: 10px;
+}
+.frame .container .message_title p{ 
+	line-height: 14px;
+    font-size:14px;
+    overflow: hidden;
+    padding-left: 5px;
+}
+
+.frame .container .message_title p.message_name{ 
+	margin-top: 7px;
+	font-weight:bold;
+}
+
+.frame .container .message_title p.message_time { 
+    color:#a3a3a3;
+    font-size:12px;
+    line-height:18px;
+}
+
+.frame .container .loading_section{ 
+	/*display: none;*/
+	width: 100%;
+	text-align: center;
+	border:none;
+}
+
+.frame .container::-webkit-scrollbar-track-piece{
+	background-color:#fff;/*滚动条的背景颜色*/
+	border-radius:2px;/*滚动条的圆角宽度*/
+	-webkit-border-radius:2px;/*滚动条的圆角宽度*/
+	-ms-border-radius:2px;/*滚动条的圆角宽度*/
+}
+.frame .container::-webkit-scrollbar{
+	margin-bottom:1px;
+	width:2px;/*滚动条的宽度*/
+}
+
+.frame .container::-webkit-scrollbar-thumb{ 
+    background-color:rgba(0,0,0,0.2);
+}

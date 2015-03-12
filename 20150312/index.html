@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <link href="styles/style.css" rel="stylesheet" />
+    <script src="scripts/underscore.js"></script>
+</head>
+<body>
+	<script type="text/template" id="box_template">
+		<div class="frame">
+			<h2>晒晒更健康<span>我也要晒</span></h2>
+			<div class='container' id="container"></div>
+		</div>
+	</script>
+	<script type="text/template" id="section_item">
+		<%_.each(data, function(item) {%>
+	        <section sid="<%=item.id%>">
+	        	<figure>
+                    <img width='100%' src="<%=item.thumb%>" />
+                    <p><%=item.message%></p>
+	            </figure>
+	            <div class="message_title">
+	                <figure>
+	                    <img src="<%=item.avatar%>" />
+	                </figure>
+	                <p class="message_name"><%=item.name%></p>
+	                <p class="message_time"><%=item.time%></p>
+	            </div>
+	        </section>
+        <%});%>
+	</script>
+	<script type="text/template" id="loading_template">
+		<section class='loading_section'>
+			<img src='<%=loading_img_url%>' width="16" height="16" >
+		</section>
+	</script>
+	<script src="scripts/messageBox.js"></script>
+	<script src="scripts/main.js"></script>
+</body>
+</html>
