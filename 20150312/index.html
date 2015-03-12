@@ -10,32 +10,45 @@
 <body>
 	<script type="text/template" id="box_template">
 		<div class="frame">
-			<h2>晒晒更健康<span>我也要晒</span></h2>
+			<div class="nav">
+				<img src="images/love_title.png">
+			</div>
+			<div class="messageCount">
+				<span class="messageTitle" id="messageTitle">350条新信息</span>
+			</div>
 			<div class='container' id="container"></div>
-		</div>
+		</div
 	</script>
+
 	<script type="text/template" id="section_item">
-		<%_.each(data, function(item) {%>
-	        <section sid="<%=item.id%>">
-	        	<figure>
-                    <img width='100%' src="<%=item.thumb%>" />
-                    <p><%=item.message%></p>
-	            </figure>
-	            <div class="message_title">
-	                <figure>
-	                    <img src="<%=item.avatar%>" />
-	                </figure>
-	                <p class="message_name"><%=item.name%></p>
-	                <p class="message_time"><%=item.time%></p>
-	            </div>
-	        </section>
-        <%});%>
+		<%_.each(data, function(item,index) {%>
+			<section>
+				<div class="message">
+					<%if(index%2===0) {%>
+						<figure>
+							<img src="images/pic.png" />
+						</figure>
+						<div class="speeker"><img src="images/love_play.png" /></div>
+						<span class="msgMinites">10”</span>
+					<%}else{%>
+						<span class="msgMinites">10”</span>
+						<div class="speeker"><img src="images/love_play.png" /></div>
+						<figure>
+							<img src="images/pic.png" />
+						</figure>
+					<%}%>
+				</div>
+				<span class="name">杨小桃<%=index%></span>
+			</section>
+		<%});%>
 	</script>
+
 	<script type="text/template" id="loading_template">
 		<section class='loading_section'>
 			<img src='<%=loading_img_url%>' width="16" height="16" >
 		</section>
 	</script>
+
 	<script src="scripts/messageBox.js"></script>
 	<script src="scripts/main.js"></script>
 </body>
