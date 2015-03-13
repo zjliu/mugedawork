@@ -14,31 +14,32 @@
 				<img src="images/love_title.png">
 			</div>
 			<div class="messageCount">
-				<span class="messageTitle" id="messageTitle">350条新信息</span>
+				<span class="messageTitle" id="messageTitle"><b id="msgCount">350</b>条新信息</span>
 			</div>
 			<div class='container' id="container"></div>
-		</div
+		</div>
+		<span class="back">回首页</span>
 	</script>
 
 	<script type="text/template" id="section_item">
 		<%_.each(data, function(item,index) {%>
-			<section>
+			<section data-id="<%=item.id%>">
 				<div class="message">
 					<%if(index%2===0) {%>
 						<figure>
-							<img src="images/pic.png" />
+							<img src="<%=item.thumb%>" />
 						</figure>
-						<div class="speeker"><img src="images/love_play.png" /></div>
-						<span class="msgMinites">10”</span>
+						<div class="speeker <%=item.isNew?'new':''%>"><img src="images/love_play.png" /></div>
+						<span class="msgMinites"><%=item.voiceLength%></span>
 					<%}else{%>
-						<span class="msgMinites">10”</span>
-						<div class="speeker"><img src="images/love_play.png" /></div>
+						<span class="msgMinites"><%=item.voiceLength%></span>
+						<div class="speeker <%=item.isNew?'new':''%>"><img src="images/love_play.png" /></div>
 						<figure>
-							<img src="images/pic.png" />
+							<img src="<%=item.thumb%>" />
 						</figure>
 					<%}%>
 				</div>
-				<span class="name">杨小桃<%=index%></span>
+				<span class="name"><%=item.name%></span>
 			</section>
 		<%});%>
 	</script>

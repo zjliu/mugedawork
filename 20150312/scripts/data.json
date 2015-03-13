@@ -1,84 +1,24 @@
 {
-	'status':0,
 	'crid': '1111111111111111111111111111',
-	'title': '有你的每一秒',
-	'thumb':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-	'hashid':'222222222222222222222222222',
 	'count':20,
 	'cpp':20,
 	'page':0,
 	'datas':[
 		{
-			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
+			'id':'79961',
+			'thumb': 'images/pic.png',
 			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
+			'voiceLength':'10”',
+			'url':'http:\/\/www.mugeda.com/xxx.mp3',
+			'isNew':true
 		},
 		{
 			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
+			'thumb': 'images/pic.png',
 			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
-		},
-		{
-			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
-		},
-		{
-			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
-		},
-		{
-			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
-		},
-		{
-			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
-		},
-		{
-			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
-		},
-		{
-			'id':'79962',
-			'time':'5分钟之前',
-			'data':'有你的每一秒',
-			'thumb': 'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'avatar':'http://wx.qlogo.cn/mmopen/tSaT7ZHXhuzEWY2tnpWUrrYiajjsMzQDhZiaQYkj3YEbYZLgibbRvZPyLJZFdOQkLdRI7BiaO4Neib0hZ0MmV4YVb9rJkhGjRzUNH/0',
-			'name':'sMall.ff',
-			'message':'生活中有你很美好！希望今 后你永远开心和快乐！'
-		}
+			'voiceLength':'12”',
+			'url':'http:\/\/www.mugeda.com/xxx.mp3',
+			'isNew':false
+		}	
 	]
 }

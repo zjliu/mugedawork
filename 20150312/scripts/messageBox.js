@@ -212,7 +212,8 @@ var messageBox = (function(win){
 		//处理数据回调方法
 		dealAjaxData_callback:function(data){ 
 			return clone(data);
-		}
+		},
+		fillDataCompleteCallback:function(){}
 	}
 
 	//加载状态枚举enum
@@ -309,6 +310,7 @@ var messageBox = (function(win){
 			var reData = opt.dealAjaxData_callback(data);
 			applyInsertBeforeTemplate({data:reData},opt.itemTemplateId,container,container.firstChild);
 			this.toggerLoading(false);
+			opt.fillDataCompleteCallback(reData);
 		},
 		showLoading:function(){
 			var opt = this.opt,

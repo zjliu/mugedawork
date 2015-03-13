@@ -33,6 +33,12 @@
 		//处理数据回调方法
 		dealAjaxData_callback:function(data){
 			return data.datas; 
+		},
+		fillDataCompleteCallback:function(data){ 
+			var count = data.length || 0;
+			var msgCountEl = document.getElementById('msgCount');
+			var sumCount = parseInt(msgCountEl.innerText);
+			msgCountEl.innerText = sumCount - count;
 		}
 	});
 }();

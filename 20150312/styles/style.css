@@ -43,21 +43,16 @@ hr { display: block; height: 1px; border: 0; border-top: 1px solid #cccccc; marg
 input, select { vertical-align: middle; }
 
 /*------------page css---------------*/
-html,body{width:100%;}
+html,body{width:100%;background-image: url(../images/love_bg.jpg);background-repeat: repeat;}
 body{
 	background-color: #f3e7de;
 }
 
 .frame { 
     width:100%;
-	height:100%;
-	background-color: #fff;
 	font-size: 14px;
     position:relative;
     overflow:hidden;
-    background-image: url(../images/love_bg.jpg);
-    background-size:cover;
-    background-repeat: no-repeat;
 }
 
 .frame .nav{ 
@@ -82,6 +77,22 @@ body{
 	margin-bottom: 50px;
 }
 
+.back{ 
+	position: fixed;
+	bottom: 60px;
+	display: block;
+	width: 40px;
+	height: 90px;
+	background-color: #eec9c5;
+	color: #de536b;
+	font-size: 21px;
+	text-align: center;
+	line-height: 30px;
+	padding: 10px 0;
+	border-radius: 5px;
+	-webkit-border-radius:2px;
+}
+
 .frame .messageTitle{ 
 	width: 115px;
 	text-align: right;
@@ -97,6 +108,8 @@ body{
 	box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 	position: relative;
 }
+
+#msgCount {font-weight: normal;}
 
 .frame .messageTitle:before,.frame .messageTitle:after{ 
 	content: '';
@@ -121,6 +134,12 @@ body{
 	padding: 0 15px;
 	margin-bottom: -25px;
 	font-size: 0px;
+	transaction:all ease 1s;
+	-webkit-transaction:all ease 1s;
+}
+
+.frame .container section:last-child{ 
+	margin-bottom: 0px;
 }
 
 .frame .container>section .name{ 
@@ -178,7 +197,7 @@ body{
 	position: relative;
 }
 
-.frame .container .message .speeker:after{ 
+.frame .container .message .speeker.new:after{ 
 	content: '';
 	display: block;
 	width: 6px;
