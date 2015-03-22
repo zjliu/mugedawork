@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <link href="styles/style.css" rel="stylesheet" />
+    <script src="scripts/underscore.js"></script>
+    <script src="scripts/base64.js"></script>
+</head>
+<body>
+	<div class="frame">
+		<h1>批量定制微卡</h1>
+		<ul class="querySection _table">
+			<li class="_tr">
+				<div class="_td">商户名称</div>
+				<div class="_td"><input id="name" type="text" /></div>
+			</li>
+			<li class="_tr">
+				<div class="_td">城　　市</div>
+				<div class="_td"><select id="citySel"></select></div>
+			</li>
+			<li class="_tr">
+				<div class="_td">区域地址</div>
+				<div class="_td"><input id="addr" type="text" /></div>
+			</li>			
+			<!--
+			<li class="_tr">
+				<div class="_td">二级分类</div>
+				<div class="_td"><select id="secondSel"></select></div>
+			</li>
+			<li class="_tr">
+				<div class="_td">三级分类</div>
+				<div class="_td"><select id="thirdSel"></select></div>
+			</li>
+			-->
+		</ul>
+		<div id="result" class="result">
+			<h2>搜索结果</h2>
+			<div id="container">
+			<div>
+		</div>
+	</div>
+	<script type="text/template" id="item_template">
+		<%_.each(data, function(item,index) {%>
+			<div class="item_title" ontouchstart="start(event)" ontouchend="toggerCard(this,event)"><%=item.shopname%></div>
+			<ul data-id="<%=item.shopid%>" class="item _table">
+				<li class="_tr">
+					<div class="thumb _td">
+						<figure><img src="<%=item.url1%>" /></figure>
+					</div>
+					<div class="view _td">
+						<ul class="_table">
+							<li class="_tr">
+								<div class="_td">商户名称</div>
+								<div class="_td"><%=item.shopname%></div>
+							</li>
+							<li class="_tr">
+								<div class="_td">城　　市</div>
+								<div class="_td"><%=item.city%></div>
+							</li>
+							<li class="_tr">
+								<div class="_td">商户地址</div>
+								<div class="_td"><%=item.addr%></div>
+							</li>
+							<li class="_tr">
+								<div class="_td">电　　话</div>
+								<div class="_td"><%=item.phone%></div>
+							</li>
+						</ul>
+						<p class="fontSize10">点击“查看微卡可以审查定制好的微卡并发送”</p>
+						<div data-id="<%=item.shopid%>" 
+							ontouchstart="start(event)" ontouchend="viewCard(this,event)" class="viewCardBtn">查看微卡</div>
+					</div>
+				</li>
+			</ul>
+		<%});%>
+	</script>
+
+	<script type="text/template" id="select_template">
+		<option value="0">--请选择--</option>
+		<%_.each(data, function(item,index) {%>
+			<option value="<%=item.value%>"><%=item.text%></option>
+		<%});%>
+	</script>
+
+	<script type="text/template" id="loading_template">
+		<section class='loading_section'>
+			<img src='<%=loading_img_url%>' width="16" height="16" >
+		</section>
+	</script>
+	<script src="scripts/main.js"></script>
+</body>
+</html>
