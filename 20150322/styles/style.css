@@ -104,12 +104,14 @@ body{
 	line-height: 40px;
 	font-size: 16px;
 	text-indent: 5%;
+	color: #4e4e4e;
 }
-
+.frame h2>span{font-size: 16px;color: #e66427;}
 .frame .result{ 
 	margin-top: 20px;
-	border-top: 1px solid #9A6;
+	border-top: 1px solid #dfdfde;
 	display: none;
+	background-color: rgba(233,233,233,0.5);
 }
 
 .frame .result .item.show{
@@ -119,8 +121,11 @@ body{
 .frame .result .item{ 
 	font-size: 12px;
 	line-height: 20px;
-	width: 100%;
-	background-color: rgb(228, 237, 243);
+	width: 90%;
+	background-color: rgba(233,233,233,0.7);
+
+	color: #333;
+	margin: 0 5%;
 	/*
 	transition:max-height ease 0.5s;
 	-webkit-transition:max-height ease 0.5s;
@@ -135,54 +140,59 @@ body{
 }
 
 .frame .result .item_title{ 
-	padding:0 5%;
+	margin:0 5%;
 	font-size: 14px;
 	height: 35px;
 	line-height: 35px;
-	background-color: rgb(207, 226, 243);
 	position: relative;
+	color: #333;
+	box-shadow:0px 1px 0px rgba(188,188,188,0.5);
 }
 .frame .result .item_title:after{ 
 	content: '';
 	display: block;
 	width: 8px;
 	height: 8px;
-	border-top:2px solid currentColor;
-	border-left:2px solid currentColor;
-	transform:rotate(45deg);
-	-webkit-transform:rotate(47deg) skewX(5deg);
+	border-top:2px solid #6d6d6d;
+	border-left:2px solid #6d6d6d;
+	transform:rotate(-133deg);
+	-webkit-transform:rotate(-133deg) skewX(5deg);
 	position: absolute;
-	top: 15px;
+	top: 9px;
 	right: 20px;
 	transition:all ease 0.5s;
 	-webkit-transition:all ease 0.5s;
 }
 .frame .result .item_title.active:after{
-	transform:rotate(-133deg);
-	-webkit-transform:rotate(-133deg) skewX(5deg);
-	top: 9px;
+	transform:rotate(45deg);
+	-webkit-transform:rotate(47deg) skewX(5deg);
+	top: 15px;	
 } 
 .frame .result .item .view{ 
 	vertical-align: top;
 	padding: 5px 10px;
 }
-
+.frame .result .item .view .addr{ 
+	text-overflow:clip; 
+	overflow:hidden;
+	width: 100%;
+}
 .frame .result .item .view ._table{width: 100%;}
 .frame .result .item .view ._td:first-child{
 	width: 70px; 
 }
-.frame .result .item .view ._td:only-child{
 
-}
-
-.frame .result .item .view .tip{}
+.frame .result .item .view a{color: #333;text-decoration: none;}
 .frame .result .item .view .viewCardBtn{
-	width: 100px;
+	width: 80px;
 	height: 30px;
 	text-align: center;
 	line-height: 30px;
-	background-color: #ff00ff;
 	margin: 10px 0;
+	color: #e66427;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border:1px solid currentColor;
 }
 .frame .result .item .thumb{ 
 	width: 30%;
