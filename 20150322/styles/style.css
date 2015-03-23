@@ -43,7 +43,7 @@ hr { display: block; height: 1px; border: 0; border-top: 1px solid #cccccc; marg
 input, select { vertical-align: middle; }
 
 /*------------page css---------------*/
-html,body{width:100%;background-image: url(../images/love_bg.jpg);background-repeat: repeat;}
+html,body{width:100%;background-image: url(../images/love_bg.jpg);background-repeat: repeat;background-size:cover;height:100%;}
 body{
 	background-color: #f3e7de;
 }
@@ -78,17 +78,18 @@ body{
     overflow:hidden;
 }
 
-.frame h1{font-size: 24px;text-align: center;line-height: 80px;color: #e85793;}
+.frame h1{font-size: 24px;text-align: center;line-height: 80px;color: #e66427;font-weight: normal;}
 .frame .querySection{width: 90%;padding: 0 5%;}
 .frame .querySection ._tr{height: 40px;line-height: 40px;}
 .frame .querySection ._td:nth-child(2n){width: 60%;}
-.frame .querySection ._td:nth-child(2n+1){font-size: 16px;}
+.frame .querySection ._td:nth-child(2n+1){font-size: 16px;color: #e66427;}
 .frame .querySection input,.frame .querySection select{
 	width: 100%;
 	height: 30px;
 	box-sizing:border-box;
 	-webkit-box-sizing:border-box;
 	border: 0;
+	color: #4a4a4a;
 }
 .frame .querySection select{ 
 	overflow: hidden;

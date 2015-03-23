@@ -1,0 +1,250 @@
+﻿/*------------reset css start---------------*/
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+
+body { line-height: 1; }
+
+:focus { outline: 1; }
+
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary { display: block; }
+
+nav ul { list-style: none; }
+
+blockquote, q { quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after { content: ''; content: none; }
+
+a { margin: 0; padding: 0; border: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+
+ins { background-color: #ff9; color: #000; text-decoration: none; }
+
+mark { background-color: #ff9; color: #000; font-style: italic; font-weight: bold; }
+
+del { text-decoration: line-through; }
+
+abbr[title], dfn[title] { border-bottom: 1px dotted #000; cursor: help; }
+
+table { border-collapse: collapse; border-spacing: 0; }
+
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #cccccc; margin: 1em 0; padding: 0; }
+
+input, select { vertical-align: middle; }
+
+/*------------page css---------------*/
+html,body{width:100%;background-image: url(../images/love_bg.jpg);background-repeat: repeat;}
+body{
+	background-color: #f3e7de;
+}
+
+.frame { 
+    width:100%;
+	font-size: 14px;
+    position:relative;
+    overflow:hidden;
+}
+
+.frame .nav{ 
+	margin-top: 75px;
+	padding: 0 70px;
+	text-align: center;
+	height: 85px;
+}
+
+.frame .nav>img{ 
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.frame .messageCount{ 
+	overflow: hidden;
+}
+
+.frame .container{ 
+	width: 100%;
+	overflow: hidden;
+	margin-bottom: 50px;
+}
+
+.back{ 
+	position: fixed;
+	bottom: 60px;
+	display: block;
+	width: 40px;
+	height: 90px;
+	background-color: #eec9c5;
+	color: #de536b;
+	font-size: 21px;
+	text-align: center;
+	line-height: 30px;
+	padding: 10px 0;
+	border-radius: 5px;
+	-webkit-border-radius:2px;
+}
+
+.frame .messageTitle{ 
+	width: 115px;
+	text-align: right;
+	color: #e4007f;
+	font-size: 14px;
+	line-height: 35px;
+	height: 35px;
+	background-color: #fefcfb;
+	float: right;
+	padding-right: 5px;
+	border-top-left-radius: 18px;
+	border-bottom-left-radius: 18px;
+	box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+	position: relative;
+}
+
+#msgCount {font-weight: normal;}
+
+.frame .messageTitle:before,.frame .messageTitle:after{ 
+	content: '';
+	display: block;
+	width: 8px;
+	height: 8px;
+	border-top:1px solid currentColor;
+	border-left:1px solid currentColor;
+	transform:rotate(45deg);
+	-webkit-transform:rotate(47deg) skewX(5deg);
+	position: absolute;
+	top: 13px;
+	left: 17px;
+}
+
+.frame .messageTitle:after{
+	top: 18px;
+}
+
+.frame .container>section{ 
+	width: 51%;
+	padding: 0 15px;
+	margin-bottom: -25px;
+	font-size: 0px;
+	transaction:all ease 1s;
+	-webkit-transaction:all ease 1s;
+}
+
+.frame .container section:last-child{ 
+	margin-bottom: 0px;
+}
+
+.frame .container>section .name{ 
+	display: block;
+	height: 25px;
+	line-height: 25px;
+	font-size: 12px;
+	color: #e4007f;
+}
+
+.frame .container>section:nth-child(2n){
+	float: right;
+	clear: right;
+}
+
+.frame .container>section:nth-child(2n) .message{
+	text-align: right;
+}
+
+.frame .container>section:nth-child(2n+1){
+	float: left;
+}
+
+.frame .container>section:nth-child(2n+1) .message{
+	text-align: left;
+}
+
+.frame .container>section:nth-child(2n) .name{
+	text-align:right;
+}
+
+.frame .container .message figure{
+	width: 30px;
+	height: 30px;
+	border-radius: 15px;
+	-webkit-border-radius:15px;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.frame .container .message figure img{ 
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.frame .container .message .speeker{ 
+	width: 45%;
+	height: 30px;
+	background-color: #e85793;
+	border-radius: 40px;
+	display: inline-block;
+	padding: 5px 12px;
+	margin: 0 3px;
+	box-sizing:border-box;
+	position: relative;
+}
+
+.frame .container .message .speeker.new:after{ 
+	content: '';
+	display: block;
+	width: 6px;
+	height: 6px;
+	background-color: #ff0000;
+	border-radius: 3px;
+	-webkit-border-radius:3px;
+	position: absolute;
+	top: 0;
+	right: -10px;
+}
+
+.frame .container .message .speeker>img{ 
+	max-height: 100%;
+}
+
+.frame .container section:nth-child(2n+1) .message .speeker{ 
+	text-align: right;
+	margin-left: 5px;
+}
+.frame .container section:nth-child(2n) .message .speeker{ 
+	text-align: left;
+	margin-right: 5px;
+}
+
+.frame .container section:nth-child(2n) .message .speeker:after{ 
+	left: -10px;
+}
+
+.frame .container section:nth-child(2n) .message .speeker img{ 
+	-webkit-transform:rotate(180deg);
+}
+
+.frame .container .message .msgMinites{ 
+	width: 30px;
+	height: 30px;
+	text-align: center;
+	line-height: 30px;
+	display: inline-block;
+	text-align: center;
+	font-size: 12px;
+	color: #e85793;
+}
+
+.frame .loading_section{ 
+	/*display: none;*/
+	width: 100%;
+	text-align: center;
+	border:none;
+}

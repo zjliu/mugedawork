@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <link href="styles/style.css" rel="stylesheet" />
+    <script src="scripts/underscore.js"></script>
+</head>
+<body>
+	<script type="text/template" id="box_template">
+		<div class="frame">
+			<div class="nav">
+				<img src="images/love_title.png">
+			</div>
+			<div class="messageCount">
+				<span class="messageTitle" id="messageTitle"><b id="msgCount">350</b>条新信息</span>
+			</div>
+			<div class='container' id="container"></div>
+		</div>
+		<span class="back">回首页</span>
+	</script>
+
+	<script type="text/template" id="section_item">
+		<%_.each(data, function(item,index) {%>
+			<section data-id="<%=item.id%>">
+				<div class="message">
+					<%if(index%2===0) {%>
+						<figure>
+							<img src="<%=item.thumb%>" />
+						</figure>
+						<div class="speeker <%=item.isNew?'new':''%>"><img src="images/love_play.png" /></div>
+						<span class="msgMinites"><%=item.voiceLength%></span>
+					<%}else{%>
+						<span class="msgMinites"><%=item.voiceLength%></span>
+						<div class="speeker <%=item.isNew?'new':''%>"><img src="images/love_play.png" /></div>
+						<figure>
+							<img src="<%=item.thumb%>" />
+						</figure>
+					<%}%>
+				</div>
+				<span class="name"><%=item.name%></span>
+			</section>
+		<%});%>
+	</script>
+
+	<script type="text/template" id="loading_template">
+		<section class='loading_section'>
+			<img src='<%=loading_img_url%>' width="16" height="16" >
+		</section>
+	</script>
+
+	<script src="scripts/messageBox.js"></script>
+	<script src="scripts/main.js"></script>
+</body>
+</html>
