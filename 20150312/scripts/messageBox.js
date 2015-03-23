@@ -29,12 +29,6 @@ HTMLElement.prototype.insertBeforeHTML = function(html,existingElement) {
     fragment = null;
 }
 
-HTMLElement.prototype.insertAfterHTML = function(html,existingElement) {
-	var el = existingElement.nextElementSibling;
-	if(el) this.insertBeforeHTML(html,el);
-	else this.appendHTML(html);
-}
-
 
 var AjaxUtil = {
 	// 基础选项
@@ -171,20 +165,11 @@ var messageBox = (function(win){
 	}
 	//insertBefore模板代码到目标元素
 	function applyInsertBeforeTemplate(data,templateId,el,existingElement){ 
-		if(!existingElement) return applyTemplate(data,templateId,el);
 		var scriptTemplate = G(templateId).innerHTML,
 			compiled = _.template(scriptTemplate),
 			html = compiled(data);
 		el.insertBeforeHTML(html,existingElement);
 	}
-
-	function applyInsertAfterTemplate(data,templateId,el,existingElement){ 
-		var scriptTemplate = G(templateId).innerHTML,
-			compiled = _.template(scriptTemplate),
-			html = compiled(data);
-		el.insertAfterHTML(html,existingElement);
-	}
-
 
 	/*-------------------插件参数---------------*/
 	var opts={ 
@@ -213,7 +198,8 @@ var messageBox = (function(win){
 		dealAjaxData_callback:function(data){ 
 			return clone(data);
 		},
-		fillDataCompleteCallback:function(){}
+		fillDataCompleteCallback:function(){},
+		frameData:function(){return {};}
 	}
 
 	//加载状态枚举enum
@@ -255,29 +241,22 @@ var messageBox = (function(win){
 				container = self.container;
 
 			//height = Math.max(container.scrollHeight,container.offsetHeight,container.clientHeight);
-			window.onscroll=function(){ 
-				/*
+			container.onscroll=function(){ 
 				if((this.scrollTop + this.offsetHeight - this.scrollHeight > -16) && self.status===loadStatus.loaded){ 
 					self.status = loadStatus.loading;
 					self.queryNext();
-				}
-				*/
-				if(window.scrollY === 0){ 
-					self.status = loadStatus.loading;
-					self.queryNext();	
 				}
 			}
 		},
 		initBox:function(){ 
 			var opt=this.opt;
-			applyTemplate(null,opt.boxTemplateId,opt.container);
+			applyTemplate(opt.frameData(),opt.boxTemplateId,opt.container);
 			this.container = opt.container.querySelector(opt.rollContainerSelector);
 			if(!this.container) throw new Error("未找到滚动元素");
 		},
 		queryNext:function(){ 
 			var nextPage = this.pageIndex + 1;
 			if(!this.pageCount || nextPage<this.pageCount){
-				this.toggerLoading(true);
 				this.queryPage(nextPage,this.proxy(this.fillData));
 			}
 		},
@@ -308,8 +287,7 @@ var messageBox = (function(win){
 		fillData:function(data){ 
 			var opt = this.opt;
 			var reData = opt.dealAjaxData_callback(data);
-			applyInsertBeforeTemplate({data:reData},opt.itemTemplateId,container,container.firstChild);
-			this.toggerLoading(false);
+			applyInsertBeforeTemplate({data:reData},opt.itemTemplateId,container,this.loadingEl);
 			opt.fillDataCompleteCallback(reData);
 		},
 		showLoading:function(){
@@ -317,13 +295,9 @@ var messageBox = (function(win){
 				data = {};
 
 			data[opt.loadingField] =opt.loading_img_url;
-			//applyTemplate(data,opt.loadingTemplateId,container);	
-			applyInsertBeforeTemplate(data,opt.loadingTemplateId,container.parentNode,container);
-			this.loadingEl = this.container.parentNode.querySelector(opt.loadingContainerSelector);
+			applyTemplate(data,opt.loadingTemplateId,container);	
+			this.loadingEl = this.container.querySelector(opt.loadingContainerSelector);
 			if(!this.loadingEl) throw new Error("未找到loading元素");
-		},
-		toggerLoading:function(isshow){ 
-			this.loadingEl.style.display = isshow ? 'block' : 'none';
 		},
 		proxy:function(func){ 
 			var self = this;

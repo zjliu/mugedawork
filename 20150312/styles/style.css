@@ -43,7 +43,7 @@ hr { display: block; height: 1px; border: 0; border-top: 1px solid #cccccc; marg
 input, select { vertical-align: middle; }
 
 /*------------page css---------------*/
-html,body{width:100%;background-image: url(../images/love_bg.jpg);background-repeat: repeat;}
+html,body{width:100%;height:100%;background-image: url(../images/love_bg.jpg);background-repeat: repeat;}
 body{
 	background-color: #f3e7de;
 }
@@ -51,7 +51,6 @@ body{
 .frame { 
     width:100%;
 	font-size: 14px;
-    position:relative;
     overflow:hidden;
 }
 
@@ -69,12 +68,18 @@ body{
 
 .frame .messageCount{ 
 	overflow: hidden;
+	padding-bottom: 5px;
 }
 
 .frame .container{ 
 	width: 100%;
-	overflow: hidden;
-	margin-bottom: 50px;
+	position:absolute;
+	top: 195px;
+    left:0;
+    right:0;
+    bottom:10px;
+	overflow-y:auto;
+	padding-top: 12px;
 }
 
 .back{ 
@@ -91,6 +96,15 @@ body{
 	padding: 10px 0;
 	border-radius: 5px;
 	-webkit-border-radius:2px;
+}
+.back a{
+	text-decoration:none;
+	outline: none;
+	display: inline-block;
+}
+
+.back a:link,.back a:visited,.back a:hover{ 
+	color: #de536b;
 }
 
 .frame .messageTitle{ 
@@ -110,7 +124,7 @@ body{
 }
 
 #msgCount {font-weight: normal;}
-
+/*
 .frame .messageTitle:before,.frame .messageTitle:after{ 
 	content: '';
 	display: block;
@@ -128,7 +142,7 @@ body{
 .frame .messageTitle:after{
 	top: 18px;
 }
-
+*/
 .frame .container>section{ 
 	width: 51%;
 	padding: 0 15px;
@@ -138,7 +152,7 @@ body{
 	-webkit-transaction:all ease 1s;
 }
 
-.frame .container section:last-child{ 
+.frame .container section:nth-last-child(2){ 
 	margin-bottom: 0px;
 }
 
@@ -183,6 +197,8 @@ body{
 .frame .container .message figure img{ 
 	max-width: 100%;
 	max-height: 100%;
+	border-radius: 50%;
+	-webkit-radius:50%;
 }
 
 .frame .container .message .speeker{ 
@@ -242,9 +258,12 @@ body{
 	color: #e85793;
 }
 
-.frame .loading_section{ 
+.frame .container .loading_section{ 
 	/*display: none;*/
 	width: 100%;
 	text-align: center;
 	border:none;
+	box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing:border-box;
 }
