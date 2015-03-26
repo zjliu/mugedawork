@@ -108,7 +108,17 @@ var mugeda_data_import = function(data){
 	}
 	*/
 
-	var isMobile = 'ontouchstart' in window;
+	function isMobileFun() {
+    	return navigator.userAgent.match(/Android/i) 
+    	|| navigator.userAgent.match(/webOS/i) 
+    	|| navigator.userAgent.match(/iPhone/i) 
+    	|| navigator.userAgent.match(/iPad/i) 
+    	|| navigator.userAgent.match(/iPod/i) 
+    	|| navigator.userAgent.match(/BlackBerry/i) 
+    	|| navigator.userAgent.match(/Windows Phone/i) ? true : false
+	}
+
+	var isMobile = isMobileFun();
 	var startPonter = null;
 
 	function start(e){
@@ -239,6 +249,14 @@ var mugeda_data_import = function(data){
 					isAdd = false;
 					break;
 				}
+			}
+			if(option.zone && option.addr){
+				if(item.zone && (item.zone.indexOf(option.zone)>-1 || option.zone.indexOf(item.zone)>-1)){
+					isAdd = true;
+				}
+				if(item.addr && (item.addr.indexOf(option.addr)>-1 || option.addr.indexOf(item.addr)>-1)){
+					isAdd = true;
+				}	
 			}
 			/*
 			if(isAdd) sum++;
