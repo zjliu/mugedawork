@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
     <title></title>
-    <link href="styles/style.css" rel="stylesheet" />
+    <link href="styles/reset.css" rel="stylesheet" />
+    <link href="styles/menu.css" rel="stylesheet" />
 	<script src="scripts/AjaxUtil.js"></script>
 </head>
 <body>
@@ -12,6 +13,8 @@
 </div>
 	<script type="text/template" id="tree_template">
 		<nav class="tree_menu">
+			<input type="checkbox" id="clickBox">
+			<label class="tree_menu_thumb" for="clickBox"><div></div></label>
 			<ul>
 				<%data.forEach(function(item,index){%>
 					<li>
