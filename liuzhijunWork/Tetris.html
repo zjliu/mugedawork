@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <style>
+    	html,body{width: 100%;height: 100%;overflow: hidden;margin: 0;padding: 0;}
+    	body{background-color: #555;}
+    	.game{ 
+    		position: absolute;
+    		top: 0;
+    		right: 0;
+    		bottom: 0;
+    		left: 0;   
+    		margin: auto; 		
+    		width: 200px;
+    		height: 430px;
+    		text-align: center;
+    	}
+    	.Tetris{ 
+    		width: 200px;
+    		height: 400px;
+
+    	}
+    	.Tetris.main{ 
+    		box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    		position: absolute;
+    		top: 0;
+    		left: 0; 		
+    	}
+    	.Tetris.bg{ 
+
+    	}
+    	.gameTools{ 
+    		height: 30px;
+    		line-height: 30px;
+    		position: absolute;
+    		width: 100%;
+    		margin: 0 auto;
+    	}
+    </style>
+</head>
+<body>
+	<div class="game">
+		<div class="gameMain">
+			<canvas id="bgTetris" class="Tetris bg" width="200" height="400"></canvas>
+			<canvas id="Tetris" class="Tetris main" width="200" height="400"></canvas>
+		</div>
+		<div class="gameTools">
+			<input type="button" id="btn" value="开始游戏">
+		</div>
+	</div>
+</body>
+</html>
+<script>
+	function G (id) {
+		return document.getElementById(id);
+	}
+
+	function eRandom(m,n){ 
+		return m+ Math.round((n-m)*Math.random());
+	}
+
+	function randomArr(arr){ 
+		return arr[eRandom(0,arr.length-1)];
+	}
+
+	var gridR = 20,
+		gridWidthCount = 10,
+		gridHeightCount = 20,
+		w = gridWidthCount * gridR,
+		h = gridHeightCount * gridR;
+
+	var canvas = G('Tetris'),
+		cxt = canvas.getContext('2d'),
+		strokeStyle = '#000',
+		lineWidth = "1px";
+
+	cxt.strokeStyle - strokeStyle;
+	cxt.lineWidth = lineWidth;
+
+	var Shape=[
+		//-------------------------- I
+		[ 
+			[1,1,1,1],
+		],
+		[ 
+			[1],
+			[1],
+			[1],
+			[1],
+		],
+
+		//---------------------------L
+		[ 
+			[1,0,0],
+			[1,1,1],
+		],
+		[ 
+			[1,1],
+			[1,0],
+			[1,0],
+		],
+		[ 
+			[1,1,1],
+			[0,0,1],
+		],
+		[ 
+			[0,1],
+			[0,1],
+			[1,1],
+		],
+		//----------------------------J
+		[ 
+			[0,0,1],
+			[1,1,1],
+		],
+		[ 
+			[1,0],
+			[1,0],
+			[1,1],
+		],
+		[ 
+			[1,1,1],
+			[1,0,0],
+		],
+		[ 
+			[1,1,0],
+			[0,1,0],
+			[0,1,0],
+		],
+
+		//-----------------------------O
+		[ 
+			[1,1],
+			[1,1],
+		],
+
+		//----------------------------- S
+		[ 
+			[0,1,1],
+			[1,1,0],
+		],
+		[ 
+			[1,0],
+			[1,1],
+			[0,1],
+		],
+		//----------------------------- Z
+		[ 
+			[1,1,0],
+			[0,1,1],
+		],
+		[ 
+			[0,1],
+			[1,1],
+			[1,0],
+		],
+
+		//-----------------------------T
+		[ 
+			[0,1,0],
+			[1,1,1],
+		],
+		[ 
+			[1,0],
+			[1,1],
+			[1,0],
+		],	
+		[ 
+			[1,1,1],
+			[0,1,0],
+		],
+		[ 
+			[0,1],
+			[1,1],
+			[0,1],
+		]
+	];
+
+	var shapeInfo=[
+		// I
+		{ 
+			color:"#F60",
+			from:0,
+			to:1
+		},
+		//L
+		{ 
+			color:"#00C",
+			from:2,
+			to:5
+		},
+		//J
+		{ 
+			color:"#C0F",
+			from:6,
+			to:9
+		},
+		//O
+		{ 
+			color:"#F00",
+			from:10,
+			to:10
+		},
+		//S
+		{ 
+			color:"#6CF",
+			from:11,
+			to:12
+		},
+		//Z
+		{ 
+			color:"#0F0",
+			from:13,
+			to:14
+		},
+		//T
+		{ 
+			color:"#FF0",
+			from:15,
+			to:18
+		}
+	];
+
+	function getRandomShapeInfo(){ 
+		return randomArr(shapeInfo);
+	}
+
+	function getChangeGridIndex(infoObj,index){ 
+		var from = infoObj.from;
+		var to = infoObj.to;
+		return index===to ? from : index+1;
+	}
+
+	function ShapeEach(shape,callback,needReturn){ 
+		if(!shape || !callback) return;
+		for(var i=0,il=shape.length;i<il;i++){ 
+			var iItem = shape[i];
+			for(var j=0,jl=iItem.length;j<jl;j++){ 
+				var item = iItem[j];
+				var result = callback(i,j,item);
+				if(needReturn && !result) return false;
+			}
+		}
+		return true;
+	}
+
+	function detect(spirit,shape,mapData,m,n){
+		var result = ShapeEach(shape,function(i,j,value){ 
+			if(value===1){ 
+				var m = (this.m || spirit.m) + j;
+				var n = (this.n || spirit.n) + i;
+				if(m>=0 && n>=0 && mapData[n][m]===1){ 
+					return false;
+				}
+			}
+			return true;
+		}.bind({'m':m,'n':n}),true);
+		return result;
+	}
+
+	//info 指是哪个shapeInfo类型，index指是哪个Shape，m指所在列，n指所在行
+	function Spirit(info,index,m,n){ 
+		this.info = info;
+		this.index = index;
+		this.m=m;
+		this.n=n;
+		this.over=false;
+		this.speed = 1;
+	}
+
+	Spirit.prototype={ 
+		update:function(mapData){ 
+			var shape = Shape[this.index];
+			if(this.n+shape.length<gridHeightCount) {
+				var success = detect(this,shape,mapData,null,this.n+1);
+				if(success) this.n+=this.speed;
+				if(!success) this.setOver(shape,mapData);
+			}
+			else this.setOver(shape,mapData);
+		},
+		draw:function(cxt){ 
+			cxt.save();
+			cxt.beginPath();
+			var shape = Shape[this.index];
+			ShapeEach(shape,function(i,j,value){ 
+				if(value===1){
+					var x = (this.m + j)*gridR;
+					var y = (this.n + i)*gridR;
+					cxt.rect(x,y,gridR,gridR);
+				}
+			}.bind(this));
+			cxt.fillStyle=this.info.color;
+			cxt.fill();
+			cxt.stroke();
+			cxt.closePath();			
+			cxt.restore();
+		},
+		toLeft:function(mapData){ 
+			if(this.m>0) { 
+				var shape = Shape[this.index];
+				var success = detect(this,shape,mapData,this.m-1,null);
+				if(success) this.m--;
+				if(!success) this.setOver(shape,mapData);
+			}
+		},
+		toRight:function(mapData){ 
+			var shape = Shape[this.index];
+			if(this.m+shape[0].length<gridWidthCount) { 
+				var success = detect(this,shape,mapData,this.m+1,null);
+				if(success) this.m++;
+				if(!success) this.setOver(shape,mapData);	
+			}
+		},
+		change:function(mapData){ 
+			var nextIndex = getChangeGridIndex(this.info,this.index); 
+			var nextSpirit = Shape[nextIndex];
+			if(this.n+nextSpirit.length>gridHeightCount) return;
+
+			var shape = Shape[nextIndex];
+			var success = detect(this,shape,mapData,null,null);
+			var changeSuccess = this.changeDetect(shape);
+			if(success && changeSuccess) this.index = nextIndex;
+			if(!success) this.setOver(shape,mapData);
+		},
+		setOver:function(shape,mapData){ 
+			ShapeEach(shape,function(i,j,value){ 
+				if(value===1 && (this.n+i>-1) && (this.m+j>-1)){
+					mapData[this.n+i][this.m+j] = 1; 
+				}
+			}.bind(this));
+			this.over = true;
+		},
+		changeDetect:function(shape){ 
+			return ShapeEach(shape,function(i,j,value){ 
+				if(value===1){ 
+					var m = this.m + j;
+					var n = this.n + i;
+					if(m<0 || m>gridWidthCount-1 || n>gridHeightCount-1) return false;
+				}
+				return true;
+			}.bind(this),true);
+		}
+	}
+
+	function Tetris(){ 
+		//平时速度
+		this.normal_speed = 300;
+		//加速时的速度
+		this.up_speed = 100;
+		this.currentSpeed = this.normal_speed;
+
+		this.isOver = false;
+
+		this.spirits = [];
+		this.drawbgCanvas();
+	}
+
+	Tetris.prototype={ 
+		start:function(){ 
+			this.initData();
+			this.createSpirit();
+			this.initEvent();
+			this.run();
+		},
+		initData:function(){ 
+			this.mapData=[];
+			for(var i=0;i<gridHeightCount;i++){ 
+				var arr = [];
+				for(var j=0;j<gridWidthCount;j++){
+					arr.push(0);
+				}
+				this.mapData.push(arr);
+			}
+		},
+		createSpirit:function(){ 
+			var info = getRandomShapeInfo(Shape);
+			var index = info.from;
+			var shape = Shape[index];
+			this.spirit = new Spirit(info,index,Math.round((gridWidthCount-shape[0].length)/2),-2);
+			this.spirits.push(this.spirit);
+		},
+		run:function(){ 
+			var self = this;
+			var lastTime = Date.now();
+			function loop(){
+				var currentTime = Date.now();
+				if(currentTime - lastTime<self.currentSpeed) { 
+					self.loopFlag = requestAnimationFrame(loop);
+					return;
+				}
+				lastTime = currentTime;
+
+				var spirit = self.spirit;
+				cxt.clearRect(0,0,w,h);
+				for(var i=0,l=self.spirits.length;i<l;i++){
+					var sp = self.spirits[i];
+					sp.draw(cxt);
+					if(!sp.over) sp.update(self.mapData);
+				}
+				if(spirit.over) { 
+					if(spirit.n<=0){ 
+						self.gameOver();
+					}
+					self.createSpirit();
+					self.changeSpeed();
+				}
+
+				if(self.isOver)	{ 
+					cancelAnimationFrame(this.loopFlag);
+					return;
+				}
+				self.loopFlag = requestAnimationFrame(loop);
+			}
+			loop();
+		},
+		initEvent:function(){ 
+			var timeSpan = 100;
+			var leftTime = Date.now();
+			var topTime = leftTime;
+			var rightTime = leftTime;
+			var bottomTime = leftTime;
+
+			var self = this;
+			function keyDown(e) {
+				var keycode = e.which;
+				var now = Date.now();
+				if(keycode>=37 && keycode<=40){ 
+					switch(keycode){ 
+						case 37: 	//左
+							if(now-leftTime<timeSpan) return;
+							leftTime = now;
+							self.spirit.toLeft(self.mapData);
+						break;
+						case 38: 	//上
+							if(now-topTime<timeSpan) return;
+							topTime = now;
+							self.spirit.change(self.mapData);
+						break;
+						case 39: 	//右
+							if(now-rightTime<timeSpan) return;
+							rightTime = now;
+							self.spirit.toRight(self.mapData);
+						break;
+						case 40: 	//下
+							self.changeSpeed(true);
+						break;
+					}
+				}
+		   }
+
+		   document.onkeydown = keyDown;
+		},
+		changeSpeed:function(isup){ 
+			var orgSpeed = this.currentSpeed;
+			this.currentSpeed = isup ? this.up_speed : this.normal_speed;
+			if(this.currentSpeed===orgSpeed) return;
+		},
+		gameOver:function(){ 
+			this.isOver = true;
+			cxt.clearRect(0,0,w,h);
+			this.showMessage("游戏结束");
+		},
+		drawbgCanvas:function(){ 
+			var bgCanvas = G('bgTetris'),
+				bgCxt = bgCanvas.getContext('2d'),
+				bgW = bgCanvas.width,
+				bgH = bgCanvas.height;
+			for(var i=1;i<gridHeightCount;i++){ 
+				bgCxt.moveTo(0,i*gridR);
+				bgCxt.lineTo(bgW,i*gridR);
+			}
+			for(var j=1;j<gridWidthCount;j++){ 
+				bgCxt.moveTo(j*gridR,0);
+				bgCxt.lineTo(j*gridR,bgH);
+			}
+			bgCxt.strokeStyle = "rgba(255,255,0,0.1)";
+			bgCxt.stroke();	
+			var url = bgCanvas.toDataURL();
+			canvas.style.backgroundImage="url("+url+")";
+		},
+		showMessage:function(text){ 
+			var gradient=cxt.createLinearGradient(0,0,w,0);
+			gradient.addColorStop("0","magenta");
+			gradient.addColorStop("0.5","blue");
+			gradient.addColorStop("1.0","red");
+			var fontSize = 20;
+			cxt.strokeStyle=gradient;
+			cxt.font=fontSize + "px Arial";
+			cxt.strokeText(text,(w-fontSize*text.length)/2,(h-fontSize)/2,w);
+		}
+	}
+
+	var game = new Tetris();
+
+    G('btn').onclick=function(){ 
+    	game.start();
+    }
+
+</script>

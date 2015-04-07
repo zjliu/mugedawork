@@ -1,0 +1,61 @@
+{
+	'title':'',
+	'footer':'',
+	'draggable':true,
+	'data':[
+		{
+			'text':'公司',
+			'url':'',
+			'value':'',
+			'children':[
+				{
+					'text':'百度',	//显示文本
+					'url':'http://www.baidu.com',
+					'value':'baidu'
+				},
+				{
+					'text':'谷歌',	//显示文本
+					'url':'http://www.baidu.com',
+					'value':'google'
+				},
+				{
+					'text':'Mugeda',	//显示文本
+					'url':'http://www.baidu.com',
+					'value':'mugeda'
+				},
+				{
+					'text':'海尔',	//显示文本
+					'url':'http://h5.tongshuai.com',
+					'value':'eHaier'
+				}
+			]
+		},
+		{
+			'text':'地区',
+			'url':'',
+			'value':'',
+			'children':[
+				{
+					'text':'北京',	//显示文本
+					'url':'http://www.baidu.com',
+					'value':'beijing'
+				},
+				{
+					'text':'大理',	//显示文本
+					'url':'http://www.baidu.com',
+					'value':'dali'
+				},
+				{
+					'text':'沈阳',	//显示文本
+					'url':'http://www.baidu.com',
+					'value':'shengyan'
+				},
+				{
+					'text':'大连',	//显示文本
+					'url':'http://h5.tongshuai.com',
+					'value':'dalian'
+				}
+			]
+		}
+	]
+}

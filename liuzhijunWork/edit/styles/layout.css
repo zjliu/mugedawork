@@ -25,4 +25,38 @@ body {
 	box-sizing:border-box;
 	-webkit-box-sizing:border-box;
 	box-shadow:0 0 3px #B59A9A;
+	padding:30px 30px 40px 30px;
+}
+
+.content .tools{
+	position:absolute;
+	width:50%;
+	height:30px;
+	bottom:5px;
+	right:30px;
+	background-color:rgb(220, 220, 220);
+}
+
+.content .tools label{
+	margin-left:5px;
+}
+
+.CodeMirror{
+	width:100%;
+	height:100%;
+	border-radius:10px;
+	font-size:16px;
+	background-color:rgb(220, 220, 220);
+	/*
+	background:#000;
+	color:#fff;
+	border:#fff 1px solid;
+	*/
+}
+
+.frame{
+	position:absolute;
+	top:10px;
+	left:10px;
+	z-index:99;
 }
