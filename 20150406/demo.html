@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <link href="styles/style.css" rel="stylesheet" />
+    <!--<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>-->
+    <script src="scripts/wx_mock.js"></script>
+</head>
+<body>
+</body>
+</html>
+<script>
+//start--------------测试 wx.config-----------
+	wx.ready(function(){ 
+		console.log('wx.ready called!')
+	});
+
+	wx.error(function(){ 
+		console.log('wx.error called!');
+	});
+
+
+	//如果不配置，默认是执行wx.ready的回调
+	wx.config();
+
+	//配置成功的
+	wxMockManager.config('config',{ 
+		'result':'success'
+	});
+	wx.config();
+
+
+	//配置失败的 result 为 fail 的时候，执行wx.error的回调
+	wxMockManager.config('config',{ 
+		'result':'fail'
+	});
+	wx.config();
+//end
+
+//start-------------测试 wx.checkJsApi---------
+	//配置成功的
+	wxMockManager.config('checkJsApi',{ 
+		'result':'success',
+		'data': {"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+	});
+
+	wx.checkJsApi({
+    	jsApiList: ['chooseImage'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+    	success: function(res) {
+        // 以键值对的形式返回，可用的api值true，不可用为false
+        // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+        	console.log(res);
+        	console.log('wx.checkJsApi success called!')
+    	}
+	});
+
+	//配置失败的
+	wxMockManager.config('checkJsApi',{ 
+		'result':'fail'
+	});	
+
+	wx.checkJsApi({
+    	jsApiList: ['chooseImage'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+    	success: function(res) {
+        // 以键值对的形式返回，可用的api值true，不可用为false
+        // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+        	console.log('wx.checkJsApi success called!');
+    	},
+    	error:function(){ 
+    		console.log('wx.checkJsApi error called!');	
+    	}
+	});
+
+//end
+
+
+//start -------------------测试 wx.chooseImage ----------
+	//测试成功
+	wxMockManager.config('chooseImage',{ 
+		'result':'success',
+		'data':{localId:121212}
+	});
+	
+
+	wx.chooseImage({ 
+		'success':function(res){ 
+			console.log(res);
+			console.log('chooseImage success called!')
+		}
+	});
+
+	//测试失败
+	wxMockManager.config('chooseImage',{ 
+		'result':'fail',
+		'data':{'msg':'error'}
+	});
+
+	wx.chooseImage({ 
+		'success':function(res){ 
+			console.log(res);
+			console.log('chooseImage success called!')
+		},
+		'error':function(info){ 
+			console.log(info);
+			console.log('chooseImage error called!')
+		}
+	});
+//end
+
+//start------------测试 wx.onVoiceRecordEnd---------
+	wxMockManager.config('onVoiceRecordEnd',{ 
+		'result':'complete',
+		'data':{localId:121212}
+	});
+	
+	wx.onVoiceRecordEnd({ 
+		'complete':function(res){ 
+			console.log(res);
+			console.log('wx.onVoiceRecordEnd complete called!')
+		}
+	});
+//end
+	
+	//以下数组中的方法配置与使用方法都如上面的 wx.checkJsApi,wx.chooseImage,wx.onVoiceRecordEnd 一样
+	var callbackMethods = [
+		'checkJsApi',				//判断当前客户端版本是否支持指定JS接口
+		'chooseImage',				//拍照或从手机相册中选图接口
+		'uploadImage',				//上传图片接口
+		'downloadImage',			//下载图片接口
+		'stopRecord',				//停止录音接口
+		'onVoiceRecordEnd',			//监听录音自动停止接口
+		'onVoicePlayEnd',			//监听语音播放完毕接口
+		'uploadVoice',				//上传语音接口
+		'downloadVoice',			//下载语音接口
+		'onMenuShareTimeline',		//分享到朋友圈
+		'onMenuShareAppMessage',	//分享给朋友
+		'onMenuShareQQ',			//分享到QQ
+		'onMenuShareWeibo'			//分享到腾讯微博
+	];
+
+	//以下数组中的方法，因无回调函数，所以无需要配置
+	var noneCallbackMethods = [ 
+		'startRecord',	//开始录音接口	
+		'playVoice',	//播放语音接口
+		'pauseVoice',	//暂停播放接口	
+		'stopVoice'		//停止播放接口
+	];
+
+//start -----------------测试 wxMockManager.fireMenuShare---------------
+/*此方法用于触发 
+	wx.onMenuShareTimeline、
+	wx.onMenuShareAppMessage、
+	wx.onMenuShareQQ、
+	wx.onMenuShareWeibo 
+	这四个方法的
+*/
+
+	//wx.fireMenuShare(type);	
+	//type不区分大小写,为 Timeline，Message，QQ，Weibo 四个中的一个就行
+	
+	wxMockManager.config('onMenuShareTimeline',{ 
+		'result':'success',
+		'success':function(){ 
+			console.log('onMenuShareTimeline success called!')
+		}
+	});
+	//触发 wx.onMenuShareTimeline事件
+	wxMockManager.fireMenuShare('timeline');
+
+
+	wxMockManager.config('onMenuShareAppMessage',{ 
+		'result':'success',
+		'success':function(){ 
+			console.log('onMenuShareAppMessage success called!')
+		}
+	});
+	//触发 wx.onMenuShareAppMessage事件
+	wxMockManager.fireMenuShare('appMessage');
+
+
+	wxMockManager.config('onMenuShareQQ',{ 
+		'result':'success',
+		'success':function(){ 
+			console.log('onMenuShareQQ success called!')
+		}
+	});
+	//触发 wx.onMenuShareQQ事件
+	wxMockManager.fireMenuShare('qq');
+
+
+	wxMockManager.config('onMenuShareWeibo',{ 
+		'result':'success',
+		'success':function(){ 
+			console.log('onMenuShareWeibo success called!')
+		}
+	});
+	//触发 wx.onMenuShareWeibo事件
+	wxMockManager.fireMenuShare('weibo');
+	
+//end
+
+
+</script>
