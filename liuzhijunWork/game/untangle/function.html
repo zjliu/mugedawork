@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <style>
+    	html,body{width: 100%;height: 100%;overflow: hidden;margin: 0;padding: 0;}
+    	body{background-color: #555;user-select:none;-webkit-user-select:none;}
+    	.container{ 
+    		width: 800px;
+    		margin: 50px auto;
+    		overflow: hidden;
+    		padding: 10px;
+    	}
+
+    	canvas{ 
+    		background-color: #fff;
+    		cursor:pointer;
+    		box-shadow: 0 0 8px #fff;
+    		border-radius: 5px;
+    		position: absolute;
+    	}
+
+    	#canvas{ 
+    		background-color: rgba(200,200,200,.1);
+    	}
+
+    	#bgCanvas{ 
+
+    	}
+
+    </style>
+</head>
+<body>
+	<div class="container">
+		<canvas id="bgCanvas" width="800" height="400"></canvas>
+		<canvas id="canvas" width="800" height="400"></canvas>
+	</div>
+</body>
+</html>
+<script>
+	function G (id) {
+		return document.getElementById(id);
+	}
+
+	JSON.clone=function(obj){ 
+		return JSON.parse(JSON.stringify(obj));
+	}
+
+	Array.prototype.max=function(){ 
+		return Math.max.apply(null,this);
+	}
+	
+	Array.prototype.min=function(){ 
+		return Math.min.apply(null,this);
+	}
+
+
+	var canvas = G('canvas'),
+		cxt = canvas.getContext('2d'),
+		W = canvas.width,
+		H = canvas.height;
+
+	var bgCanvas = G('bgCanvas'),
+		bgCxt = bgCanvas.getContext('2d'),
+		bgW = bgCanvas.width,
+		bgH = bgCanvas.height;
+
+	 function drawBg(cxt){ 
+	 	cxt.moveTo(0,bgH/2);
+	 	cxt.lineTo(bgW,bgH/2);
+	 	cxt.moveTo(bgW/2,0);
+	 	cxt.lineTo(bgW/2,bgH);
+	 	cxt.strokeStyle='green';
+	 	cxt.stroke();
+	 }
+
+ 	drawBg(bgCxt);
+
+	 function drawLines(cxt,points){ 
+	 	cxt.save();
+	 	cxt.translate(W/2,H/2);
+	 	cxt.beginPath();
+	 	for(var i=0,l=points.length;i<l;i++){ 
+	 		var point = points[i];
+	 		cxt.lineTo(point.x,point.y);
+	 	}
+	 	cxt.stroke();
+	 	cxt.restore();
+	 }
+
+	 var xScope = { 
+	 	from:-4,
+	 	to:4,
+	 	increase:0.01
+	 };
+
+	var maxValue = H*0.9;
+	function drawFunction(fun,from,to,increase){ 
+		var points = [];
+		var resultArr = [];
+		for(var i=from;i<=to;i+=increase){ 
+			var value = fun(i);
+			resultArr.push(value);
+			points.push({x:i,y:value});
+		}
+		var max = resultArr.max();
+		var min = resultArr.min();
+		var scope = max-min;
+		var banlance = maxValue / scope;
+		banlance = 15;
+		points.map(function(item){ 
+			item.x *= banlance;
+			item.y *= banlance;
+			return item;
+		});
+		cxt.clearRect(0,0,W,H);
+		drawLines(cxt,points);
+	}
+
+	drawFunction(function(x){ 
+		return Math.sqrt(100-x*x)
+	},-10,10,0.01);
+
+</script>

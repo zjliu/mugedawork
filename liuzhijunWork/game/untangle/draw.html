@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <style>
+    	html,body{width: 100%;height: 100%;overflow: hidden;margin: 0;padding: 0;}
+    	body{background-color: #555;user-select:none;-webkit-user-select:none;}
+    	.container{ 
+    		width: 600px;
+    		margin: 50px auto;
+    		overflow: hidden;
+    		padding: 10px;
+    	}
+
+    	#canvas{ 
+    		background-color: #fff;
+    		cursor:pointer;
+    		box-shadow: 0 0 8px #fff;
+    		border-radius: 5px;
+    	}
+
+    </style>
+</head>
+<body>
+	<div class="container">
+		<canvas id="canvas" width="400" height="400"></canvas>
+	</div>
+</body>
+</html>
+<script>
+	function G (id) {
+		return document.getElementById(id);
+	}
+
+	JSON.clone=function(obj){ 
+		return JSON.parse(JSON.stringify(obj));
+	}
+
+	var canvas = G('canvas'),
+		cxt = canvas.getContext('2d'),
+		W = canvas.width,
+		H = canvas.height;
+
+	var isMobile = 'ontouchstart' in window;
+	 	Start = isMobile ? "touchstart" : "mousedown",
+	 	Move = isMobile ? "touchmove" : "mousemove",
+	 	End = isMobile ? "touchend" : "mouseup";
+
+
+	function eRandom(m,n){ 
+		return m+ Math.floor((n-m+1)*Math.random());
+	}
+
+	function randomArr(arr){
+		return arr[Math.floor(Math.random()*arr.length)];
+	}
+
+	function sumArr(arr,to){ 
+		for(var i=0,sum=0;i<to;i++) sum+=arr[i];
+		return sum;
+	}
+
+	function getArrayItems(arr,count,exceptIndex){ 
+		var copyArr = arr.slice();
+		if(exceptIndex!=undefined) copyArr.splice(exceptIndex,1);
+		var len = copyArr.length;
+		if(len<count) return;
+		var tempArr = [];
+		for(var i=0;i<count;i++){ 
+			var index = Math.floor(Math.random()*copyArr.length);
+			tempArr.push(copyArr[index]);
+			copyArr.splice(index,1);
+		}
+		return tempArr;
+	}
+
+	function outOrderArray(arr){ 
+		return getArrayItems(arr,arr.length);	
+	}
+
+	var pointCount = 15,
+		pointLine = 3,
+		pointR  = 7;
+
+
+	function Point(x,y){ 
+		this.r = pointR;
+		this.x = x;
+		this.y = y; 
+		this.selected = false;
+	}
+
+
+	Point.prototype={ 
+		draw:function(cxt){ 
+			cxt.save();
+			cxt.beginPath();
+			cxt.arc(this.x,this.y,this.r,0,Math.PI*2);
+			cxt.fillStyle= this.selected ? "#f00" : "#0f0";
+			cxt.fill();
+			cxt.closePath();
+			cxt.restore();
+		},
+		lineTo:function(point){ 
+			cxt.save();
+			cxt.beginPath();
+			cxt.moveTo(this.x,this.y);
+			cxt.lineTo(point.x,point.y);
+			cxt.stroke();
+			cxt.closePath();
+			cxt.restore();
+		}
+	}
+
+	function PolygonalLine(pointCount,fullCallback){ 
+		this.points=[];
+		this.length = pointCount;
+		this.fullCallback = fullCallback;
+	}
+
+	PolygonalLine.prototype={ 
+		push:function(point){ 
+			if(this.points.length<this.length) { 
+				this.points.push(point);
+				if(this.points.length>=this.length) {
+					for(var i=0;i<this.length-1;i++){ 
+						this.points[i].lineTo(this.points[i+1]);
+					}
+					this.fullCallback && this.fullCallback();
+					this.points=[];
+				}
+			}
+		}
+	}
+
+	function Game(){ 
+		this.init();
+	}
+
+	Game.prototype = { 
+		/*
+		init:function(){ 
+			this.initData();
+			this.draw();
+			this.initEvent();
+		},
+		initData:function(){ 
+			//初使化顶点
+			var points = [];
+			for(var i=0;i<pointCount;i++) points.push(new Point());
+
+			//创建边集合为二维数据
+			var edges = [];
+			for(var i=0;i<pointCount;i++){
+				var temp = [];
+				for(var j=0;j<pointCount;j++){
+					temp.push(0);
+				}
+				edges.push(temp);
+			}
+
+			var numArr = [];
+			for(var i=0;i<pointCount;i++) numArr.push(i);
+
+			//初使化边集合
+			for(var i=0;i<pointCount;i++){
+				var sum = sumArr(edges[i],i);
+				var count = pointLine - sum;
+				if(!count) continue;
+				var selectedArr=getArrayItems(numArr.slice(i+1,pointCount),count);
+				if(!selectedArr) continue;
+				for(var j=0,jl=selectedArr.length;j<jl;j++){ 
+					var index = selectedArr[j];
+					edges[i][index] = 1;
+					//有向图为对称矩阵
+					edges[index][i] = 1;
+				}
+			}
+			this.points = points;
+			this.edges = edges;
+		},
+		*/
+		init:function(){ 
+			//点集合
+			this.points=[];
+			this.lineSegment = new PolygonalLine(2);
+			this.initEvent();
+		},
+		draw:function(){ 
+			cxt.clearRect(0,0,W,H);
+			for(var i=0,l=this.points.length;i<l;i++){ 
+				this.points[i].draw(cxt);
+			}
+			/*
+			for(var j=0,l=pointCount;j<l;j++){ 
+				for(var i=j+1;i<pointCount;i++){ 
+					if(this.edges[j][i]===1){ 
+						this.points[j].lineTo(this.points[i]);
+					}
+				}
+			}
+			*/
+		},
+		createPoint:function(position){ 
+			this.points.push(new Point(position.x,position.y));
+		},
+		findPoint:function(position){ 
+			for(var i=0,l=this.points.length;i<l;i++){ 
+				var point = this.points[i];
+				if(Math.pow(position.x-point.x,2)+Math.pow(position.y-point.y,2)<=4*point.r*point.r){
+					return point;
+				}
+			}
+		},
+		initEvent:function(){ 
+			var top = canvas.getBoundingClientRect().top;
+			var left = canvas.getBoundingClientRect().left;
+			function getPositon(e){ 
+				return {x:e.pageX - left,y:e.pageY - top};
+			}
+			//添加point事件
+			canvas.addEventListener('dblclick',function(e){
+				var position = getPositon(e);
+				this.createPoint(position);
+				this.draw();
+			}.bind(this));
+
+			function canvasClick(point){ 
+				if(point) point.selected = !point.selected; 
+				this.draw();				
+			}
+
+			var startPosition = null;
+			var endPosition = null;
+			function startEvent(e){ 
+				var evt = isMobile ? e.touches[0] : e;
+				 startPosition = getPositon(evt)
+				this.currentPoint = this.findPoint(startPosition);
+			}
+			function moveEvent(e){ 
+				if(!this.currentPoint) return;
+				var evt = isMobile ? e.targetTouches[0] : e;
+				var position  = getPositon(evt);
+				this.currentPoint.x=position.x;
+				this.currentPoint.y=position.y;
+				this.draw();
+			}
+			function endEvent(e){ 
+				if(!this.currentPoint) return;
+				var evt = isMobile ? e.changedTouches[0] : e;
+				var endPosition = getPositon(evt);
+				if(endPosition.x===startPosition.x && endPosition.y===startPosition.y){ 
+					this.currentPoint.selected = !this.currentPoint.selected;
+					this.draw();
+					this.lineSegment.push(this.currentPoint);
+				}
+				delete this.currentPoint;
+			}
+			canvas.addEventListener(Start,startEvent.bind(this));
+			canvas.addEventListener(Move,moveEvent.bind(this));
+			canvas.addEventListener(End,endEvent.bind(this));
+		}
+	}
+
+	var game=new Game();
+
+
+</script>
