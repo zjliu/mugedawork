@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <link href="styles/reset.css" rel="stylesheet" />
+    <link href="styles/animate.css" rel="stylesheet" />
+	<!--codemirror-->
+    <link href="scripts/codemirror/lib/codemirror.css" rel="stylesheet" />
+	<script src="scripts/codemirror/lib/codemirror.js"></script>
+	<script src="scripts/codemirror/addon/edit/closetag.js"></script>
+	<script src="scripts/codemirror/addon/fold/xml-fold.js"></script>
+	<script src="scripts/codemirror/mode/xml/xml.js"></script>
+	<script src="scripts/codemirror/mode/javascript/javascript.js"></script>
+	<script src="scripts/codemirror/mode/css/css.js"></script>
+	<script src="scripts/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+	<!--menu-->
+    <link href="../menu/styles/menu.css" rel="stylesheet" />
+	<script src="scripts/AjaxUtil.js"></script>
+
+	<!--contentmenu-->
+    <link href="styles/contextmenu.css" rel="stylesheet" />
+
+	<!--dialog-->
+    <link href="styles/dialog.css" rel="stylesheet" />
+
+	<!--layout-->
+    <link href="styles/layout.css" rel="stylesheet" />
+
+	<!--download-->
+	<script src="scripts/download.js"></script>
+</head>
+<body>
+	<div class="page">
+		<p class="progress"></p>
+		<div id="frame" class="frame"></div>
+		<div class="content">
+			<div class="articleTitle">
+				<input title='点击修改标题' type="text" id="title" />
+			</div>
+			<input id="toolsCB" type="checkbox" class="hidden" />
+			<div class="tools">
+				<label>背景颜色:</label><input onchange="changeColor(this)" id="color" type="color" />
+				<label>切换模式:</label>
+				<select id="lang" onchange="changeMode(this)"></select>
+				<input onclick="reset(this)" id="reset" type="button" value="重新设置" />
+			</div>
+			<label for="toolsCB" class="toolsTogger"></label>
+			<div class="hidden messageTip" data-animate="bounceIn"></div>
+			<textarea id="code"></textarea>
+		</div>
+	</div>
+	<script type="text/template" id="tree_template">
+		<nav class="tree_menu">
+			<input type="checkbox" id="clickBox">
+			<label class="tree_menu_thumb" for="clickBox"><div></div></label>
+			<ul>
+				<%data.forEach(function(item,index){%>
+					<li>
+						<a href="<%=item.url%>"><%=item.text%></a>
+						<%if(item.children && item.children.length){%>
+							<ul>
+								<%item.children.forEach(function(citem,index){%>
+									<li><a href="<%=citem.url%>"><%=citem.text%></a></li>
+								<%});%>
+							</ul>
+						<%}%>
+					</li>
+				<%});%>
+			</ul>
+		</nav>
+	</script>
+	<div id="rightMenu" class="contextmenu">
+		<ul>
+			<li><a data-type="newPage" href="javascript:void(0)">新文档</a></li>
+			<li><a data-type="save" href="javascript:void(0)">保存</a></li>
+			<li><a data-type="saveAs" href="javascript:void(0)">另存为</a></li>
+			<li><a data-type="delete" href="javascript:void(0)">删除</a></li>
+			<li><a data-type="download" href="javascript:void(0)">下载</a></li>
+			<li><a data-type="reload" href="javascript:void(0)">刷新</a></li>
+		</ul>
+	</div>
+	<div id="dialog" class="dialog">
+		<label class="close closeBtn" title="关闭">+</label>
+		<div class="container"></div>
+	</div>
+	<div id='mask' class="mask"></div>
+
+
+	<script type="text/template" id="codemirrorTemplate">
+		<%data.forEach(function(item){%>
+			<option key="<%=item.cid%>" value="<%=item.text.toLowerCase()%>"><%=item.text%></option>
+		<%});%>
+	</script>
+
+	<script type="text/template" id="alertTemplate">
+		<div class="commonContent">
+			<p><%=data.message%></p>
+			<div data-type="ok" class="commonbtn close"><%=data.ok%></div>
+		</div>
+	</script>
+
+	<script type="text/template" id="confirmTemplate">
+		<div draggable="true" class="commonContent confirmContent">
+			<p><%=data.message%></p>
+			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
+			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
+		</div>
+	</script>
+
+	<script type="text/template" id="promptTemplate">
+		<div class="commonContent confirmContent promptContent">
+			<label><%=data.message%>：</label>
+			<input class="promptInput" type="text" />
+			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
+			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
+		</div>
+	</script>
+
+	<script type="text/template" id="saveAsTemplate">
+		<div class="commonContent confirmContent saveAsContent">
+			<label>分类：</label>
+			<label for="articleCategory" class="articleCategory select">
+				<select id="articleCategory">
+					<%data.list.forEach(function(item){%>
+						<option <%=item.cid===data.cid?"selected":""%> value="<%=item.cid%>"><%=item.text%></option>
+					<%});%>
+				</select>
+			</label>
+			<br>
+			<label>标题：</label>
+			<input class="articleTitle" type="text" value="<%=data.title%>" />
+			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
+			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
+		</div>
+	</script>
+
+	<script src="scripts/main.js"></script>
+</body>
+</html>
