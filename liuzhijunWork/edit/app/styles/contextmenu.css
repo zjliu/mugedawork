@@ -10,16 +10,17 @@
 .contextmenu>ul{
 	width:100%;
 	color: #F4F4F4;
-	font-family: 'Dosis', Helvetica, Arial, sans-serif;
 	font-weight: 600;
+	list-style:none;
 }
 
 .contextmenu>ul>li{
-	line-height:40px;
+	line-height:39px;
 	position:relative;
 	background: #141619;
 	border-bottom: 1px solid rgba(252, 252, 252, 0.1);
 	transition:all ease 0.5s;
+	box-sizing:border-box;
 }
 
 .contextmenu>ul>li:hover{
@@ -36,16 +37,23 @@
 	border-bottom-right-radius:4px;
 }
 
-.contextmenu li>a{
-	display:block;
+.contextmenu li>span{
 	text-decoration: none;
 	margin:0 25px 0 10px;
 	overflow:hidden;
 	text-overflow:ellipsis;
 	color:#fff;
+	font-weight:normal;
+	cursor:pointer;
+	display:block;
 }
-
-.contextmenu li>a:visited{
-	color:currentColor;
+.contextmenu li>span:after{
+	content:attr(tip);
+	width:60px;
+	font-size:12px;
+	margin-left:70px;
+	opacity:0.5;
+	position:absolute;
+	top:0;
+	right:0;
 }
-

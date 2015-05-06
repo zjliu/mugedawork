@@ -4,7 +4,8 @@ var AjaxUtil = {
 		type : "get", // 默认提交的方法,get post
 		url : "", // 请求的路径 required
 		data : {}, // 请求的参数
-		dataType : 'text', // 返回的内容的类型,text,xml,json
+		dataType : 'json', // 返回的内容的类型,text,xml,json
+		tokenField : 'access-token',
 		callback : function() {
 		}// 回调函数 required
 	},
@@ -35,7 +36,6 @@ var AjaxUtil = {
 		for ( var pro in newOptions) {
 			obj[pro] = newOptions[pro];
 		}
-		obj['_'] = parseInt(Date.now()+Math.random()*100);
 		return obj;
 	},
 	// 格式化请求参数
@@ -46,6 +46,7 @@ var AjaxUtil = {
 			var paramValue = params[pro]; 
 			paramsArray.push(pro + "=" + paramValue);
 		}
+		paramsArray.push("_=" + Date.now()+Math.random()*100);
 		return paramsArray.join("&");
 	},
 
@@ -106,6 +107,11 @@ var AjaxUtil = {
 
 		// 建立连接
 		xmlhttp.open(method, url, true);
+
+		var tokenKey = this.options.tokenField;
+		if(tokenKey && localStorage[tokenKey]) {
+			xmlhttp.setRequestHeader('x-'+tokenKey,localStorage[tokenKey]);
+		}
 
 		if ("GET" === method.toUpperCase()) {
 			//发送请求

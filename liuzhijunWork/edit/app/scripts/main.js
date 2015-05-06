@@ -2,6 +2,14 @@ function G(id){
 	return document.getElementById(id);
 }
 
+HTMLElement.prototype.Q=function(selector){
+	return this.querySelector(selector);
+}
+
+HTMLElement.prototype.QA=function(selector){
+	return this.querySelectorAll(selector);
+}
+
 if(!HTMLElement.prototype.appendHTML){
 	HTMLElement.prototype.appendHTML = function(html) {
 	    var fragment = GetHTMLFragment(html);
@@ -96,6 +104,9 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 }
 
 !function(win){
+	
+	var tokenFiled = 'access-token';
+	AjaxUtil.options.tokenFiled = tokenFiled;
 
 	var Q=function(selector){
 		return document.querySelector(selector);
@@ -112,13 +123,13 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	var code = G('code');
 	var defOpt = {
 		lineNumbers: true,
-		mode: 'text/html',
+		mode: 'javascript',
 		autoCloseTags: true
 	}
 	var editor = CodeMirror.fromTextArea(code,defOpt);
 
 	function setValue(value){
-		editor.setValue(value);
+		editor.setValue(unescape(value));
 	}
 
 	function getValue(){
@@ -142,15 +153,32 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		},2000);
 	}
 
+	var TypeObj={
+		'js':'javascript',
+		'css':'css',
+		'html':'text/html',
+		'less':'css',
+		'sass':'sass',
+		'haml':'text/html'
+	};
+	var reTypeObj={
+		'javascript':'js',
+		'css':'css',
+		'text/html':'html'
+	};
+
 	function setTitle(value){
 		titleEl.value = value;
+		var type = value.match(/[^\./]+$/)[0];
+		lang.value = TypeObj[type] || TypeObj.js;
+		changeMode(lang);
 	}
 
 	function getTitle(){
 		return titleEl.value;
 	}
 
-	var defColor = '#DCDCDC';
+	var defColor = '#eeeeee';
 
 	function changeMode(el){
 		editor.setOption("mode",el.value);
@@ -176,6 +204,13 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 
 	win.reset = reset;
 
+	function toolsCBChange(){
+		localStorage.showTools = ~~this.checked;
+	}
+
+	var toolsCBEl = G('toolsCB');
+	toolsCBEl.addEventListener('change',toolsCBChange,false);
+
 	function init(){
 		if(localStorage.codemirrorbg) {
 			var el = G('color');
@@ -186,6 +221,9 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 			var el = lang;
 			el.value = localStorage.codemirrormode;
 			el.onchange();
+		}
+		if(localStorage.showTools){
+			toolsCBEl.checked = !!~~localStorage.showTools;
 		}
 	}
 
@@ -244,7 +282,6 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		}
 	});
 
-
 	function initArticle(aid){
 		if(aid){
 			AjaxUtil.ajax({
@@ -284,7 +321,12 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	}
 
 	var rightMenu = G('rightMenu');
-	win.oncontextmenu=function(e){
+	var baseLiHeight = 40;
+	var rightMenuHeight = rightMenu.querySelectorAll('li').length * baseLiHeight;
+	win.oncontextmenu = function(e){
+		e.preventDefault();
+	}
+	G('edit').oncontextmenu=function(e){
 		e.preventDefault();
 		if(/^(mask)|(dialog)$/.test(e.target.className)) return;
 		var clientObject = document.body.getBoundingClientRect();
@@ -292,7 +334,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		var bodyW = clientObject.width;
 		var bodyH = clientObject.height;
 		var contextW = parseInt(contextStyleObj['width']);
-		var contextH = parseInt(contextStyleObj['height']) || 246;
+		var contextH = parseInt(contextStyleObj['height']) || rightMenuHeight;
 
 		//默认在鼠标位置右下方
 		rightMenu.style.top = e.pageY+'px';
@@ -350,9 +392,22 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		openFromTemplate(data,'confirmTemplate',300,150);
 	}
 
-	function openPrompt(tip){
+	function openPrompt(tip,callback){
 		var data={message:tip||'',ok:'确定',cancel:'取消'};
 		openFromTemplate(data,'promptTemplate',300,150);
+		callback && callback();
+	}
+
+	function openFileOpen(tip,callback){
+		var data={message:tip||'',ok:'确定',cancel:'取消'};
+		openFromTemplate(data,'openFileTemplate',300,150);
+		callback && callback();
+	}
+
+	function openLogin(callback){
+		var data={ok:'确定',cancel:'取消'};
+		openFromTemplate(data,'loginTemplate',300,150);
+		callback && callback();
 	}
 
 	function openFromTemplate(data,tempId,width,height){
@@ -363,6 +418,36 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		applyTemplate(data,tempId,container);
 		showDialog();
 	}
+
+	/*
+	function initDialogEvent(){
+		var isStart = false;
+		var lastPosition = null;
+		function start(e){
+			if(e.target!==dialogEl) return;
+			isStart = true;
+		}
+		function move(e){
+			if(!isStart) return;
+			var position = {x:e.pageX,y:e.pageY};
+			if(lastPosition){
+				var transformStr = 'translate('+[position.x-lastPosition.x+'px',position.y-lastPosition.y+'px']+')';
+				dialogEl.style.webkitTransform = transformStr;
+			}
+			else{
+				lastPosition = position;
+			}
+		}
+		function end(e){
+			if(!isStart) return;
+			isStart = false;
+		}
+		dialogEl.addEventListener('mousedown',start,false);
+		dialogEl.addEventListener('mousemove',move,false);
+		dialogEl.addEventListener('mouseup',end,false);
+	}
+	initDialogEvent();
+	*/
 
 	var closeCallback = null;
 	dialogEl.onclick=function(e){
@@ -381,6 +466,33 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 			openConfirm('如果未保存的文件,确定打开新页面?');
 			closeCallback = function(isOk){
 				isOk &&	(win.location.href="/index.html");
+			}
+		},
+		openFile:function(){
+			hideContextMenu();
+			var fileText = '';
+			var fileName = '';
+			openFileOpen('选择文件',function(){
+				var input = G('openFileInput');
+				input.addEventListener('change',function(e){
+					fileName = this.value.match(/[^\\\/]+$/)[0];
+					var label = dialogEl.querySelector('.openFileBtn');
+					label.innerHTML = '文件读取中';
+					var files = e.target.files;
+					var readFile = files[0];
+					var reader = new FileReader();
+					reader.onload=function(e){
+						fileText = this.result;
+						input.value='';
+						label.innerHTML = '读取完毕';
+					}
+					reader.readAsText(readFile);
+				});
+			});
+			closeCallback = function(isOk){
+				if(!isOk) return;
+				setValue(fileText);
+				setTitle(fileName);
 			}
 		},
 		save:function(){
@@ -450,7 +562,13 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		},
 		download:function(){
 			hideContextMenu();
-			openPrompt('文件名');
+			openPrompt('文件名',function(){
+				var title = getTitle();
+				if(!title) return;
+				var index = title.lastIndexOf('.');
+				if(index===-1) title +='.'+ reTypeObj[lang.value];
+				dialogEl.querySelector('input').value = title;
+			});
 			closeCallback=function(isOk){
 				if(!isOk || !win.saveText) return;
 				var fileName = dialogEl.querySelector('.promptInput').value || getTitle() || 'download.text';
@@ -462,7 +580,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	var rightClick = false;	
 	rightMenu.onclick=function(e){
 		var target = e.target;
-		if(target.tagName.toLowerCase()=="a"){
+		if(target.tagName.toLowerCase()=="span"){
 			rightClick = true;
 			var type = target.getAttribute('data-type');
 			if(rightMenuEvents[type]) rightMenuEvents[type]();
@@ -475,6 +593,95 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		}
 		rightClick=false;
 	});
+
+	document.addEventListener('keydown',function(e){
+		if(!e.ctrlKey) return;
+		var type = '';
+		switch(String.fromCharCode(e.keyCode)){
+			case 'C':
+				type = 'newPage';
+				break;
+			case 'O':
+				type = 'openFile';
+				break;
+			case 'S':
+				type = e.altKey ? 'saveAs' : 'save';
+				break;
+			case 'D':
+				if(e.altKey) type="delete";
+				break;
+			case 'M':
+				type = 'download';
+				break;
+			case 'R':
+				type = 'reload';
+				break;
+		}
+		if(type){
+			e.preventDefault();
+			rightMenuEvents[type]();
+		}
+	});
+
+/*===============login=============*/
+	function doLogin(){
+		var el = G('login');
+		var nameEl = el.Q('input[name="username"]');
+		var pwdEl= el.Q('input[name="password"]');
+		var name = nameEl.value.trim();
+		var pwd = pwdEl.value.trim();
+		if(!name) {
+			nameEl.focus();
+			return;
+		}
+		if(!pwd){
+			pwdEl.focus();
+			return;
+		}
+		var mdata={'name':name,'pwd':pwd,'_':Math.random()};
+		AjaxUtil.ajax({
+			url:'/login',
+			type:'post',
+			data:mdata,
+			dataType:'json',
+			success:function(data){
+				if(data.success) {
+					localStorage[tokenFiled] = data.token;
+					localStorage.userName = name;
+					window.location.href='#edit';
+				}
+				else pwdEl.focus();
+			}
+		});
+	}
+	win.login = doLogin;
+
+	var orgHash = location.hash;
+	function hashchange(){
+		hash=location.hash || '#edit';
+		if(orgHash && Q(orgHash)){
+			var orgPage = Q(orgHash);
+			orgPage.classList.remove('slidedown');
+		}
+		if(hash && Q(hash)){
+			var curPage = Q(hash);
+			setTimeout(function(){
+				curPage.classList.add('slidedown');
+			});
+		}
+		orgHash = hash;
+	}
+	window.onhashchange=hashchange;
+	hashchange();
+
+	function initLogin(){
+		var userInfo = G('userInfo');
+		var aEl = document.createElement('a');
+		aEl.href = localStorage.userName ? 'javascript:void(0)' : '#login';
+		aEl.innerHTML = localStorage.userName || '登录';
+		userInfo.appendChild(aEl);
+	}
+	initLogin();
 
 }(window);
 

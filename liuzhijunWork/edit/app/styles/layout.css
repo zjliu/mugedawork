@@ -7,13 +7,37 @@ body {
 	-webkit-user-select: none;
 	user-select: none;
 	-ms-touch-action: none;
+	font-family:'microsoft yahei',Verdana,Arial,Helvetica,sans-serif;
+	background-color:#000;
 }
 
 .header, .footer, .content , .page { position: absolute; left: 0; top: 0; }
 
 .page{
-	/*background:#e9e9e9;*/
-	background:#222222;
+	transition:all ease 0.5s;
+	-webkit-transition:all ease 0.5s;
+	transform:scaleY(0);
+	transform-origin:0px 0px;
+}
+
+.page.slidedown{
+	transform:scaleY(1);
+}
+
+.page .userInfo{
+	position:absolute;
+	top:0;
+	right:50px;
+	width:200px;
+	height:50px;
+	text-align:right;
+	line-height:50px;
+	cursor:pointer;
+}
+
+.page .userInfo a{
+	text-decoration: none;
+	color:#fff;
 }
 
 .hidden{
@@ -66,6 +90,8 @@ body {
 	bottom:5px;
 	right:30px;
 	background-color:rgb(220, 220, 220);
+	transition:opacity ease 0.5s;
+	opacity:0;
 }
 
 .content .messageTip{
@@ -82,7 +108,17 @@ body {
 	margin-left:5px;
 }
 
-.content .toolsTogger,.content .toolsTogger:before{
+.content .toolsTogger{
+	width:30px;
+	height:40px;
+	bottom:0px;
+	right:0px;
+	position:absolute;
+	transition:all ease-in-out 0.5s;
+}
+
+.content .toolsTogger>span,.content .toolsTogger>span:before{
+	display:block;
 	width:5px;
 	height:5px;
 	border:2px solid red;
@@ -90,18 +126,30 @@ body {
 	border-left:0px solid transparent;
 }
 
-.content .toolsTogger{
-	bottom:15px;
-	right:6px;
+.content .toolsTogger>span{
 	position:absolute;
-	transform:rotate(135deg);
-	transition:all ease-in-out 1.5s;
+	margin:auto;
+	top:0;
+	bottom:0;
+	left:-6px;
+	right:0;
+	transform:rotate(-45deg);
+	-webkit-transform:rotate(-45deg);
 }
 
-.content .toolsTogger:before{
+.content .toolsTogger>span:before{
 	content:'';
 	display:block;
 	margin:4px;
+}
+
+#toolsCB:checked+.tools{
+	opacity:1;
+}
+
+#toolsCB:checked~.toolsTogger{
+	transform:rotate(180deg);
+	-webkit-transform:rotate(180deg);
 }
 
 .CodeMirror{
@@ -110,6 +158,7 @@ body {
 	border-radius:10px;
 	font-size:16px;
 	background-color:rgb(220, 220, 220);
+	font-family:'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 	/*
 	background:#000;
 	color:#fff;
@@ -122,7 +171,17 @@ body {
 	top:10px;
 	left:10px;
 	z-index:9;
+	/*
+	transition:all ease 0.5s;
+	transform:translate(-40px,0px);
+	*/
 }
+
+/*
+.frame:hover{
+	transform:translate(0,0);
+}
+*/
 
 .progress{ 
 	margin:0;

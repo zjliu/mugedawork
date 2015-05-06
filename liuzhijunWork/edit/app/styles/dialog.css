@@ -16,6 +16,9 @@
 	transition:all ease 0.5s;
 	padding:15px;
 	box-sizing:border-box;
+	/*
+	cursor:move;
+	*/
 }
 
 .dialog .container{
@@ -24,6 +27,7 @@
 	background-color:#ddd;
 	position:relative;
 	border-radius:5px;
+	cursor:auto;
 }
 
 .dialog.active{
@@ -77,6 +81,7 @@
 .dialog .container .commonContent{
 	width:100%;
 	height:100%;
+	box-sizing:border-box;
 }
 
 .dialog .container .commonContent>p{
@@ -155,6 +160,25 @@
 /*promptContent*/
 .dialog .container .promptContent{
 	padding-top:20px;
+}
+
+/*openFileContent*/
+.dialog .container .openFileContent{
+	padding-top:40px;
+}
+
+.dialog .container .openFileInput{
+	display:none;
+}
+
+.dialog .container .openFileContent label{
+	display:block;
+	width:100px;
+	height:30px;
+	line-height:30px;
+	margin:auto;
+	background:#3bb3e0;
+	cursor:pointer;
 }
 
 .select {

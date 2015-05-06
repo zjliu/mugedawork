@@ -56,7 +56,7 @@
 .tree_menu>ul{
 	position:absolute;
 	top:0;
-	left:50px;
+	left:40px;
 	transform:scaleX(0);
 	-webkit-transition:all ease 0.5s;
 	transform-origin:0px 0px;
@@ -99,6 +99,7 @@
 	overflow:hidden;
 	text-overflow:ellipsis;
 	color:#fff;
+	font-weight:normal;
 }
 .tree_menu li>a:visited{
 	color:currentColor;

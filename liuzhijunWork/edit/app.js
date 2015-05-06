@@ -1,6 +1,10 @@
 var express=require('express');
 var app=express();
+var jwt = require('jwt-simple');
+var moment = require('moment');
 var bodyParser = require('body-parser');
+
+app.set('jwtTokenSecret', 'liuzhijunToken9527@beijing');
 
 app.use(bodyParser());
 
@@ -20,6 +24,40 @@ app.param(function(name, fn){
 	}
 });
 
+function checkToken(req){
+	var token = (req.body && req.body.access_token) || (req.query && req.query.access_token) || req.headers['x-access-token'];
+	if(!token) return;
+	try{
+		var decoded = jwt.decode(token, app.get('jwtTokenSecret'));
+		if (decoded.exp <= Date.now()) {
+			return false;
+		}
+		return decoded;
+	}
+	catch(err){
+		return;
+	}
+}
+
+function createToken(data){
+	if(!data || !data.length) return;
+	var user = data[0];
+	var expires = moment().add('days', 7).valueOf();
+	var token = jwt.encode({ iss: user.uid,exp: expires}, app.get('jwtTokenSecret'));
+	return token;
+}
+
+var tokenError = {'success':false,'message':'access_token error or expired!'};
+
+app.post('/login',function(req,res){
+	var name = req.body.name;
+	var pwd = req.body.pwd;
+	var Q = require('./server/do');
+	Q.login(name,pwd,function(data){
+		var result = {'success':!!data.length,'token':createToken(data)};
+		res.json(result);
+	});
+});
 
 app.get('/categoryList',function(req,res){
 	var Q = require('./server/do');
@@ -44,6 +82,11 @@ app.get('/article/:aid',function(req,res){
 });
 
 app.post('/article/add',function(req,res){
+	var tokenObj = checkToken(req);
+	if(!tokenObj){
+		res.json(tokenError);
+		return;
+	}
 	var Q = require('./server/do');
 	var cid = req.body.cid;
 	var title = req.body.title;
@@ -52,12 +95,17 @@ app.post('/article/add',function(req,res){
 		res.json({'success':false,'message':'参数不足'});
 		return;
 	}
-	Q.addArticle(cid,title,content,function(success,data){
+	var uid = tokenObj.iss;
+	Q.addArticle(cid,uid,title,content,function(success,data){
 		res.json({'success':success,'data':data});
 	});
 });
 
 app.post('/article/save',function(req,res){
+	if(!checkToken(req)){
+		res.json(tokenError);
+		return;
+	}
 	var Q = require('./server/do');
 	var aid = req.body.aid;
 	var title = req.body.title;
@@ -76,6 +124,10 @@ app.post('/article/save',function(req,res){
 });
 
 app.get('/article/delete',function(req,res){
+	if(!checkToken(req)){
+		res.json(tokenError);
+		return;
+	}
 	var Q = require('./server/do');
 	var aid = req.query.aid;
 	if(!aid){

@@ -3,7 +3,7 @@
 <head lang="zh_cn">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
-    <title></title>
+    <title>LiuZhiJun Editor</title>
     <link href="styles/reset.css" rel="stylesheet" />
     <link href="styles/animate.css" rel="stylesheet" />
 	<!--codemirror-->
@@ -23,6 +23,9 @@
 	<!--contentmenu-->
     <link href="styles/contextmenu.css" rel="stylesheet" />
 
+	<!--login-->
+    <link href="styles/login.css" rel="stylesheet" />
+
 	<!--dialog-->
     <link href="styles/dialog.css" rel="stylesheet" />
 
@@ -33,24 +36,44 @@
 	<script src="scripts/download.js"></script>
 </head>
 <body>
-	<div class="page">
+	<div id="edit" class="page">
 		<p class="progress"></p>
 		<div id="frame" class="frame"></div>
+		<div id="userInfo" class="userInfo"></div>
 		<div class="content">
 			<div class="articleTitle">
-				<input title='点击修改标题' type="text" id="title" />
+				<input title='点击修改标题' placeholder="点击修改标题" type="text" id="title" />
 			</div>
 			<input id="toolsCB" type="checkbox" class="hidden" />
 			<div class="tools">
-				<label>背景颜色:</label><input onchange="changeColor(this)" id="color" type="color" />
+				<label>背景颜色:</label><input onchange="changeColor(this)" id="color" type="color" value="#eeeeee" />
 				<label>切换模式:</label>
 				<select id="lang" onchange="changeMode(this)"></select>
 				<input onclick="reset(this)" id="reset" type="button" value="重新设置" />
 			</div>
-			<label for="toolsCB" class="toolsTogger"></label>
+			<label class="toolsTogger" for="toolsCB" title="显示设置"><span></span></label>
 			<div class="hidden messageTip" data-animate="bounceIn"></div>
 			<textarea id="code"></textarea>
 		</div>
+	</div>
+	<div id="login" class="page">
+		<div class="loginwrapper">
+		  <h1>Editor     Login</h1>
+		  <section>
+			<form action="javascript:login()">
+				<input class="main-form" type="text" name="username" placeholder="yolo@life.com"/>
+				<input class="main-form" type="password" name="password" placeholder="password"/>
+				<input type="submit" value="Sign in"/>
+			<form>
+		  </section>
+		  <!--
+		  <footer>
+		    <input class="yolo" name="" value="" type="checkbox"/><h6>Remember me</h6>
+		  </footer>
+		  -->
+		</div>
+		<canvas id="loginBgCanvas"></canvas>
+		<script src="scripts/water.js"></script>
 	</div>
 	<script type="text/template" id="tree_template">
 		<nav class="tree_menu">
@@ -74,12 +97,13 @@
 	</script>
 	<div id="rightMenu" class="contextmenu">
 		<ul>
-			<li><a data-type="newPage" href="javascript:void(0)">新文档</a></li>
-			<li><a data-type="save" href="javascript:void(0)">保存</a></li>
-			<li><a data-type="saveAs" href="javascript:void(0)">另存为</a></li>
-			<li><a data-type="delete" href="javascript:void(0)">删除</a></li>
-			<li><a data-type="download" href="javascript:void(0)">下载</a></li>
-			<li><a data-type="reload" href="javascript:void(0)">刷新</a></li>
+			<li><span data-type="newPage"	tip="Ctrl+C"	>新建</span></li>
+			<li><span data-type="openFile"	tip="Ctrl+O"	>打开</span></li>
+			<li><span data-type="save"		tip="Ctrl+S"	>保存</span></li>
+			<li><span data-type="saveAs"	tip="Ctrl+Alt+S">另存</span></li>
+			<li><span data-type="delete"	tip="Ctrl+Alt+D">删除</span></li>
+			<li><span data-type="download"	tip="Ctrl+M"	>下载</span></li>
+			<li><span data-type="reload"	tip="Ctrl+Alt+R">刷新</span></li>
 		</ul>
 	</div>
 	<div id="dialog" class="dialog">
@@ -114,6 +138,15 @@
 		<div class="commonContent confirmContent promptContent">
 			<label><%=data.message%>：</label>
 			<input class="promptInput" type="text" />
+			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
+			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
+		</div>
+	</script>
+
+	<script type="text/template" id="openFileTemplate">
+		<div class="commonContent confirmContent openFileContent">
+			<label for="openFileInput" class="openFileBtn"><%=data.message%></label>
+			<input id="openFileInput" class="openFileInput" type="file" />
 			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
 			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
 		</div>
