@@ -124,6 +124,10 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	var defOpt = {
 		lineNumbers: true,
 		mode: 'javascript',
+		lineWrapping: true,
+		extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
+		foldGutter: true,
+		gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
 		autoCloseTags: true
 	}
 	var editor = CodeMirror.fromTextArea(code,defOpt);
@@ -178,7 +182,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		return titleEl.value;
 	}
 
-	var defColor = '#eeeeee';
+	var defColor = '#ffffff';
 
 	function changeMode(el){
 		editor.setOption("mode",el.value);
@@ -648,6 +652,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 				if(data.success) {
 					localStorage[tokenFiled] = data.token;
 					localStorage.userName = name;
+					initLogin();
 					window.location.href='#edit';
 				}
 				else pwdEl.focus();

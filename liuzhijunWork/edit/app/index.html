@@ -11,6 +11,8 @@
 	<script src="scripts/codemirror/lib/codemirror.js"></script>
 	<script src="scripts/codemirror/addon/edit/closetag.js"></script>
 	<script src="scripts/codemirror/addon/fold/xml-fold.js"></script>
+	<script src="scripts/codemirror/addon/fold/foldcode.js"></script>
+	<script src="scripts/codemirror/addon/fold/foldgutter.js"></script>
 	<script src="scripts/codemirror/mode/xml/xml.js"></script>
 	<script src="scripts/codemirror/mode/javascript/javascript.js"></script>
 	<script src="scripts/codemirror/mode/css/css.js"></script>
@@ -46,7 +48,7 @@
 			</div>
 			<input id="toolsCB" type="checkbox" class="hidden" />
 			<div class="tools">
-				<label>背景颜色:</label><input onchange="changeColor(this)" id="color" type="color" value="#eeeeee" />
+				<label>背景颜色:</label><input onchange="changeColor(this)" id="color" type="color" value="#ffffff" />
 				<label>切换模式:</label>
 				<select id="lang" onchange="changeMode(this)"></select>
 				<input onclick="reset(this)" id="reset" type="button" value="重新设置" />
