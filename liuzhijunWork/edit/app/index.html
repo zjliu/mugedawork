@@ -5,21 +5,51 @@
     <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
     <title>LiuZhiJun Editor</title>
     <link href="styles/reset.css" rel="stylesheet" />
-    <link href="styles/animate.css" rel="stylesheet" />
 	<!--codemirror-->
     <link href="scripts/codemirror/lib/codemirror.css" rel="stylesheet" />
+    <link href="scripts/codemirror/theme/3024-night.css" rel="stylesheet" />
 	<script src="scripts/codemirror/lib/codemirror.js"></script>
-	<script src="scripts/codemirror/addon/edit/closetag.js"></script>
-	<script src="scripts/codemirror/addon/fold/xml-fold.js"></script>
+
+	<!--代码折叠-->
 	<script src="scripts/codemirror/addon/fold/foldcode.js"></script>
+	<script src="scripts/codemirror/addon/fold/brace-fold.js"></script>
 	<script src="scripts/codemirror/addon/fold/foldgutter.js"></script>
+	<link href="scripts/codemirror/addon/fold/foldgutter.css" rel="stylesheet" />
+	<script src="scripts/codemirror/addon/fold/xml-fold.js"></script>
+	<script src="scripts/codemirror/addon/fold/markdown-fold.js"></script>
+	<script src="scripts/codemirror/addon/fold/comment-fold.js"></script>
+	
+	<!-- 查找
+	<script src="scripts/codemirror/addon/dialog/dialog.js"></script>
+	<link href="scripts/codemirror/addon/dialog/dialog.css" rel="stylesheet" />
+	<script src="scripts/codemirror/addon/search/searchcursor.js"></script>
+	<script src="scripts/codemirror/addon/search/search.js"></script>
+	<script src="scripts/codemirror/addon/scroll/annotatescrollbar.js"></script>
+	<script src="scripts/codemirror/addon/search/matchesonscrollbar.js"></script>
+	-->
+
+	<!-- vim-->
+	<script src="scripts/codemirror/addon/dialog/dialog.js"></script>
+	<script src="scripts/codemirror/addon/search/searchcursor.js"></script>
+	<script src="scripts/codemirror/mode/clike/clike.js"></script>
+	<script src="scripts/codemirror/addon/edit/matchbrackets.js"></script>
+	<script src="scripts/codemirror/keymap/vim.js"></script>
+
+	<!-- Html-->
+	<script src="scripts/codemirror/addon/edit/closetag.js"></script>
+	<!--
+	<script src="scripts/codemirror/addon/selection/active-line.js"></script>
+	-->
 	<script src="scripts/codemirror/mode/xml/xml.js"></script>
+	<!--JS-->
 	<script src="scripts/codemirror/mode/javascript/javascript.js"></script>
+	<!--css-->
 	<script src="scripts/codemirror/mode/css/css.js"></script>
+	<!--Html 混合模式-->
 	<script src="scripts/codemirror/mode/htmlmixed/htmlmixed.js"></script>
 
 	<!--menu-->
-    <link href="../menu/styles/menu.css" rel="stylesheet" />
+    <link href="styles/menu.css" rel="stylesheet" />
 	<script src="scripts/AjaxUtil.js"></script>
 
 	<!--contentmenu-->
@@ -39,22 +69,33 @@
 </head>
 <body>
 	<div id="edit" class="page">
+		<input id="editorFullScreen" type="checkbox" class="hidden" />
 		<p class="progress"></p>
 		<div id="frame" class="frame"></div>
-		<div id="userInfo" class="userInfo"></div>
+		<div id="userInfo" class="userInfo">
+			<div class="noLogin">
+				<a href="#login">登录</a>
+			</div>
+			<div class="login">
+				<a href="javascript:void(0)"></a>
+				<ul id="userInfoUl" class="userInfoUl">
+					<li type="exit">退出</li>
+				</ul>
+			</div>
+		</div>
 		<div class="content">
 			<div class="articleTitle">
 				<input title='点击修改标题' placeholder="点击修改标题" type="text" id="title" />
 			</div>
+			<label class="fullscreen" for="editorFullScreen" title="全屏(ESC)"></label>
 			<input id="toolsCB" type="checkbox" class="hidden" />
 			<div class="tools">
-				<label>背景颜色:</label><input onchange="changeColor(this)" id="color" type="color" value="#ffffff" />
-				<label>切换模式:</label>
-				<select id="lang" onchange="changeMode(this)"></select>
-				<input onclick="reset(this)" id="reset" type="button" value="重新设置" />
+				<label>背景颜色:</label><input id="color" type="color" value="#000000" />
+				<label>文件类型:</label><select id="lang" ></select>
+				<label>vim模式:</label><input id="vim" type="checkbox" value="vim" />
+				<input id="reset" type="button" value="重新设置" />
 			</div>
 			<label class="toolsTogger" for="toolsCB" title="显示设置"><span></span></label>
-			<div class="hidden messageTip" data-animate="bounceIn"></div>
 			<textarea id="code"></textarea>
 		</div>
 	</div>
@@ -99,7 +140,7 @@
 	</script>
 	<div id="rightMenu" class="contextmenu">
 		<ul>
-			<li><span data-type="newPage"	tip="Ctrl+C"	>新建</span></li>
+			<li><span data-type="newPage"	tip="Ctrl+U"	>新建</span></li>
 			<li><span data-type="openFile"	tip="Ctrl+O"	>打开</span></li>
 			<li><span data-type="save"		tip="Ctrl+S"	>保存</span></li>
 			<li><span data-type="saveAs"	tip="Ctrl+Alt+S">另存</span></li>

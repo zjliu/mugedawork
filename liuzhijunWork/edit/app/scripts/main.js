@@ -38,6 +38,30 @@ if(!String.prototype.trim){
 	}
 }
 
+//进入全屏
+function requestFullScreen() {
+   var de = document.documentElement;
+   if (de.requestFullscreen) {
+        de.requestFullscreen();
+    } else if (de.mozRequestFullScreen) {
+       de.mozRequestFullScreen();
+    } else if (de.webkitRequestFullScreen) {
+       de.webkitRequestFullScreen();
+   }
+}
+
+//退出全屏
+function exitFullScreen() {
+   var de = document;
+   if (de.exitFullscreen) {
+        de.exitFullscreen();
+   } else if (de.mozCancelFullScreen) {
+        de.mozCancelFullScreen();
+   } else if (de.webkitCancelFullScreen) {
+        de.webkitCancelFullScreen();
+   }
+}
+
 var getParam = function (name) {
 	var url = window.location.search;
 	var reg = new RegExp('(\\?|&)' + name + '=([^&?]*)', 'i');
@@ -103,6 +127,20 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	el.insertAfterHTML(html,existingElement);
 }
 
+function notify(title,body){
+	if(window.currentNotify) window.currentNotify.close();
+	if(Notification.permission !== 'denied'){
+		Notification.requestPermission();
+	}
+	if(Notification.permission === "granted"){
+		var option = {'dir':'rtl','icon':'images/notify.png','body':body};
+		window.currentNotify = new Notification(title,option);
+		setTimeout(function(){
+			window.currentNotify.close();
+		},2000);
+	}
+}
+
 !function(win){
 	
 	var tokenFiled = 'access-token';
@@ -128,9 +166,13 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
 		foldGutter: true,
 		gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-		autoCloseTags: true
+		autoCloseTags: true,
+		//styleActiveLine: true,
+		//matchBrackets: true,
+		theme:'3024-night'
 	}
 	var editor = CodeMirror.fromTextArea(code,defOpt);
+	win.editor = editor;
 
 	function setValue(value){
 		editor.setValue(unescape(value));
@@ -143,8 +185,13 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	var lang = G('lang');
 	var titleEl = G('title');
 	var dialogEl = G('dialog');
+	var colorEl = G('color');
+	var resetBtn = G('reset');
+	var vimEl = G('vim');
+	var userInfoUl = G('userInfoUl');
 	var dialogCloseEls = dialogEl.querySelectorAll('.close');
 	var maskEl = G('mask');
+
 	//遮罩
 	doMask();
 	var messageTip = document.querySelector('.messageTip');
@@ -175,38 +222,46 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		titleEl.value = value;
 		var type = value.match(/[^\./]+$/)[0];
 		lang.value = TypeObj[type] || TypeObj.js;
-		changeMode(lang);
+		changeMode.bind(lang)();
 	}
 
 	function getTitle(){
 		return titleEl.value;
 	}
 
-	var defColor = '#ffffff';
+	var defColor = '#000000';
 
-	function changeMode(el){
-		editor.setOption("mode",el.value);
-		localStorage.codemirrormode=el.value;
+	function changeMode(){
+		editor.setOption("mode",this.value);
+		localStorage.codemirrormode=this.value;
 	}
 
-	win.changeMode = changeMode;
+	lang.onchange = changeMode;
 
-	function changeColor(el){
-		Q('.CodeMirror').style.backgroundColor=el.value;
-		localStorage.codemirrorbg=el.value;
+	function changeColor(){
+		Q('.CodeMirror').style.backgroundColor=this.value;
+		localStorage.codemirrorbg=this.value;
 	}
 
-	win.changeColor = changeColor;
+	colorEl.onchange = changeColor;
+
+	function vimChange(){
+		editor.setOption('keyMap',vimEl.checked?"vim":"default");
+		editor.setOption('matchBrackets',vimEl.checked);
+		editor.setOption('showCursorWhenSelecting',vimEl.checked);
+		localStorage.isVim = vimEl.checked;
+	}
+
+	vimEl.onchange = vimChange;
 
 	function reset(){
-		var color = G('color');
 		lang.value = defOpt.mode;
-		color.value = defColor;
+		colorEl.value = defColor;
+		colorEl.onchange();
 		lang.onchange();
-		color.onchange();
 	}
 
-	win.reset = reset;
+	resetBtn.onclick = reset;
 
 	function toolsCBChange(){
 		localStorage.showTools = ~~this.checked;
@@ -217,9 +272,9 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 
 	function init(){
 		if(localStorage.codemirrorbg) {
-			var el = G('color');
-			el.value = localStorage.codemirrorbg;
-			el.onchange();
+			var el_color = G('color');
+			el_color.value = localStorage.codemirrorbg || defColor;
+			el_color.onchange();
 		}
 		if(localStorage.codemirrormode){
 			var el = lang;
@@ -229,9 +284,11 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		if(localStorage.showTools){
 			toolsCBEl.checked = !!~~localStorage.showTools;
 		}
+		if(localStorage.isVim){
+			vimEl.checked = localStorage.isVim==="true";	
+			vimEl.onchange();
+		}
 	}
-
-	init();
 
 	var ajaxCompleteObj={count:0,'category':false,'categoryList':false,'article':false};
 
@@ -283,6 +340,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 			ajaxCompleteObj.categoryList=true;
 			ajaxCompleteObj.count++;
 			unMask();
+			init();
 		}
 	});
 
@@ -325,7 +383,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	}
 
 	var rightMenu = G('rightMenu');
-	var baseLiHeight = 40;
+	var baseLiHeight = 35;
 	var rightMenuHeight = rightMenu.querySelectorAll('li').length * baseLiHeight;
 	win.oncontextmenu = function(e){
 		e.preventDefault();
@@ -423,36 +481,6 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		showDialog();
 	}
 
-	/*
-	function initDialogEvent(){
-		var isStart = false;
-		var lastPosition = null;
-		function start(e){
-			if(e.target!==dialogEl) return;
-			isStart = true;
-		}
-		function move(e){
-			if(!isStart) return;
-			var position = {x:e.pageX,y:e.pageY};
-			if(lastPosition){
-				var transformStr = 'translate('+[position.x-lastPosition.x+'px',position.y-lastPosition.y+'px']+')';
-				dialogEl.style.webkitTransform = transformStr;
-			}
-			else{
-				lastPosition = position;
-			}
-		}
-		function end(e){
-			if(!isStart) return;
-			isStart = false;
-		}
-		dialogEl.addEventListener('mousedown',start,false);
-		dialogEl.addEventListener('mousemove',move,false);
-		dialogEl.addEventListener('mouseup',end,false);
-	}
-	initDialogEvent();
-	*/
-
 	var closeCallback = null;
 	dialogEl.onclick=function(e){
 		var el = e.target;
@@ -495,8 +523,8 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 			});
 			closeCallback = function(isOk){
 				if(!isOk) return;
-				setValue(fileText);
 				setTitle(fileName);
+				setValue(fileText);
 			}
 		},
 		save:function(){
@@ -511,7 +539,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 				dataType:'json',
 				success:function(data){
 					hideContextMenu();
-					showMessageTip(data.success?'保存成功！':'保存失败！');
+					notify('保存文件',data.success?'文件保存成功！':data.message);
 				}
 			});
 		},
@@ -533,7 +561,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 					dataType:'json',
 					success:function(data){
 						hideContextMenu();
-						//showMessageTip(data.success?'保存成功！':'保存失败！');
+						notify('另存文件',data.success?'文件另存成功！':data.message);
 						data.success && (win.location.href='index.html?aid='+data.data.aid);
 					}
 				});
@@ -552,6 +580,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 					data:mdata,
 					dataType:'json',
 					success:function(data){
+						notify('删除文件',data.success?'文件删除成功！':data.message);
 						data.success && (win.location.href='index.html');
 					}
 				});
@@ -599,10 +628,15 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 	});
 
 	document.addEventListener('keydown',function(e){
+		if(e.keyCode===122){
+			var editorFullScreen = G('editorFullScreen');
+			editorFullScreen.checked = !editorFullScreen.checked;
+			return;
+		}
 		if(!e.ctrlKey) return;
 		var type = '';
 		switch(String.fromCharCode(e.keyCode)){
-			case 'C':
+			case 'U':
 				type = 'newPage';
 				break;
 			case 'O':
@@ -653,6 +687,7 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 					localStorage[tokenFiled] = data.token;
 					localStorage.userName = name;
 					initLogin();
+					notify('用户登录',data.success?'用户登录成功！':data.message);
 					window.location.href='#edit';
 				}
 				else pwdEl.focus();
@@ -660,6 +695,12 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 		});
 	}
 	win.login = doLogin;
+
+	function exitLogin(){
+		delete localStorage[tokenFiled];
+		delete localStorage.userName;
+		window.location.href="#login";
+	}
 
 	var orgHash = location.hash;
 	function hashchange(){
@@ -681,12 +722,35 @@ function applyInsertAfterTemplate(data,templateId,el,existingElement){
 
 	function initLogin(){
 		var userInfo = G('userInfo');
-		var aEl = document.createElement('a');
-		aEl.href = localStorage.userName ? 'javascript:void(0)' : '#login';
-		aEl.innerHTML = localStorage.userName || '登录';
-		userInfo.appendChild(aEl);
+		var isLogin = !!localStorage[tokenFiled];
+		var loginEl = userInfo.querySelector('.login');
+		var noLoginEl = userInfo.querySelector('.noLogin');
+		if(isLogin){
+			loginEl.firstElementChild.innerHTML = localStorage.userName;
+			loginEl.classList.add('active');
+			noLoginEl.classList.remove('active');
+		}
+		else{
+			noLoginEl.classList.add('active');
+			loginEl.classList.remove('active');
+		}
 	}
 	initLogin();
+
+	var userEvents={
+		exit:function(){
+			delete localStorage[tokenFiled];
+			delete localStorage.userName;
+			win.location.href="index.html#login";
+		}
+	}
+
+	userInfoUl.addEventListener('click',function(e){
+		var target = e.target;
+		if(target.tagName.toLowerCase()!=='li') return;
+		var type=target.getAttribute('type');
+		userEvents[type] && userEvents[type]();
+	});
 
 }(window);
 

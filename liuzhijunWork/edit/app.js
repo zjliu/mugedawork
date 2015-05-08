@@ -2,7 +2,10 @@ var express=require('express');
 var app=express();
 var jwt = require('jwt-simple');
 var moment = require('moment');
+
 var bodyParser = require('body-parser');
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.set('jwtTokenSecret', 'liuzhijunToken9527@beijing');
 
@@ -42,7 +45,7 @@ function checkToken(req){
 function createToken(data){
 	if(!data || !data.length) return;
 	var user = data[0];
-	var expires = moment().add('days', 7).valueOf();
+	var expires = moment().add(7,'days').valueOf();
 	var token = jwt.encode({ iss: user.uid,exp: expires}, app.get('jwtTokenSecret'));
 	return token;
 }
