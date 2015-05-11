@@ -349,7 +349,6 @@ function notify(title,body){
 			AjaxUtil.ajax({
 				url:'/article/'+aid,
 				type:'get',
-				data:{'_':Math.random()},
 				dataType:'json',
 				success:function(data){
 					setTitle(data.title);
@@ -420,85 +419,45 @@ function notify(title,body){
 		rightMenu.style.display='none';
 	}
 
-	function showDialog(){
-		dialogEl.style.display='block';
-		maskEl.style.display='block';
-		setTimeout(function(){
-			dialogEl.classList.add('active');
-			maskEl.classList.add('active');
-		});
-	}
+	var dialog = new Dialog({
+		'dialogEl':dialogEl,
+		'maskEl':maskEl
+	});
 
-	function closeDialog(){
-		dialogEl.classList.remove('active');
-		maskEl.classList.remove('active');
-		setTimeout(function(){
-			dialogEl.style.display='none';
-			maskEl.style.display='none';
-		},500);
-	}
-
-	function openDialog(html){
-		var container = dialogEl.querySelector('.container');
-		container.innerHTML = html;
-		showDialog();
-	}
-
-	function openAlert(message){
+	function openAlert(message,closeCallback){
 		var data={message:message||'',ok:'确定'};
-		openFromTemplate(data,'alertTemplate',300,150);
+		dialog.openFromTemplate(data,'alertTemplate',300,150,closeCallback);
 	}
 
-	function openConfirm(message){
+	function openConfirm(message,closeCallback){
 		var data={message:message||'',ok:'确定',cancel:'取消'};
-		openFromTemplate(data,'confirmTemplate',300,150);
+		dialog.openFromTemplate(data,'confirmTemplate',300,150,closeCallback);
 	}
 
-	function openPrompt(tip,callback){
+	function openPrompt(tip,callback,closeCallback){
 		var data={message:tip||'',ok:'确定',cancel:'取消'};
-		openFromTemplate(data,'promptTemplate',300,150);
+		dialog.openFromTemplate(data,'promptTemplate',300,150,closeCallback);
 		callback && callback();
 	}
 
-	function openFileOpen(tip,callback){
+	function openFileOpen(tip,callback,closeCallback){
 		var data={message:tip||'',ok:'确定',cancel:'取消'};
-		openFromTemplate(data,'openFileTemplate',300,150);
+		dialog.openFromTemplate(data,'openFileTemplate',300,150,closeCallback);
 		callback && callback();
 	}
 
-	function openLogin(callback){
+	function openLogin(callback,closeCallback){
 		var data={ok:'确定',cancel:'取消'};
-		openFromTemplate(data,'loginTemplate',300,150);
+		dialog.openFromTemplate(data,'loginTemplate',300,150,closeCallback);
 		callback && callback();
-	}
-
-	function openFromTemplate(data,tempId,width,height){
-		if(width) dialogEl.style.width = width + 'px';
-		if(height) dialogEl.style.height = height + 'px';
-		var container = dialogEl.querySelector('.container');
-		container.innerHTML = '';
-		applyTemplate(data,tempId,container);
-		showDialog();
-	}
-
-	var closeCallback = null;
-	dialogEl.onclick=function(e){
-		var el = e.target;
-		if(el.classList.contains('close')){
-			var type = el.getAttribute('data-type');
-			closeDialog();
-			closeCallback && closeCallback(type==='ok');
-			closeCallback = null;
-		}
 	}
 
 	var rightMenuEvents = {
 		newPage:function(){
 			hideContextMenu();
-			openConfirm('如果未保存的文件,确定打开新页面?');
-			closeCallback = function(isOk){
+			openConfirm('如果未保存的文件,确定打开新页面?',function(isOk){
 				isOk &&	(win.location.href="/index.html");
-			}
+			});
 		},
 		openFile:function(){
 			hideContextMenu();
@@ -520,12 +479,11 @@ function notify(title,body){
 					}
 					reader.readAsText(readFile);
 				});
-			});
-			closeCallback = function(isOk){
+			},function(isOk){
 				if(!isOk) return;
 				setTitle(fileName);
 				setValue(fileText);
-			}
+			});
 		},
 		save:function(){
 			if(!aid) return this.saveAs();
@@ -547,10 +505,9 @@ function notify(title,body){
 			hideContextMenu();
 			if(!categoryData) return;
 			var data={'ok':'确定','cancel':'取消','list':categoryData,'title':getTitle()||'','cid':cid||''};
-			openFromTemplate(data,'saveAsTemplate',300,150);
 			var content = encodeURIComponent(getValue());
 			var mdata = {'content':content};
-			closeCallback = function(isOk){
+			dialog.openFromTemplate(data,'saveAsTemplate',300,150,function(isOk){
 				if(!isOk) return;
 				mdata.cid = G('articleCategory').value;
 				mdata.title = dialogEl.querySelector('.articleTitle').value;
@@ -565,13 +522,12 @@ function notify(title,body){
 						data.success && (win.location.href='index.html?aid='+data.data.aid);
 					}
 				});
-			}
+			});
 		},
 		delete:function(){
 			hideContextMenu();
 			if(!aid) return;
-			openConfirm('如果确定删除此文件?');
-			closeCallback = function(isOk){
+			openConfirm('如果确定删除此文件?',function(isOk){
 				if(!isOk) return;
 				var mdata = {'aid':aid};
 				AjaxUtil.ajax({
@@ -584,14 +540,13 @@ function notify(title,body){
 						data.success && (win.location.href='index.html');
 					}
 				});
-			}
+			});
 		},
 		reload:function(){
 			hideContextMenu();
-			openConfirm('如果未保存的文件,确定重新加载?');
-			closeCallback = function(isOk){
+			openConfirm('如果未保存的文件,确定重新加载?',function(isOk){
 				isOk && (win.location.reload());
-			}
+			});
 		},
 		download:function(){
 			hideContextMenu();
@@ -601,12 +556,11 @@ function notify(title,body){
 				var index = title.lastIndexOf('.');
 				if(index===-1) title +='.'+ reTypeObj[lang.value];
 				dialogEl.querySelector('input').value = title;
-			});
-			closeCallback=function(isOk){
+			},function(isOk){
 				if(!isOk || !win.saveText) return;
 				var fileName = dialogEl.querySelector('.promptInput').value || getTitle() || 'download.text';
 				win.saveText(fileName,getValue());
-			}
+			});
 		}
 	};
 
@@ -753,4 +707,3 @@ function notify(title,body){
 	});
 
 }(window);
-

@@ -88,6 +88,7 @@
 	height:100%;
 	line-height:100px;
 	font-size:14px;
+	text-align:center;
 }
 
 .dialog .container .commonContent>.commonbtn{
@@ -134,7 +135,7 @@
 	width:150px;
 	vertical-align: middle;
 }
-.dialog .container .promptContent .promptInput,.dialog .container .saveAsContent .articleTitle{
+.dialog .container input[type="text"]{
 	width:150px;
 	border:1px solid rgba(0,0,0,0);
 	padding:2px 0;
@@ -144,14 +145,14 @@
 	-webkit-transition: box-shadow 0.30s ease-in-out;
 	transition: box-shadow 0.30s ease-in-out;
 }
-.dialog .container .promptContent .promptInput:focus,.dialog .container .saveAsContent .articleTitle:focus{
+.dialog .container input[type="text"]:focus{
 	outline:none;
 	border:#87C6F9 1px solid;
 	box-shadow: 0 0 2px rgba(103, 166, 217, 1);
 }
 .dialog .container .promptContent label,.dialog .container .saveAsContent label{
 	display:inline-block;
-	width:75px;
+	width:27%;
 	text-align:right;
 	height:30px;
 	line-height:30px;
@@ -181,7 +182,11 @@
 	cursor:pointer;
 }
 
-.select {
+.dialog .container .createArticleContent{
+
+}
+
+.dialog .select {
 	display: block;
 	position: relative;
 	overflow: hidden;
@@ -196,7 +201,7 @@
 	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
-.select:before, .select:after {
+.dialog .select:before,.dialog .select:after {
 	content: '';
 	position: absolute;
 	right: 11px;
@@ -205,15 +210,15 @@
 	border-left: 3px outset transparent;
 	border-right: 3px outset transparent;
 }
-.select:before {
+.dialog .select:before {
 	top: 10px;
 	border-bottom: 3px solid #7f9298;
 }
-.select:after {
+.dialog .select:after {
 	top: 16px;
 	border-top: 3px solid #7f9298;
 }
-.select > select {
+.dialog .select > select {
 	position: relative;
 	z-index: 2;
 	width: 100%;
@@ -227,7 +232,8 @@
 	border: 0;
 	-webkit-appearance: none;
 }
-.select > select:focus {
+.dialog .select > select:focus {
 	color: #4d5a5e;
 	outline: 0;
 }
+

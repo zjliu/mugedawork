@@ -81,7 +81,7 @@ app.get('/article/:aid',function(req,res){
 	var Q = require('./server/do');
 	Q.getArticle(req.params.aid,function(data){
 		res.json(data);
-	});
+	},req.query,res);
 });
 
 app.post('/article/add',function(req,res){

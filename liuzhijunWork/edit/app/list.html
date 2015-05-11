@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title>LiuZhiJun Editor</title>
+    <link href="article/38?type=css&min=false" rel="stylesheet" />
+	<!-- AjaxUtile.js -->
+	<script src="article/22?type=js&min=false"></script>
+	<!-- template.js -->
+	<script src="article/35?type=js&min=false"></script>
+
+	<!--dialog-->
+    <link href="styles/dialog.css" rel="stylesheet" />
+	<script src="scripts/dialog.js"></script>
+
+	<!--layout-->
+    <link href="styles/list.css" rel="stylesheet" />
+</head>
+<body>
+	<header>
+		<a href="javascript:void(0)" id="createBtn" >新建作品</a>
+	</header>
+	<article>
+		<div class="group">
+			<div id="articleList" class="articleList"></div>
+		<div>
+		<nav class="page-nav"></nav>
+	</article>
+	<footer></footer>
+	<div id="dialog" class="dialog">
+		<label class="close closeBtn" title="关闭">+</label>
+		<div class="container"></div>
+	</div>
+	<div id='mask' class="mask"></div>
+	<script type="text/template" id="articleTemplate">
+		<%data.forEach(function(item,index){%>
+			<section>
+				<div class="iframe-wrap">
+					<a href="#" class="cover-link"></a>
+					<iframe src="article/22?type=js&min=false" frameborder="0" scrolling="no"></iframe>
+					<div class="meta-title"></div>
+					<div class="meta-menu"></div>
+				</div>
+				<div class="meta"></div>
+			</section>
+		<%});%>
+	</script>
+	<script type="text/template" id="createArticleTemplate">
+		<div class="commonContent confirmContent saveAsContent">
+			<h3>添加作品</h3>
+			<label>标题：</label>
+			<input type="text" class="article_title" />
+			<br/>
+			<label>描述：</label>
+			<input type="text" class="article_desc" />
+			<br/>
+			<label>HTML ID：</label>
+			<input type="text" class="article_html" />
+			<br/>
+			<label>CSS ID：</label>
+			<input type="text" class="article_css" />
+			<br/>
+			<label>JS ID：</label>
+			<input type="text" class="article_js" />
+			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
+			<div data-type="cancel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
+		</div>
+	</script>
+	<script src="scripts/list.js"></script>
+</body>
+</html>

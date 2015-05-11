@@ -2,6 +2,17 @@ var sqlite3 = require('sqlite3').verbose();
 
 var db = new sqlite3.Database('./server/db.sqlite3');
 
+var userType={
+	'admin':0,
+	'user':1
+}
+
+var articleType={
+	'public':0,
+	'private':1,
+	'website':2
+}
+
 function doLogin(name,pwd,callback){
 	var crypto = require('crypto');
 	var md5 = crypto.createHash('md5');
@@ -27,10 +38,51 @@ function getArticleList(callback){
 	});
 }
 
-function getArticle(aid,callback){ 
+function getArticle(aid,callback,queryObj,res){ 
 	var sql = 'select title,content,cid from article where aid='+aid;
+	var type = queryObj.type;
+	var min = queryObj.min === "true";
 	query(sql,function(data){
-		data && data.length && callback && callback(data[0]);
+		if(type && data && data.length){
+			var contentValue = '';
+			var value = unescape(data[0].content);
+			switch(type){
+				case 'js':
+					contentValue = "application/x-javascript";
+					if(min){
+						try{
+							var UglifyJS = require("uglify-js");
+							var result = UglifyJS.minify(value, {fromString: true});
+							value = result.code;
+						}catch(e){
+							console.log(e.message);
+						}
+					}
+				break;
+				case 'css':
+					contentValue = 'text/css';
+					if(min){
+						try{
+							var uglifycss = require('uglifycss');
+							value = uglifycss.processString(value);
+						}catch(e){
+							console.log(e.message);
+						}
+					}
+				break;
+				case 'html':
+					contentValue =  'text/html';
+				break;
+			}
+			if(contentValue){
+				res.writeHead(200,{"Content-Type":	contentValue});
+				res.write(value);
+				res.end();
+			}
+		}
+		else{
+			data && data.length && callback && callback(data[0]);
+		}
 	});
 }
 
