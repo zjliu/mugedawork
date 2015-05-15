@@ -99,7 +99,7 @@ app.post('/article/add',function(req,res){
 		return;
 	}
 	var uid = tokenObj.iss;
-	Q.addArticle(cid,uid,title,content,function(success,data){
+	Q.addArticle(uid,req.body,function(success,data){
 		res.json({'success':success,'data':data});
 	});
 });
@@ -141,5 +141,65 @@ app.get('/article/delete',function(req,res){
 		res.json({'success':success});
 	});
 });
+
+app.post('/pen/add',function(req,res){
+	var tokenObj = checkToken(req);
+	if(!tokenObj){
+		res.json(tokenError);
+		return;
+	}
+	var Q = require('./server/do');
+	var uid = tokenObj.iss;
+	Q.addPen(uid,req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
+app.post('/pen/update',function(req,res){
+	var tokenObj = checkToken(req);
+	if(!tokenObj){
+		res.json(tokenError);
+		return;
+	}
+	var Q = require('./server/do');
+	var uid = tokenObj.iss;
+	Q.updatePen(uid,req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
+app.post('/pen/delete',function(req,res){
+	var tokenObj = checkToken(req);
+	if(!tokenObj){
+		res.json(tokenError);
+		return;
+	}
+	var Q = require('./server/do');
+	var uid = tokenObj.iss;
+	Q.deletePen(uid,req.body.pid,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
+app.get('/pen/list',function(req,res){
+	var tokenObj = checkToken(req);
+	if(!tokenObj){
+		res.json(tokenError);
+		return;
+	}
+	var Q = require('./server/do');
+	var uid = tokenObj.iss;
+	Q.getPenList(uid,function(data){
+		res.json(data);
+	});
+});
+
+app.param('pid',/^\d+$/);
+app.get('/pen/:pid',function(req,res){
+	var Q = require('./server/do');
+	var pid = req.params.pid;
+	Q.getPen(pid,res,req.query);
+});
+
 
 app.listen(4000);
