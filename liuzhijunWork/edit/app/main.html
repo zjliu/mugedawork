@@ -22,19 +22,18 @@
 	<!--main-->
     <link href="styles/main.css" rel="stylesheet" />
     <link href="styles/list.css" rel="stylesheet" />
-
+    <link href="styles/cat.css" rel="stylesheet" />
 
 </head>
 <body>
-	<div class="listMenu">
-		<a href="#page1" value="作品列表" class="active"></a>
-		<a href="#page2" value="分类管理"></a>
-		<a href="#page3" value="个人信息"></a>
-		<a href="#page4" value="统计信息"></a>
-	</div>
+	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"}]'>
+	</list-menu>
 	<div class="content">
 		<div id="page1" data-fun="penlist" class="page codepenList slideleft">
-			<div class="header"><a href="javascript:void(0)" id="createBtn" >新建作品</a></div>
+			<div class="header">
+				<pen-btn id="createBtn" data-value="新建作品"></pen-btn>
+				<pen-btn data-href="/index.html" data-value="新建文件"></pen-btn>
+			</div>
 			<article>
 				<div class="group">
 					<div id="articleList" class="articleList"></div>
@@ -86,18 +85,60 @@
 				</div>
 			</script>
 		</div>
-		<div id="page2" class="page">2</div>
-		<div id="page3" class="page">3</div>
-		<div id="page4" class="page">4</div>
+		<div id="page2" data-fun="catlist" class="page catList">
+			<div class="categoryContainer">
+				<form id="catForm" action="javascript:addCat()">
+					<input name="text" class="searchInput" type="text" placeholder="Enter To Add" /><br/>
+					<ul class="listUl" id="catlistUl"></ul>
+				</form>
+			</div>
+			<script type="text/template" id="catsTemplate">
+				<%data.forEach(function(item){%>
+					<li><span artCount="<%=item.count%>"><%=item.text%></span><span data-cid="<%=item.cid%>">删除</span></li>
+				<%});%>
+			</script>
+		</div>
+		<div id="page3" data-fun="userinfo" class="page userInfoList">
+			<x-dialog data-color="green" data-title="web compontents">
+				<h2 class="cth2">content test!</h2>
+			</x-dialog>
+			<template tagName="x-dialog" data-prototype="HTMLElement">
+				<style>
+					h1{color:red;}
+					:host{display:block;}
+				</style>
+				<h1 pseudo="-webkit-ksx"></h1>	
+				<content select=".cth2"></content>
+			</template>
+			<style>
+				x-dialog /deep/ h1{
+					font-size:20px;
+				}
+			</style>
+		</div>
+		<div id="page4" class="page">
+			<input type="range" class="custom" />
+			<style>
+				input[type="range"].custom::-webkit-slider-runnable-track{
+					-webkit-appearance: none;
+					background-color:red;
+				}
+			</style>
+		</div>
 	</div>
 	<div id="dialog" class="dialog">
 		<label class="close closeBtn" title="关闭">+</label>
 		<div class="container"></div>
 	</div>
 	<div id='mask' class="mask"></div>
-	<script type="text/template" id="catsTemplate">
-	</script>
 	<script type="text/template" id="infoTemplate">
+	</script>
+
+	<script type="text/template" id="alertTemplate">
+		<div class="commonContent">
+			<p><%=data.message%></p>
+			<div data-type="ok" class="commonbtn close"><%=data.ok%></div>
+		</div>
 	</script>
 
 	<script type="text/template" id="confirmTemplate">
@@ -107,6 +148,45 @@
 			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
 		</div>
 	</script>
+	
+	<template id="penBtnTemplate" tagName="pen-btn" data-prototype="HTMLButtonElement">
+		<style>
+			:host{display:inline-block;}
+			a{outline: 0; cursor: pointer; display: inline-block; vertical-align: top;padding: 12px 18px; position: relative;
+				background: -webkit-gradient(linear, left top, left bottom, from(#4d4d4d), to(#2f2f2f));
+				background: -webkit-linear-gradient(#4d4d4d, #2f2f2f); background: linear-gradient(#4d4d4d, #2f2f2f);
+				border-radius: 5px; border: 1px solid black; color: white !important; font-size: 12px; white-space: nowrap;
+				text-overflow: ellipsis; text-decoration: none !important; cursor: pointer; text-align: center}
+		</style>
+		<a></a>	
+	</template>
+	<template id="listMenuTemplate" tagName="list-menu" data-prototype="HTMLDivElement">
+		<style>
+			:host{display:box; display:-webkit-box; -webkit-box-orient:vertical; box-sizing:border-box; -webkit-box-sizing:border-box;
+				box-shadow:0px 0px 3px 8px rgba(255,255,255,.3); }
+			:host>a{ display:block; box-flex: 1; -webkit-box-flex: 1; text-align:center; position:relative; cursor:pointer;
+			box-sizing:border-box; -webkit-box-sizing:border-box; position:relative; color:#fff; border-bottom:1px solid rgba(50, 43, 7, 1);
+			background-image:-webkit-linear-gradient(to right,#000,rgba(255,255,255,.3));
+			background-image:linear-gradient(to right,rgba(255,255,255,.3),#000); font-size:14px; }
+
+			:host>a:last-child{ border-bottom:none; }
+
+			:host>a.active:before{ content:''; position:absolute; top:0; right:-8px; width:8px;
+				height:100%; background:rgba(255,0,0,0.7); border-radius:4px; }
+
+			:host>a:after{ content:attr(value); position:absolute; top:50%; left:50%;
+				transform:translate(-50%,-50%); -webkit-transform:translate(-50%,-50%);
+			}
+		</style>
+		<script class="temp">
+			<%data.forEach(function(item){%>
+				<a href="<%=item.href%>" class="<%=item.active?'active':''%>" value="<%=item.value%>"></a>
+			<%});%>
+		</script>
+	</template>
+
+	<script src="scripts/customDom.js"></script>
+	<script src="scripts/registerDom.js"></script>
 	<script src="scripts/main.js"></script>
 </body>
 </html>

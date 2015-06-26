@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <title>LiuZhiJun Editor</title>
+    <link href="styles/reset.css" rel="stylesheet" />
+	<script src="scripts/animator.js"></script>
+	<style>
+		html,body{
+			width:100%;
+			height:100%;
+		}
+		[ani-controller]{
+			position:absolute;
+			top:0;
+			bottom:0;
+			left:0;
+			right:0;
+		}
+		div>div{
+			position:absolute;
+			width:100px;
+			height:50px;
+			line-height:50px;
+			color:#fff;
+			background:#000;
+			text-align:center;
+			left:0;
+			right:0;
+			top:0;
+			bottom:0;
+			margin:auto;
+		}
+
+		div>div:first-child{
+			left:-300px;
+		}
+		div>div:last-child{
+			left:300px;
+		}
+	</style>
+</head>
+<body>
+	<div ani-controller="testCtrl">
+		<div ani-syn="1" ani-filed="o1">syn1</div>	
+		<div ani-syn="2" ani_filed="o2">syn2</div>	
+		<div ani-syn="3" nai_filed="o3">syn3</div>	
+	</div>
+</body>
+</html>
+<script src="scripts/ctrl.js"></script>
+<script>
+	var a = new ani();
+</script>

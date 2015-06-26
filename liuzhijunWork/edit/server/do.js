@@ -7,6 +7,11 @@ var userType={
 	'user':1
 }
 
+var catType={
+	'public':0,
+	'private':1
+}
+
 var articleType={
 	'public':0,
 	'private':1,
@@ -47,21 +52,21 @@ function doLogin(name,pwd,callback){
 }
 
 function getCategoryList(callback){
-	var sql = 'select cid,text from cat';
+	var sql = 'select cid,text,type,(select count(*) from article where cid=c.cid) count from cat c';
 	query(sql,function(data){
 		callback && callback(data);
 	});
 }
 
 function getArticleList(callback){
-	var sql = 'select c.cid,c.text cname,a.aid,a.title from article a,cat c where a.cid = c.cid';
+	var sql = 'select c.cid,c.text cname,a.aid,a.title from article a,cat c where a.cid = c.cid and a.type='+articleType.public;
 	query(sql,function(data){
 		callback && callback(data);
 	});
 }
 
 function getArticle(aid,callback,queryObj,res){ 
-	var sql = 'select title,content,cid from article where aid='+aid;
+	var sql = 'select title,content,cid,(select type from cat where cid=a.cid) type from article a where aid='+aid;
 	var type = queryObj.type;
 	var min = queryObj.min === "true";
 	query(sql,function(data){
@@ -265,6 +270,42 @@ function getPen(pid,res,params){
 	});
 }
 
+function addCategory(params,callback){
+	params.udate = "datetime('now')";
+	var fileds = {
+		'text':true,'udate':false
+	};
+	var sql = getInsertSql('cat',params,fileds);
+	exec(sql,function(error){
+		if(!callback) return;
+		if(error===null){
+			var sql = "select max(cid) cid from cat";
+			query(sql,function(data){
+				data && data.length && callback(true,data[0]);
+			});
+		}
+		else{
+			callback && callback(false);
+		}
+	});
+}
+
+function deleteCategory(params,callback){
+	var cid = params.cid;
+	var sql = 'select count(*) count from article where cid='+cid;
+	query(sql,function(data){
+		var count = data[0].count;
+		if(count>0){
+			callback && callback(false,'只能删除无文件的分类!');
+			return;
+		}
+		var msql = 'delete from cat where cid='+cid;
+		exec(msql,function(error){
+			callback && callback(error===null);
+		});
+	});
+}
+
 function query(sql,callback){
 	db.serialize(function(){
 		db.all(sql,function(err,rows){
@@ -293,3 +334,5 @@ exports.getPenList= getPenList;
 exports.getPen = getPen;
 exports.updatePen = updatePen;
 exports.deletePen = deletePen;
+exports.addCategory = addCategory;
+exports.deleteCategory = deleteCategory;

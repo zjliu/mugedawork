@@ -80,6 +80,7 @@
 			<div class="login">
 				<a href="javascript:void(0)"></a>
 				<ul id="userInfoUl" class="userInfoUl">
+					<li type="admin">管理</li>
 					<li type="exit">退出</li>
 				</ul>
 			</div>
@@ -92,7 +93,8 @@
 			<input id="toolsCB" type="checkbox" class="hidden" />
 			<div class="tools">
 				<label>背景颜色:</label><input id="color" type="color" value="#000000" />
-				<label>文件类型:</label><select id="lang" ></select>
+				<label>文件类型:</label>
+					<select id="lang" ></select>
 				<label>vim模式:</label><input id="vim" type="checkbox" value="vim" />
 				<input id="reset" type="button" value="重新设置" />
 			</div>
@@ -157,7 +159,7 @@
 	<div id='mask' class="mask"></div>
 
 
-	<script type="text/template" id="codemirrorTemplate">
+	<script type="text/template" id="langTemplate">
 		<%data.forEach(function(item){%>
 			<option key="<%=item.cid%>" value="<%=item.text.toLowerCase()%>"><%=item.text%></option>
 		<%});%>
@@ -198,6 +200,18 @@
 
 	<script type="text/template" id="saveAsTemplate">
 		<div class="commonContent confirmContent saveAsContent">
+			<label>标题：</label>
+			<input class="articleTitle" type="text" value="<%=data.title%>" />
+			<br>
+			<label>类型：</label>
+			<label for="articleType" class="articleCategory select">
+				<select id="articleType">
+					<option value="1">私有文件</option>
+					<option value="0">公有文件</option>
+					<option value="2">网站本身</option>
+				</select>
+			</label>
+			<br>
 			<label>分类：</label>
 			<label for="articleCategory" class="articleCategory select">
 				<select id="articleCategory">
@@ -206,9 +220,6 @@
 					<%});%>
 				</select>
 			</label>
-			<br>
-			<label>标题：</label>
-			<input class="articleTitle" type="text" value="<%=data.title%>" />
 			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
 			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
 		</div>

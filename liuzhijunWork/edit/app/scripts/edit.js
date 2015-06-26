@@ -212,6 +212,7 @@ function notify(title,body){
 		'sass':'sass',
 		'haml':'text/html'
 	};
+
 	var reTypeObj={
 		'javascript':'js',
 		'css':'css',
@@ -335,7 +336,10 @@ function notify(title,body){
 		dataType:'json',
 		success:function(data){
 			categoryData = data;
-			applyTemplate(categoryData,'codemirrorTemplate',lang);
+			var langData = data.filter(function(item){
+				return item.type===0;
+			});
+			applyTemplate(langData,'langTemplate',lang);
 			initArticle(aid);
 			ajaxCompleteObj.categoryList=true;
 			ajaxCompleteObj.count++;
@@ -351,12 +355,14 @@ function notify(title,body){
 				type:'get',
 				dataType:'json',
 				success:function(data){
-					setTitle(data.title);
+					var title = data.title;
+					setTitle(title);
 					setValue(data.content);
-					cid = data.cid;
-					var op=lang.querySelector('option[key="'+cid+'"]');
-					lang.value = op.value;
-					lang.onchange();
+					var type = title.substr(title.lastIndexOf('.')+1,title.length-title.lastIndexOf('.'));
+					if(TypeObj[type]){
+						lang.value = TypeObj[type];
+						lang.onchange();
+					}
 					ajaxCompleteObj.article=true;
 					ajaxCompleteObj.count++;
 					unMask();
@@ -507,7 +513,7 @@ function notify(title,body){
 			var data={'ok':'确定','cancel':'取消','list':categoryData,'title':getTitle()||'','cid':cid||''};
 			var content = encodeURIComponent(getValue());
 			var mdata = {'content':content};
-			dialog.openFromTemplate(data,'saveAsTemplate',300,150,function(isOk){
+			dialog.openFromTemplate(data,'saveAsTemplate',300,200,function(isOk){
 				if(!isOk) return;
 				mdata.cid = G('articleCategory').value;
 				mdata.title = dialogEl.querySelector('.articleTitle').value;
@@ -696,6 +702,9 @@ function notify(title,body){
 			delete localStorage[tokenFiled];
 			delete localStorage.userName;
 			win.location.href="index.html#login";
+		},
+		admin:function(){
+			win.location.href="main.html";
 		}
 	}
 

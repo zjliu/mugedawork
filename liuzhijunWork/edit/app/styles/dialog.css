@@ -135,11 +135,14 @@
 }
 .dialog .container input[type="text"]{
 	width:150px;
+	line-height:18px;
 	border:1px solid rgba(0,0,0,0);
 	padding:2px 0;
 	text-indent:2px;
 	overflow:hidden;
 	background:#fff;
+	box-sizing:border-box;
+	-webkit-box-sizing:border-box;
 	-webkit-transition: box-shadow 0.30s ease-in-out;
 	transition: box-shadow 0.30s ease-in-out;
 }
@@ -154,6 +157,9 @@
 	text-align:right;
 	height:30px;
 	line-height:30px;
+	vertical-align: middle;
+	box-sizing:border-box;
+	-webkit-box-sizing:border-box;
 }
 
 /*promptContent*/

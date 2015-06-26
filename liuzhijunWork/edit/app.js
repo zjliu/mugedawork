@@ -201,5 +201,18 @@ app.get('/pen/:pid',function(req,res){
 	Q.getPen(pid,res,req.query);
 });
 
+app.post('/cat/add',function(req,res){
+	var Q = require('./server/do');
+	Q.addCategory(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
+app.post('/cat/delete',function(req,res){
+	var Q = require('./server/do');
+	Q.deleteCategory(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
 
 app.listen(4000);

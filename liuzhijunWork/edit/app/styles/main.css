@@ -12,17 +12,11 @@ html, body {
 
 .listMenu{
 	position:fixed;
-	top:0;
+	top:0px;
 	left:0;
 	bottom:0;
 	width:10%;
 	z-index:1;
-	display:box;
-	display:-webkit-box;
-	-webkit-box-orient:vertical;
-	box-sizing:border-box;
-	-webkit-box-sizing:border-box;
-	box-shadow:0px 0px 3px 8px rgba(255,255,255,.3);
 }
 
 .content{
@@ -50,52 +44,4 @@ html, body {
 
 .content .page.slideleft{
 	transform:scaleX(1);
-}
-
-.listMenu>a{
-	display:block;
-	box-flex: 1;
-	-webkit-box-flex: 1;
-	text-align:center;
-	position:relative;
-	cursor:pointer;
-	box-sizing:border-box;
-	-webkit-box-sizing:border-box;
-	position:relative;
-	color:#fff;
-	border-bottom:1px solid rgba(50, 43, 7, 1);
-	background-image:-webkit-linear-gradient(to right,#000,rgba(255,255,255,.3));
-	background-image:linear-gradient(to right,rgba(255,255,255,.3),#000);
-}
-
-.listMenu>a:last-child{
-	border-bottom:none;
-}
-
-/*
-.listMenu>a.active{
-	background-image:-webkit-linear-gradient(to right,#eee,rgba(255,255,255,.3));
-	background-image:linear-gradient(to right,rgba(255,255,255,.3),#888);
-	border-radius:1px;
-}
-*/
-
-.listMenu>a.active:before{
-	content:'';
-	position:absolute;
-	top:0;
-	right:-8px;
-	width:8px;
-	height:100%;
-	background:rgba(255,0,0,0.7);
-	border-radius:4px;
-}
-
-.listMenu>a:after{
-	content:attr(value);
-	position:absolute;
-	top:50%;
-	left:50%;
-	transform:translate(-50%,-50%);
-	-webkit-transform:translate(-50%,-50%);
 }
