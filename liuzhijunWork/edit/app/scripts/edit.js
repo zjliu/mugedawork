@@ -230,6 +230,10 @@ function notify(title,body){
 		return titleEl.value;
 	}
 
+	function getType(){
+		return document.getElementById('articleType').value;
+	}
+
 	var defColor = '#000000';
 
 	function changeMode(){
@@ -517,6 +521,7 @@ function notify(title,body){
 				if(!isOk) return;
 				mdata.cid = G('articleCategory').value;
 				mdata.title = dialogEl.querySelector('.articleTitle').value;
+				mdata.type = getType();
 				AjaxUtil.ajax({
 					url:'/article/add',
 					type:'post',
