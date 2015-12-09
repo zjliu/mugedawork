@@ -210,13 +210,15 @@ function notify(title,body){
 		'html':'text/html',
 		'less':'css',
 		'sass':'sass',
-		'haml':'text/html'
+		'haml':'text/html',
+		'md':'text/x-markdown'
 	};
 
 	var reTypeObj={
 		'javascript':'js',
 		'css':'css',
-		'text/html':'html'
+		'text/html':'html',
+		'text/x-markdown':'md'
 	};
 
 	function setTitle(value){

@@ -15,6 +15,8 @@
 	<!--dialog-->
     <link href="styles/dialog.css" rel="stylesheet" />
 	<script src="scripts/dialog.js"></script>
+    <link href="styles/zjTable.css" rel="stylesheet" />
+	<script src="scripts/zjTable.js"></script>
 
 	<!--layout-->
     <link href="styles/menu.css" rel="stylesheet" />
@@ -26,7 +28,7 @@
 
 </head>
 <body>
-	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"}]'>
+	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"},{"href":"#page5","value":"作品管理"}]'>
 	</list-menu>
 	<div class="content">
 		<div id="page1" data-fun="penlist" class="page codepenList slideleft">
@@ -125,6 +127,29 @@
 				}
 			</style>
 		</div>
+		<div id="page5" class="page">
+			<table class="zjtable">
+				<tr>
+					<th type="int">姓别</th>
+					<th rowspan="2" type="string">姓名</th>
+					<th colspan="2" type="string">所在地</th>
+					<th type="date">日期</th>
+				</tr>
+				<tr>
+					<th type="string">所在地</th>
+					<th type="date">日期1</th>
+					<th type="date">日期2</th>
+					<th type="date">日期2</th>
+				</tr>
+				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
+				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
+				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
+				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
+				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
+				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
+				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
+			</table>
+		</div>
 	</div>
 	<div id="dialog" class="dialog">
 		<label class="close closeBtn" title="关闭">+</label>
@@ -188,5 +213,7 @@
 	<script src="scripts/customDom.js"></script>
 	<script src="scripts/registerDom.js"></script>
 	<script src="scripts/main.js"></script>
+
+	<script src="scripts/blog.js"></script>
 </body>
 </html>
