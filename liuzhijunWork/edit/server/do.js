@@ -306,6 +306,30 @@ function deleteCategory(params,callback){
 	});
 }
 
+function createDBTable(params,callback){
+	params.udate = "datetime('now')";
+	var fileds = { 'stct':true,'data':true,'type':false,'udate':false};
+	var sql = getInsertSql('db',params,fileds);
+	exec(sql,function(error){
+		if(!callback) return;
+		if(error===null){
+			var sql = "select max(id) id from db";
+			query(sql,function(data){
+				data && data.length && callback(true,data[0]);
+			});
+		}
+		else{
+			callback && callback(false);
+		}
+	});
+}
+function updateDBTable(param,callback){
+
+}
+function dropDBTable(param,callback){
+
+}
+
 function query(sql,callback){
 	db.serialize(function(){
 		db.all(sql,function(err,rows){
@@ -336,3 +360,6 @@ exports.updatePen = updatePen;
 exports.deletePen = deletePen;
 exports.addCategory = addCategory;
 exports.deleteCategory = deleteCategory;
+exports.createDBTable = createDBTable;
+exports.updateDBTable = updateDBTable;
+exports.dropDBTable = dropDBTable;
