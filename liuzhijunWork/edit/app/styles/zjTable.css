@@ -42,11 +42,16 @@
 .zjtable .zjtable_row_up,
 .zjtable .zjtable_row_down{ margin:0 5px; cursor:pointer; }
 
+
 .zjtable td.zjtable_opr_data{ padding:1em 5px; width:100px; }
 .zjtable td.zjtable_opr_move{ padding:1em 5px; width:80px; }
-.zjtable td.zjtable_opr_data i:hover, .zjtable td.zjtable_opr_move i:hover{ color:red; }
 
-.zjtable tr.edit td input:focus{ color:#fff; font-size:30px; }
+.zjtable tr.edit .zjtable_row_update,
+.zjtable td.zjtable_opr_data i:hover, 
+.zjtable td.zjtable_opr_move i:hover{ color:red; }
+
+.zjtable tr.edit td input:not(.Wdate):focus{ color:#fff; font-size:30px; }
+.zjtable tr.edit td input.Wdate{ color:#fff; cursor:pointer; }
 .zjtable tr.edit td input,
 .zjtable tr.edit td select{ 
 	width:100%; 

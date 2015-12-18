@@ -1,18 +1,13 @@
 var zjData= [ 
-/*
 	[
-		{name:"base", text:"固有属性", colspan:2},
-		{name:"other", text:"添加属性", colspan:2}
+		{name:"table", text:"表结构", colspan:3}
 	],
 	[
-		{ name:"sex", text:"性别", type:"shortInt"},
-		{ name:"name", text:"姓名",  type:"string"},
-		{ name:"address", text:"地址",  type:"string"},
-		{ name:"date", text:"日期",  type:"date"}
-	]
-*/
+		{name:"field",text:"属姓名",colspan:2,type:"string"},
+		{name:"field",text:"属姓名",type:"string"}
+	],
 	[
-		{name:"field",text:"属姓名",type:"int"},
+		{name:"field",text:"属姓名",type:"string"},
 		{name:"type",text:"类型",type:"list", data:['整数','短整数','字符串','日期'] },
 		{name:"opacity",text:"日期",type:"date"}
 	]
@@ -63,27 +58,36 @@ var zjTable = (function(){
 	var selectTemplate = `
 		<select>
 			<%for(var i=0,l=data.length;i<l;i++){%>
-				<option value="<%=i%>"<%=attr('selected',value===data[i])%>><%=data[i]%></option>
+				<option value="<%=i%>"<%=attr('selected',value===i)%>><%=data[i]%></option>
 			<%}%>
 		</select>
 	`;
 	//data,item,edit
 	var rowDataTemplate = `
-		<tr class="tbData<%=data.edit?" edit":""%>">
+		<tr class="tbData<%=data.edit?" edit newRow":""%>">
 			<%if(data.edit){for(var value of item){switch(value.type){%>
-				<%case "list":%>
+				<%case 'date':%>
+					<td><input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" value="<%=value.value%>" /></td>
+				<%break;case "list":%>
 					<td><select>
 						<%for(var i=0,l=value.value.length;i<l;i++){%>
 							<option value="<%=i%>"><%=value.value[i]%></option>
 						<%}%>
 					</select></td>
 				<%break;default:%><td><input type="text" value="<%=value.value%>" /></td><%break;%>
-			<%}}}else for(var i=0,l=item.length;i<l;i++){%><td><%=item[i]%></td><%}%>
+			<%}}}else{var fields=data.fields[data.fields.length-1];for(var i=0,l=item.length;i<l;i++){var field=fields[i];%>
+				<%if(field.type==="list"){%>
+					<td sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
+				<%}else{%> <td><%=item[i]%></td> <%}%>
+			<%}}%>
 			<%if(data.operate){with(data.operate){%>
 				<%if(add+update+drop>0){%>
 					<td class="zjtable_opr_data">
 						<%if(add){%> <i class="zjtable_row_add fa fa-plus" title="添加"></i> <%}%>
-						<%if(update){%> <i class="zjtable_row_update fa fa-pencil-square-o" title="修改"></i> <%}%>
+						<%if(update){%> 
+							<%if(data.edit){%> <i class="zjtable_row_update fa fa-check" title="保存"></i> 
+							<%}else{%> <i class="zjtable_row_update fa fa-pencil-square-o" title="修改"></i> <%}%>
+						<%}%>
 						<%if(drop){%> <i class="zjtable_row_delete fa fa-times" title="删除"></i> <%}%>
 					</td>
 				<%}%>
@@ -99,16 +103,15 @@ var zjTable = (function(){
 	var headerTemptStr = `
 		<table class="zjtable" width="<%=data.tableWidth%>px">
 			<%data.fields.forEach(function(jtem,jndex){%>
-				<%var isLast=jndex===data.fields.length-1;%>
-				<tr<%=attr("class",isLast?"fields":"header")%>>
+				<tr<%=attr("class",(jndex===data.fields.length-1)?"fields":"header")%>>
 					<%jtem.forEach(function(item){%>
 						<th<%=attr("type",item.type)%><%=attr("rowspan",item.rowspan)%><%=attr("colspan",item.colspan)%>>
 							<%=item.text%>
 						</th>
 					<%});%>
-					<%if(isLast && data.operate){with(data.operate){%>
+					<%if(jndex===0 && data.operate){with(data.operate){%>
 						<%if(add+update+drop+up+down>0){%>
-							<th<%=attr("colspan",~~!!(add+update+drop) + ~~!!(up+down)===2?2:0)%>>操作</th>
+							<th<%=attr("colspan",~~!!(add+update+drop) + ~~!!(up+down)===2?2:0)%> rowspan="<%=data.fields.length%>">操作</th>
 						<%}%>
 					<%}}%>
 				</tr>
@@ -157,6 +160,23 @@ var zjTable = (function(){
 		getColData:function(tdEl){
 			return this.tData[tdEl.index()];
 		},
+		getRowData:function(trEl){
+			var tds = trEl.children;
+			var tData = this.tData[this.tData.length-1];
+			var arr = [],td,value;
+			for(var i=0,l=tData.length;i<l;i++){
+				td = tds[i];
+				value = td.querySelector('input,select').value;
+				switch(tData[i].type){
+					case 'int':case'shortInt':case 'list':
+					value = ~~value;
+					default:
+					break;
+				}
+				arr.push(value);
+			}
+			console.log(arr);
+		},
 		getTableWidth:function(){
 			var arr = this.tData[this.tData.length-1].map(p=>twObj[p.type]);
 				arr.push(180);
@@ -185,12 +205,13 @@ var zjTable = (function(){
 		initOperate:function(){
 			var self = this;
 			this.containerEl.addEventListener('click',function(e){
-				var target = e.target;
-				if(/zjtable_row_add/.test(target.className)) {self.addNewRow(target);return;}
-				if(/zjtable_row_update/.test(target.className)) {self.modifyRow(target);return;}
-				if(/zjtable_row_delete/.test(target.className)) {self.deleteRow(target);return;}
-				if(/zjtable_row_up/.test(target.className)) {self.rangeRow(target,true);return;}
-				if(/zjtable_row_down/.test(target.className)) {self.rangeRow(target);return;}
+				var target = e.target,clist=target.classList;
+				function dis(){target.style.opacity=0.5;}
+				if(clist.contains('zjtable_row_add')) {self.addNewRow(target);return;}
+				if(clist.contains('zjtable_row_update')){self.modifyRow(target);return;}
+				if(clist.contains('zjtable_row_delete')) {self.deleteRow(target);return;}
+				if(clist.contains('zjtable_row_up')) {self.rangeRow(target,true);return;}
+				if(clist.contains('zjtable_row_down')) {self.rangeRow(target);return;}
 			});
 		},
 		addNewRow:function(el){
@@ -205,14 +226,25 @@ var zjTable = (function(){
 		},
 		modifyRow:function(el){
 			var trEl = el.closest(p=>p.tagName.toLowerCase()==='tr');
-				trEl.classList.add('edit');
+			if(trEl.classList.contains('edit')){
+				this.getRowData(trEl);
+				return;
+			}
+			trEl.classList.add('edit');
+			el.classList.remove('fa-pencil-square-o');
+			el.classList.add('fa-check');
+			el.setAttribute('title','保存');
 			var arr = this.tData[this.tData.length-1];
 			for(var i=0,l=arr.length;i<l;i++){
 				var item = arr[i];
 				var td = trEl.children[i];
 				switch(item.type){
 					case 'list':
-						td.innerHTML = selectFun(item.data,0);
+						td.innerHTML = selectFun(item.data,~~td.getAttribute('sindex'));
+					break;
+					case 'datetime':
+					case 'date':
+						td.innerHTML = `<input type="text" class="Wdate" readonly="readonly" onclick="WdatePicker()" value="${td.innerText}" >`;
 					break;
 					default:
 						td.innerHTML = `<input type="text" value="${td.innerText}">`;
