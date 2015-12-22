@@ -215,9 +215,30 @@ app.post('/cat/delete',function(req,res){
 	});
 });
 
+app.post('/db/get',function(req,res){
+	var Q = require('./server/do');
+	Q.getDBTable(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
 app.post('/db/add',function(req,res){
 	var Q = require('./server/do');
 	Q.createDBTable(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
+app.post('/db/update',function(req,res){
+	var Q = require('./server/do');
+	Q.updateDBTable(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
+app.post('/db/delete',function(req,res){
+	var Q = require('./server/do');
+	Q.dropDBTable(req.body,function(success,data){
 		res.json({'success':success,'data':data});
 	});
 });

@@ -323,11 +323,50 @@ function createDBTable(params,callback){
 		}
 	});
 }
-function updateDBTable(param,callback){
 
+function getDBTable(param,callback){
+	var sql = 'select * from db where id='+param.pid;
+	query(sql,function(rows){
+		callback && callback(~~rows.length,rows[0]);
+	});
 }
-function dropDBTable(param,callback){
 
+function updateDBTable(param,callback){
+	var index = param.index; 
+	var sql = 'select data from db where id='+param.id;
+	query(sql,function(rows){
+		if(rows.length){
+			var row = JSON.parse(rows[0].data);
+			row[index]=JSON.parse(param.data);
+			var fields = {'data':true,'udate':false};
+			var pd = {udate:"datetime('now')",data:JSON.stringify(row)};
+			var whereSql = 'where id='+param.id;
+			var updateSql = getUpdateSql('db',pd,fields,whereSql);
+			exec(updateSql,function(error){
+				callback && callback(error===null);
+			});
+		}else{
+			callback && callback(false);
+		}
+	});
+
+	/*
+	var data = param.data;
+	var index = param.index; 
+	var id = param.id;
+	var fileds = {
+		'stct':true,'data':true,'type':false,'udate':false
+	};
+	params.udate = "datetime('now')";
+	var whereSql = 'where id='+param.id;
+	var updateSql = getUpdateSql('db',params,fileds,whereSql);
+	exec(updateSql,function(error){
+		callback && callback(error===null);
+	});
+	*/
+}
+
+function dropDBTable(param,callback){
 }
 
 function query(sql,callback){
@@ -360,6 +399,9 @@ exports.updatePen = updatePen;
 exports.deletePen = deletePen;
 exports.addCategory = addCategory;
 exports.deleteCategory = deleteCategory;
+
 exports.createDBTable = createDBTable;
 exports.updateDBTable = updateDBTable;
 exports.dropDBTable = dropDBTable;
+
+exports.getDBTable = getDBTable;

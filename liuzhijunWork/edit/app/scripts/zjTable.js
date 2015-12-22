@@ -1,27 +1,26 @@
+/*
 var zjData= [ 
 	[
-		{name:"table", text:"表结构", colspan:3}
+		{name:"table", text:"表字段", colspan:4}
 	],
 	[
-		{name:"field",text:"属姓名",colspan:2,type:"string"},
-		{name:"field",text:"属姓名",type:"string"}
-	],
-	[
-		{name:"field",text:"属姓名",type:"string"},
-		{name:"type",text:"类型",type:"list", data:['整数','短整数','字符串','日期'] },
-		{name:"opacity",text:"日期",type:"date"}
+		{name:"field",text:"属姓名",type:"string",hidden:false},
+		{name:"type",text:"类型",type:"list", data:['int','shortInt','string','date'],hidden:false },
+		{name:"color",text:"顔色",type:"color",hidden:false},
+		{name:"udate",text:"更新日期",type:"date",hidden:false}
 	]
 ];
 
 var mdata = [
-	['男',0,'2015-03-14'],
-	['男',1,'2015-03-14'],
-	['男',2,'2015-03-14'],
-	['男',0,'2015-03-14'],
-	['男',1,'2015-03-14'],
-	['男',1,'2015-03-14'],
-	['男',2,'2015-03-14']
+	['name',0,'#33FF33','2015-03-14'],
+	['sex',1,'rgba(23,233,78,0.5)','2015-03-14'],
+	['region',2,'red','2015-03-14'],
+	['city',0,'hsl(0, 50%, 50%)','2015-03-14'],
+	['cuntry',1,'red','2015-03-14'],
+	['area',1,'red','2015-03-14'],
+	['date',2,'red','2015-03-14']
 ];
+*/
 
 function ajax(opt){
 	var isPost = opt.type.toLowerCase()==='post';
@@ -43,12 +42,21 @@ function ajax(opt){
 	}
 }
 
+function getHEX(el,name){
+	var rgbaStr = getComputedStyle(el)[name];
+	return '#'+rgbaStr.split(/[(,)]/).splice(1,3).map(p=>(~~p)?(~~p).toString(16):'00').join('');
+}
+
 HTMLElement.prototype.index=function(){
 	return Array.prototype.indexOf.call(this.parentNode.children,this);
 }
 
+HTMLElement.prototype.sindex=function(selector){
+	return Array.prototype.indexOf.call(this.parentNode.querySelectorAll(selector),this);
+}
+
 var zjTable = (function(){
-	var twObj={'int':70,'shortInt':40,'string':70,'shortString':40,'date':120,'datetime':150,'list':120};
+	var twObj={'int':70,'shortInt':40,'string':70,'color':70,'shortString':40,'date':120,'datetime':150,'list':120};
 	function getNowString(ctime){
 		var d = new Date;
 		var str = [d.getFullYear(),d.getMonth()+1,d.getDate()].join('-');
@@ -65,8 +73,11 @@ var zjTable = (function(){
 	//data,item,edit
 	var rowDataTemplate = `
 		<tr class="tbData<%=data.edit?" edit newRow":""%>">
+			<td></td>
 			<%if(data.edit){for(var value of item){switch(value.type){%>
-				<%case 'date':%>
+				<%case 'color':%>
+					<td><input type="color" value="<%=value.value%>" /></td>
+				<%break;case 'date':%>
 					<td><input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" value="<%=value.value%>" /></td>
 				<%break;case "list":%>
 					<td><select>
@@ -77,8 +88,10 @@ var zjTable = (function(){
 				<%break;default:%><td><input type="text" value="<%=value.value%>" /></td><%break;%>
 			<%}}}else{var fields=data.fields[data.fields.length-1];for(var i=0,l=item.length;i<l;i++){var field=fields[i];%>
 				<%if(field.type==="list"){%>
-					<td sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
-				<%}else{%> <td><%=item[i]%></td> <%}%>
+					<td class="field" sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
+				<%}else if(field.type==="color"){%>
+					<td class="field"><span style="background-color:<%=item[i]%>"></span></td>
+				<%}else{%><td class="field"><%=item[i]%></td> <%}%>
 			<%}}%>
 			<%if(data.operate){with(data.operate){%>
 				<%if(add+update+drop>0){%>
@@ -104,6 +117,9 @@ var zjTable = (function(){
 		<table class="zjtable" width="<%=data.tableWidth%>px">
 			<%data.fields.forEach(function(jtem,jndex){%>
 				<tr<%=attr("class",(jndex===data.fields.length-1)?"fields":"header")%>>
+					<%if(jndex===0){%>
+						<th type="index"<%=attr("rowspan",data.fields.length)%>>序号</th>
+					<%}%>
 					<%jtem.forEach(function(item){%>
 						<th<%=attr("type",item.type)%><%=attr("rowspan",item.rowspan)%><%=attr("colspan",item.colspan)%>>
 							<%=item.text%>
@@ -144,18 +160,26 @@ var zjTable = (function(){
 		},
 		initData:function(){
 			var self = this;
-			this.queryData(function(data){
-				self.tData = zjData;
-				self.containerEl.innerHTML = headerFun({
-					fields:zjData,
-					data:mdata,
+			this.queryData(function(info){
+				if(!info.success) return;
+				var data = info.data;
+				var tData = JSON.parse(data.stct);
+				var data = JSON.parse(data.data);
+				self.tData = tData;
+				self.tableData = {
+					fields:tData,
+					data:data,
 					operate:{add:1,update:1,drop:1,up:1,down:1},
 					tableWidth:self.getTableWidth()
-				});
+				};
+				self.show(self.data);
 			});
 		},
 		queryData:function(callback){
-			ajax({ type:'POST', url:this.opts.dataUrl, data:{a:1,b:2}, success:callback });
+			ajax({ type:'POST', url:this.opts.dataUrl, data:{pid:1}, success:callback });
+		},
+		show:function(){
+			this.containerEl.innerHTML = headerFun(this.tableData);
 		},
 		getColData:function(tdEl){
 			return this.tData[tdEl.index()];
@@ -165,21 +189,21 @@ var zjTable = (function(){
 			var tData = this.tData[this.tData.length-1];
 			var arr = [],td,value;
 			for(var i=0,l=tData.length;i<l;i++){
-				td = tds[i];
+				td = tds[i+1];
 				value = td.querySelector('input,select').value;
 				switch(tData[i].type){
 					case 'int':case'shortInt':case 'list':
-					value = ~~value;
+						value = ~~value;
 					default:
 					break;
 				}
 				arr.push(value);
 			}
-			console.log(arr);
+			return arr;
 		},
 		getTableWidth:function(){
 			var arr = this.tData[this.tData.length-1].map(p=>twObj[p.type]);
-				arr.push(180);
+				arr.push(221);
 			return arr.reduce((a,b)=>a+b);
 		},
 		getEmptyTrData:function(){
@@ -214,20 +238,33 @@ var zjTable = (function(){
 				if(clist.contains('zjtable_row_down')) {self.rangeRow(target);return;}
 			});
 		},
+		getTargetTr:function(el){
+			return el.closest(p=>p.tagName.toLowerCase()==='tr');
+		},
+		data_save:function(data,index){
+			ajax({
+				url:'/db/update',
+				type:'post',
+				data:{data:JSON.stringify(data),index:index,id:1},
+				success:function(info){
+					if(info.success) alert('成功！');
+					else alert('失败！');
+				}
+			});
+		},
 		addNewRow:function(el){
-			var trEl = el.closest(p=>p.tagName.toLowerCase()==='tr');
+			var trEl = this.getTargetTr(el);
 			var temp = document.createElement('tbody');
-			temp.innerHTML = rowFun({
-				tbData:this.tData, edit:true,
-				operate:{add:1,update:1,drop:1,up:1,down:1}
-			}, this.getEmptyTrData());
+			temp.innerHTML = rowFun({ tbData:this.tData, edit:true, operate:this.tableData.operate }, this.getEmptyTrData());
 			if(trEl.nextElementSibling) trEl.parentElement.insertBefore(temp.firstChild,trEl.nextElementSibling);
 			else trEl.parentElement.appendChild(temp.firstChild);
 		},
 		modifyRow:function(el){
-			var trEl = el.closest(p=>p.tagName.toLowerCase()==='tr');
+			var trEl = this.getTargetTr(el);
 			if(trEl.classList.contains('edit')){
-				this.getRowData(trEl);
+				var subData=this.getRowData(trEl);
+				var index = trEl.sindex('tr.tbData:not(.newRow)');
+				this.data_save(subData,index);
 				return;
 			}
 			trEl.classList.add('edit');
@@ -237,7 +274,7 @@ var zjTable = (function(){
 			var arr = this.tData[this.tData.length-1];
 			for(var i=0,l=arr.length;i<l;i++){
 				var item = arr[i];
-				var td = trEl.children[i];
+				var td = trEl.children[i+1];
 				switch(item.type){
 					case 'list':
 						td.innerHTML = selectFun(item.data,~~td.getAttribute('sindex'));
@@ -246,6 +283,10 @@ var zjTable = (function(){
 					case 'date':
 						td.innerHTML = `<input type="text" class="Wdate" readonly="readonly" onclick="WdatePicker()" value="${td.innerText}" >`;
 					break;
+					case 'color':
+						var color = getHEX(td.querySelector('span'),'background-color');
+						td.innerHTML = `<input type="color" value="${color}">`;
+					break;
 					default:
 						td.innerHTML = `<input type="text" value="${td.innerText}">`;
 					break;
@@ -253,11 +294,20 @@ var zjTable = (function(){
 			}
 		},
 		deleteRow:function(el){
-			var trEl = el.closest(p=>p.tagName.toLowerCase()==='tr');
-			trEl.parentElement.removeChild(trEl);
+			var trEl = this.getTargetTr(el);
+			trEl.classList.add('deleted');
+			setTimeout(function(){ trEl.parentElement.removeChild(trEl); },500);
 		},
 		rangeRow:function(el,isup){
+			var trEl = this.getTargetTr(el);
+			if(trEl.classList.contains('edit')) return;
+			var index = trEl.sindex('tr.tbData');
+			if(index===0 && isup || !trEl.nextElementSibling && !isup) return;
+			var data = this.tableData.data;
+			data.splice(index+(isup?-1:1),0,data.splice(index,1)[0]);
+			this.show();
 		}
 	}
 	return table;
 })();
+

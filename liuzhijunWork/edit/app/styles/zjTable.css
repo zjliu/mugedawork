@@ -11,12 +11,14 @@
 
 .zjtable th[type=shortString]{ width:40px; }
 .zjtable th[type=string]{ width:70px; }
+.zjtable th[type=color]{ width:70px; }
 .zjtable th[type=int]{ width:70px; }
 .zjtable th[type=shortInt]{ width:40px; }
 .zjtable th[type=date]{ width:120px; }
 .zjtable th[type=datetime]{ width:150px; }
 .zjtable th[type=image]{ width:150px; }
 .zjtable th[type=list]{ width:120px; }
+.zjtable th[type=index]{width:40px;}
 
 .zjtable tr { border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; border-color: #46637f; }
 
@@ -31,10 +33,11 @@
 	-webkit-box-sizing:border-box; 
 	word-wrap:break-word;
 }
-.zjtable th { vertical-align: middle; padding:1em 0; }
 
-.zjtable td:before { content: attr(data-th) ": "; font-weight: bold; width: 6.5em; display: inline-block; }
-.zjtable td:before { display: none; }
+.zjtable th { vertical-align: middle; padding:1em 0; }
+.zjtable tbody{ counter-reset: item; }
+.zjtable tr>td:first-child{ vertical-align: middle; text-shadow:1px 1px 2px rgba(255,255,255,.2); }
+.zjtable tr>td:first-child:before{ content:'#'; counter-increment: item; content: counter(item); }
 
 .zjtable .zjtable_row_add,
 .zjtable .zjtable_row_delete,
@@ -67,7 +70,10 @@
 }
 .zjtable tr.edit td input{ padding:2px 2px; transition:font-size ease 0.5s;width:95%;}
 .zjtable tr.edit td select option{ background-color:#333; }
-.zjtable tr.edit td{ padding:0; height:44px; line-height:44px; background-color:#333; color:#fff; vertical-align: middle; }
+.zjtable tr.edit td.field{ padding:0; height:44px; line-height:44px; background-color:#333; color:#fff; vertical-align: middle; }
 .zjtable tr.edit td>div{ width:100%; height:100%; overflow:hidden; }
-
+.zjtable tr.tbData:hover:not(.edit){ background:rgba(70,99,127,1); }
+.zjtable tr.tbData{ transition:transform ease 0.5s;transform:scaleY(1);transform-origin:50% 0; }
+.zjtable tr.tbData.deleted {transform:scaleY(0);}
+.zjtable tr.tbData td span{ display:inline-block; width:50px; height:10px; vertical-align: middle; border-radius:5px; }
 
