@@ -28,7 +28,9 @@ function ajax(opt){
 	var paramStr = ''; for(var key in opt.data) paramStr=[paramStr,'&',key,'=',opt.data[key]].join('');
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange=function(){
-		if(this.readyState===4 && this.status===200) opt.success(JSON.parse(this.responseText));
+		if(this.readyState!==4) return;
+		if(this.status===200) opt.success && opt.success(JSON.parse(this.responseText));
+		else this.error && this.error(this.responseText);
 	}
 	if(isPost){
 		xhr.open(opt.type,opt.url);
@@ -44,7 +46,7 @@ function ajax(opt){
 
 function getHEX(el,name){
 	var rgbaStr = getComputedStyle(el)[name];
-	return '#'+rgbaStr.split(/[(,)]/).splice(1,3).map(p=>(~~p)?(~~p).toString(16):'00').join('');
+	return '#'+rgbaStr.split(/[(,)]/).splice(1,3).map(function(p){var c=(~~p).toString(16); return c.length===1?'0'+c:c;}).join('');
 }
 
 HTMLElement.prototype.index=function(){
@@ -76,16 +78,16 @@ var zjTable = (function(){
 			<td></td>
 			<%if(data.edit){for(var value of item){switch(value.type){%>
 				<%case 'color':%>
-					<td><input type="color" value="<%=value.value%>" /></td>
+					<td class="field"><input type="color" value="<%=value.value%>" /></td>
 				<%break;case 'date':%>
-					<td><input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" value="<%=value.value%>" /></td>
+					<td class="field"><input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" value="<%=value.value%>"/></td>
 				<%break;case "list":%>
-					<td><select>
+					<td class="field"><select>
 						<%for(var i=0,l=value.value.length;i<l;i++){%>
 							<option value="<%=i%>"><%=value.value[i]%></option>
 						<%}%>
 					</select></td>
-				<%break;default:%><td><input type="text" value="<%=value.value%>" /></td><%break;%>
+				<%break;default:%><td class="field"><input type="text" value="<%=value.value%>" /></td><%break;%>
 			<%}}}else{var fields=data.fields[data.fields.length-1];for(var i=0,l=item.length;i<l;i++){var field=fields[i];%>
 				<%if(field.type==="list"){%>
 					<td class="field" sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
@@ -95,7 +97,7 @@ var zjTable = (function(){
 			<%}}%>
 			<%if(data.operate){with(data.operate){%>
 				<%if(add+update+drop>0){%>
-					<td class="zjtable_opr_data">
+					<td class="zjtable_opr_data ow<%=add+update+drop%>">
 						<%if(add){%> <i class="zjtable_row_add fa fa-plus" title="添加"></i> <%}%>
 						<%if(update){%> 
 							<%if(data.edit){%> <i class="zjtable_row_update fa fa-check" title="保存"></i> 
@@ -105,7 +107,7 @@ var zjTable = (function(){
 					</td>
 				<%}%>
 				<%if(up+down>0){%>
-					<td class="zjtable_opr_move">
+					<td class="zjtable_opr_move ow<%=up+down%>">
 						<%if(up){%> <i class="zjtable_row_up fa fa-arrow-up" title="上移"></i><%}%>
 						<%if(down){%> <i class="zjtable_row_down fa fa-arrow-down" title="下移"></i> <%}%>
 					</td>
@@ -133,6 +135,9 @@ var zjTable = (function(){
 				</tr>
 			<%});%>
 			<%data.data.forEach(function(item){%> ${rowDataTemplate} <%});%>
+			<%if(data.operate){with(data.operate){if(add+update+drop+up+down>0){%>
+				<tr class="tipTr"><td class="zjtable_tip_tr" colspan="<%=data.fields[data.fields.length-1].length+3%>"></td></tr>
+			<%}}}%>
 		</table>
 	`;
 	var selectFun = template(selectTemplate,'data,value');
@@ -140,7 +145,8 @@ var zjTable = (function(){
 	var rowFun = template(rowDataTemplate,'data,item');
 	var options = {
 		container:null,
-		dataUrl:null
+		dataUrl:null,
+		showops:true
 	};
 	var table = function(opts){
 		this.opts = {};
@@ -164,19 +170,25 @@ var zjTable = (function(){
 				if(!info.success) return;
 				var data = info.data;
 				var tData = JSON.parse(data.stct);
+				var operation = JSON.parse(data.operation);
 				var data = JSON.parse(data.data);
+				self.operation = operation;
 				self.tData = tData;
-				self.tableData = {
-					fields:tData,
-					data:data,
-					operate:{add:1,update:1,drop:1,up:1,down:1},
-					tableWidth:self.getTableWidth()
-				};
+				if(!data || !data.length) data = [self.getEmptyTrData().map(p=>p.type==="list"?0:p.value)];
+				self.tableData = { fields:tData, data:data, operate:operation, tableWidth:self.getTableWidth() };
 				self.show(self.data);
+				if(!info.success){ self.showTip('数据请求失败！'); return; }
+				else self.showTip('数据请求成功！'); 
 			});
 		},
 		queryData:function(callback){
 			ajax({ type:'POST', url:this.opts.dataUrl, data:{pid:1}, success:callback });
+		},
+		showTip:function(tip){
+			var tipEl = this.containerEl.querySelector('.zjtable_tip_tr');
+			if(!tipEl) return;
+			tipEl.innerText =  tip;
+			setTimeout(function(){ tipEl.innerText = ''; },1000);
 		},
 		show:function(){
 			this.containerEl.innerHTML = headerFun(this.tableData);
@@ -203,7 +215,19 @@ var zjTable = (function(){
 		},
 		getTableWidth:function(){
 			var arr = this.tData[this.tData.length-1].map(p=>twObj[p.type]);
-				arr.push(221);
+			var optW = 41; //顺号宽
+			with(this.operation){
+				switch(add+update+drop){
+					case 3: optW+=100; break;
+					case 2: optW+=80; break;
+					case 1: optW+=60; break;
+				}
+				switch(up+down){
+					case 2: optW+=80; break;
+					case 1: optW+=60; break;
+				}
+			}
+			arr.push(optW);
 			return arr.reduce((a,b)=>a+b);
 		},
 		getEmptyTrData:function(){
@@ -217,6 +241,7 @@ var zjTable = (function(){
 					case 'date': obj.value = getNowString(); break;
 					case 'datetime': obj.value = getNowString(true); break;
 					case 'list': obj.value = item.data; break;
+					case 'color': obj.value = '#000000'; break;
 					default: obj.value = ''; break;
 				}
 				arr.push(obj);
@@ -241,14 +266,19 @@ var zjTable = (function(){
 		getTargetTr:function(el){
 			return el.closest(p=>p.tagName.toLowerCase()==='tr');
 		},
-		data_save:function(data,index){
+		getQueryData:function(data,type,index){
+			var tableId = 1;
+			return {data:data,type:type,index:index,id:tableId};
+		},
+		data_save:function(data,index,isNew,callback){
+			var self = this;
 			ajax({
 				url:'/db/update',
-				type:'post',
-				data:{data:JSON.stringify(data),index:index,id:1},
+				type:'POST',
+				data:self.getQueryData(JSON.stringify(data),isNew?"add":"update",index),
 				success:function(info){
-					if(info.success) alert('成功！');
-					else alert('失败！');
+					self.showTip(`数据${isNew?"添加":"更新"}${info.success?"成功":"失败"}`);
+					if(info.success && callback) callback();
 				}
 			});
 		},
@@ -261,17 +291,29 @@ var zjTable = (function(){
 		},
 		modifyRow:function(el){
 			var trEl = this.getTargetTr(el);
+			var arr = this.tData[this.tData.length-1];
 			if(trEl.classList.contains('edit')){
 				var subData=this.getRowData(trEl);
-				var index = trEl.sindex('tr.tbData:not(.newRow)');
-				this.data_save(subData,index);
+				var index = trEl.sindex('tr.tbData');
+				var isNew = trEl.classList.contains('newRow');
+				this.data_save(subData,index,isNew,function(){
+					var tds = trEl.querySelectorAll('.field');
+					for(var i=0,l=arr.length;i<l;i++){
+						var td = tds[i],value = td.querySelector('input,select').value;
+						if(arr[i].type==='color') td.innerHTML = `<span style="background-color:${value}"></span>`;
+						else if(arr[i].type==='list') td.innerText = arr[i].data[~~value];
+						else td.innerText = value;
+					}
+					trEl.classList.remove('edit');
+					el.classList.remove('fa-check');
+					el.classList.add('fa-pencil-square-o');
+				});
 				return;
 			}
 			trEl.classList.add('edit');
 			el.classList.remove('fa-pencil-square-o');
 			el.classList.add('fa-check');
 			el.setAttribute('title','保存');
-			var arr = this.tData[this.tData.length-1];
 			for(var i=0,l=arr.length;i<l;i++){
 				var item = arr[i];
 				var td = trEl.children[i+1];
@@ -294,7 +336,23 @@ var zjTable = (function(){
 			}
 		},
 		deleteRow:function(el){
+			var self = this;
 			var trEl = this.getTargetTr(el);
+			if(trEl.parentNode.querySelectorAll('tr.tbData').length===1){ self.showTip('最后一行不能删除'); return; }
+			var isNew = trEl.classList.contains('newRow');
+			if(isNew) { this.removeTr(trEl);return; }
+			var index = trEl.sindex('tr.tbData');
+			ajax({
+				url:'/db/update',
+				type:'POST',
+				data:self.getQueryData([],'delete',index),
+				success:function(info){
+					if(info.success) self.removeTr(trEl);
+					self.showTip(`删除${info.success?"成功":"失败"}！`);
+				}
+			});
+		},
+		removeTr:function(trEl){
 			trEl.classList.add('deleted');
 			setTimeout(function(){ trEl.parentElement.removeChild(trEl); },500);
 		},
@@ -302,10 +360,25 @@ var zjTable = (function(){
 			var trEl = this.getTargetTr(el);
 			if(trEl.classList.contains('edit')) return;
 			var index = trEl.sindex('tr.tbData');
-			if(index===0 && isup || !trEl.nextElementSibling && !isup) return;
-			var data = this.tableData.data;
-			data.splice(index+(isup?-1:1),0,data.splice(index,1)[0]);
-			this.show();
+			if(index===0 && isup || !trEl.nextElementSibling.classList.contains('tbData') && !isup) return;
+			var queryData = this.getQueryData([],'exchange',index); queryData.isup = ~~isup;
+			var self = this;
+			ajax({
+				url:'/db/update',
+				type:'POST',
+				data:queryData,
+				success:function(info){
+					self.showTip(`排序${info.success?"成功":"失败"}！`);
+					if(!info.success) return;
+					var cpTr = trEl.cloneNode(true);
+					var tbody=trEl.parentNode,preEl = trEl.previousElementSibling,nextEl=trEl.nextElementSibling;
+					if(!trEl.parentNode) return;
+					trEl.parentNode.removeChild(trEl);
+					if(isup) { tbody.insertBefore(cpTr,preEl); return;}
+					if(nextEl.nextElementSibling) tbody.insertBefore(cpTr,nextEl.nextElementSibling);
+					else tbody.appendChild(cpTr);
+				}
+			});
 		}
 	}
 	return table;

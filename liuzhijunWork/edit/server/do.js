@@ -332,14 +332,32 @@ function getDBTable(param,callback){
 }
 
 function updateDBTable(param,callback){
-	var index = param.index; 
+	var index = parseInt(param.index);
+	var type = param.type;
 	var sql = 'select data from db where id='+param.id;
 	query(sql,function(rows){
 		if(rows.length){
-			var row = JSON.parse(rows[0].data);
-			row[index]=JSON.parse(param.data);
+			var rowArr = JSON.parse(rows[0].data);
+			switch(type){
+				case 'add':
+					rowArr.splice(index,0,JSON.parse(param.data));
+				break;
+				case 'update':
+					rowArr[index]=JSON.parse(param.data);
+				break;
+				case 'delete':
+					rowArr.splice(index,1);
+				break;
+				case 'exchange':
+					var isup = ~~param.isup;
+					if(index===0 && isup || index===rowArr.length-1 && !isup) callbak && callback(false);
+					rowArr.splice(index+(isup?-1:1),0,rowArr.splice(index,1)[0]);
+				break;
+				default:
+				break;
+			}
 			var fields = {'data':true,'udate':false};
-			var pd = {udate:"datetime('now')",data:JSON.stringify(row)};
+			var pd = {udate:"datetime('now')",data:JSON.stringify(rowArr)};
 			var whereSql = 'where id='+param.id;
 			var updateSql = getUpdateSql('db',pd,fields,whereSql);
 			exec(updateSql,function(error){
@@ -349,21 +367,6 @@ function updateDBTable(param,callback){
 			callback && callback(false);
 		}
 	});
-
-	/*
-	var data = param.data;
-	var index = param.index; 
-	var id = param.id;
-	var fileds = {
-		'stct':true,'data':true,'type':false,'udate':false
-	};
-	params.udate = "datetime('now')";
-	var whereSql = 'where id='+param.id;
-	var updateSql = getUpdateSql('db',params,fileds,whereSql);
-	exec(updateSql,function(error){
-		callback && callback(error===null);
-	});
-	*/
 }
 
 function dropDBTable(param,callback){

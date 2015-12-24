@@ -36,9 +36,10 @@
 
 .zjtable th { vertical-align: middle; padding:1em 0; }
 .zjtable tbody{ counter-reset: item; }
-.zjtable tr>td:first-child{ vertical-align: middle; text-shadow:1px 1px 2px rgba(255,255,255,.2); }
-.zjtable tr>td:first-child:before{ content:'#'; counter-increment: item; content: counter(item); }
+.zjtable tr.tbData>td:first-child{ vertical-align: middle; text-shadow:1px 1px 2px rgba(255,255,255,.2); }
+.zjtable tr.tbData>td:first-child:before{ content:'#'; counter-increment: item; content: counter(item); }
 
+.zjtable .zjtable_row_empty,
 .zjtable .zjtable_row_add,
 .zjtable .zjtable_row_delete,
 .zjtable .zjtable_row_update,
@@ -48,8 +49,12 @@
 
 .zjtable td.zjtable_opr_data{ padding:1em 5px; width:100px; }
 .zjtable td.zjtable_opr_move{ padding:1em 5px; width:80px; }
+.zjtable td.ow1{ width:60px; }
+.zjtable td.ow2{ width:80px; }
+.zjtable td.ow3{ width:100px;}
 
 .zjtable tr.edit .zjtable_row_update,
+.zjtable td.zjtable_row_empty i:hover,
 .zjtable td.zjtable_opr_data i:hover, 
 .zjtable td.zjtable_opr_move i:hover{ color:red; }
 
@@ -75,5 +80,8 @@
 .zjtable tr.tbData:hover:not(.edit){ background:rgba(70,99,127,1); }
 .zjtable tr.tbData{ transition:transform ease 0.5s;transform:scaleY(1);transform-origin:50% 0; }
 .zjtable tr.tbData.deleted {transform:scaleY(0);}
+.zjtable tr.tbData td{ height:44px; vertical-align: middle; }
 .zjtable tr.tbData td span{ display:inline-block; width:50px; height:10px; vertical-align: middle; border-radius:5px; }
+
+.zjtable .zjtable_tip_tr{ height:25px; line-height:25px; text-align:left; padding:0 5px; color:rgba(255,255,255,.5); }
 
