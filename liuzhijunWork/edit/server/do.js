@@ -372,6 +372,30 @@ function updateDBTable(param,callback){
 function dropDBTable(param,callback){
 }
 
+function queryTableList(param,callback){
+	var stctData = [
+		[
+			{"name":"stct","text":"表头","type":"string"},
+			{"name":"data","text":"数据","type":"string"},
+			{"name":"type","text":"类型","type":"shortInt"},
+			{"name":"operation","text":"操作","type":"string"},
+			{"name":"udate","text":"更新","type":"string"}
+		],
+	];
+
+	var sql = 'select stct,data,type,operation,udate from db';
+	query(sql,function(rows){
+		var arr = rows.map(p=>[p.stct,p.data,p.type,p.operation,p.udate]);
+		var obj = {};
+		obj.stct = JSON.stringify(stctData);
+		obj.data = JSON.stringify(arr);
+		obj.type = 1;
+		obj.operation = JSON.stringify({"add":1,"update":1,"drop":1,"up":1,"down":1});
+		obj.udate = "";
+		callback && callback(true,obj);
+	});
+}
+
 function query(sql,callback){
 	db.serialize(function(){
 		db.all(sql,function(err,rows){
@@ -408,3 +432,5 @@ exports.updateDBTable = updateDBTable;
 exports.dropDBTable = dropDBTable;
 
 exports.getDBTable = getDBTable;
+
+exports.queryTableList = queryTableList;

@@ -1,6 +1,7 @@
 !function(){
 	var tb=new zjTable({
 		container:'#page5',
-		dataUrl:'/db/get'
+		queryUrl:'/db/get',
+		updateUrl:'/db/update'
 	});
 }();

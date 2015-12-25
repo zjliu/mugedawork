@@ -93,7 +93,7 @@ var zjTable = (function(){
 					<td class="field" sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
 				<%}else if(field.type==="color"){%>
 					<td class="field"><span style="background-color:<%=item[i]%>"></span></td>
-				<%}else{%><td class="field"><%=item[i]%></td> <%}%>
+				<%}else{%><td class="field"><%=unescape(item[i])%></td> <%}%>
 			<%}}%>
 			<%if(data.operate){with(data.operate){%>
 				<%if(add+update+drop>0){%>
@@ -145,7 +145,8 @@ var zjTable = (function(){
 	var rowFun = template(rowDataTemplate,'data,item');
 	var options = {
 		container:null,
-		dataUrl:null,
+		queryUrl:'/db/get',
+		updateUrl:'/db/update',
 		showops:true
 	};
 	var table = function(opts){
@@ -182,7 +183,7 @@ var zjTable = (function(){
 			});
 		},
 		queryData:function(callback){
-			ajax({ type:'POST', url:this.opts.dataUrl, data:{pid:1}, success:callback });
+			ajax({ type:'POST', url:this.opts.queryUrl, data:{pid:1}, success:callback });
 		},
 		showTip:function(tip){
 			var tipEl = this.containerEl.querySelector('.zjtable_tip_tr');
@@ -207,6 +208,7 @@ var zjTable = (function(){
 					case 'int':case'shortInt':case 'list':
 						value = ~~value;
 					default:
+						value = escape(value);
 					break;
 				}
 				arr.push(value);
@@ -217,15 +219,8 @@ var zjTable = (function(){
 			var arr = this.tData[this.tData.length-1].map(p=>twObj[p.type]);
 			var optW = 41; //顺号宽
 			with(this.operation){
-				switch(add+update+drop){
-					case 3: optW+=100; break;
-					case 2: optW+=80; break;
-					case 1: optW+=60; break;
-				}
-				switch(up+down){
-					case 2: optW+=80; break;
-					case 1: optW+=60; break;
-				}
+				switch(add+update+drop){ case 3: optW+=100; break; case 2: optW+=80; break; case 1: optW+=60; break; }
+				switch(up+down){ case 2: optW+=80; break; case 1: optW+=60; break; }
 			}
 			arr.push(optW);
 			return arr.reduce((a,b)=>a+b);
@@ -273,7 +268,7 @@ var zjTable = (function(){
 		data_save:function(data,index,isNew,callback){
 			var self = this;
 			ajax({
-				url:'/db/update',
+				url:self.opts.updateUrl,
 				type:'POST',
 				data:self.getQueryData(JSON.stringify(data),isNew?"add":"update",index),
 				success:function(info){
@@ -343,7 +338,7 @@ var zjTable = (function(){
 			if(isNew) { this.removeTr(trEl);return; }
 			var index = trEl.sindex('tr.tbData');
 			ajax({
-				url:'/db/update',
+				url:self.opts.updateUrl,
 				type:'POST',
 				data:self.getQueryData([],'delete',index),
 				success:function(info){
@@ -364,7 +359,7 @@ var zjTable = (function(){
 			var queryData = this.getQueryData([],'exchange',index); queryData.isup = ~~isup;
 			var self = this;
 			ajax({
-				url:'/db/update',
+				url:self.opts.updateUrl,
 				type:'POST',
 				data:queryData,
 				success:function(info){

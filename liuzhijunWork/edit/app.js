@@ -243,4 +243,11 @@ app.post('/db/delete',function(req,res){
 	});
 });
 
+app.post('/db/tblist',function(req,res){
+	var Q = require('./server/do');
+	Q.queryTableList(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
 app.listen(4000);

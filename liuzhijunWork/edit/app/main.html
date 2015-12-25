@@ -32,7 +32,7 @@
 	<script src="scripts/My97DatePicker/WdatePicker.js"></script>
 </head>
 <body>
-	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"},{"href":"#page5","value":"作品管理"}]'>
+	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"},{"href":"#page5","value":"作品管理"},{"href":"#page6","value":"表管理"}]'>
 	</list-menu>
 	<div class="content">
 		<div id="page1" data-fun="penlist" class="page codepenList slideleft">
@@ -117,42 +117,17 @@
 				<content select=".cth2"></content>
 			</template>
 			<style>
-				x-dialog /deep/ h1{
-					font-size:20px;
-				}
+				x-dialog /deep/ h1{ font-size:20px; }
 			</style>
 		</div>
 		<div id="page4" class="page">
 			<input type="range" class="custom" />
 			<style>
-				input[type="range"].custom::-webkit-slider-runnable-track{
-					-webkit-appearance: none;
-					background-color:red;
-				}
+				input[type="range"].custom::-webkit-slider-runnable-track{ -webkit-appearance: none; background-color:red; }
 			</style>
 		</div>
-		<div id="page5" class="page">
-			<table class="zjtable">
-				<tr>
-					<th type="int">姓别</th>
-					<th rowspan="2" type="string">姓名</th>
-					<th colspan="2" type="string">所在地</th>
-					<th type="date">日期</th>
-				</tr>
-				<tr>
-					<th type="string">所在地</th>
-					<th type="date">日期1</th>
-					<th type="date">日期2</th>
-					<th type="date">日期2</th>
-				</tr>
-				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
-				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
-				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
-				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
-				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
-				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
-				<tr><td>男</td><td>刘致军</td><td>北京</td><td>2016-02-07 12:00</td></tr>
-			</table>
+		<div id="page5" class="page"></div>
+		<div id="page6" class="page">
 		</div>
 	</div>
 	<div id="dialog" class="dialog">
