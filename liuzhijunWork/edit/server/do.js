@@ -325,7 +325,8 @@ function createDBTable(params,callback){
 }
 
 function getDBTable(param,callback){
-	var sql = 'select * from db where id='+param.pid;
+	if(param.pid==='') param.pid = 1;
+	var sql = `select id,stct,operation,data from db where id=${param.pid}`;
 	query(sql,function(rows){
 		callback && callback(~~rows.length,rows[0]);
 	});

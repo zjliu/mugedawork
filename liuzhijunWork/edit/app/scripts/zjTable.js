@@ -44,6 +44,11 @@ function ajax(opt){
 	}
 }
 
+function eachList(dom,selector,callback){
+	if(!callback) return;
+	Array.prototype.forEach.call(dom.querySelectorAll(selector),callback);
+}
+
 function getHEX(el,name){
 	var rgbaStr = getComputedStyle(el)[name];
 	return '#'+rgbaStr.split(/[(,)]/).splice(1,3).map(function(p){var c=(~~p).toString(16); return c.length===1?'0'+c:c;}).join('');
@@ -136,7 +141,14 @@ var zjTable = (function(){
 			<%});%>
 			<%data.data.forEach(function(item){%> ${rowDataTemplate} <%});%>
 			<%if(data.operate){with(data.operate){if(add+update+drop+up+down>0){%>
-				<tr class="tipTr"><td class="zjtable_tip_tr" colspan="<%=data.fields[data.fields.length-1].length+3%>"></td></tr>
+				<tr class="tipTr">
+					<td class="zjtable_tip_tr" colspan="<%=data.fields[data.fields.length-1].length+1%>"></td>
+					<td colspan="2" class="zjtable_opr_all">
+						<i class="zjtable_row_update fa fa-pencil-square-o update_all" title="修改全部"></i>
+						<i class="zjtable_row_update fa fa-check save_all" title="保存全部"></i>
+						<i class="zjtable_row_delete fa fa-times delete_all" title="清空数据"></i>
+					</td>
+				</tr>
 			<%}}}%>
 		</table>
 	`;
@@ -147,7 +159,8 @@ var zjTable = (function(){
 		container:null,
 		queryUrl:'/db/get',
 		updateUrl:'/db/update',
-		showops:true
+		showops:true,
+		tableId:null
 	};
 	var table = function(opts){
 		this.opts = {};
@@ -183,7 +196,8 @@ var zjTable = (function(){
 			});
 		},
 		queryData:function(callback){
-			ajax({ type:'POST', url:this.opts.queryUrl, data:{pid:1}, success:callback });
+			var data = {pid:this.opts["tableId"]};
+			ajax({ type:'POST', url:this.opts.queryUrl, data:data, success:callback });
 		},
 		showTip:function(tip){
 			var tipEl = this.containerEl.querySelector('.zjtable_tip_tr');
@@ -250,12 +264,15 @@ var zjTable = (function(){
 			var self = this;
 			this.containerEl.addEventListener('click',function(e){
 				var target = e.target,clist=target.classList;
-				function dis(){target.style.opacity=0.5;}
-				if(clist.contains('zjtable_row_add')) {self.addNewRow(target);return;}
-				if(clist.contains('zjtable_row_update')){self.modifyRow(target);return;}
-				if(clist.contains('zjtable_row_delete')) {self.deleteRow(target);return;}
-				if(clist.contains('zjtable_row_up')) {self.rangeRow(target,true);return;}
-				if(clist.contains('zjtable_row_down')) {self.rangeRow(target);return;}
+				if(clist.contains('update_all')) {self.update_all();return;}
+				if(clist.contains('save_all')) {self.save_all();return;}
+				if(clist.contains('delete_all')) {self.delete_all();return;}
+				var trEl = self.getTargetTr(target);
+				if(clist.contains('zjtable_row_add')) {self.addNewRow(trEl);return;}
+				if(clist.contains('zjtable_row_update')){self.modifyRow(trEl);return;}
+				if(clist.contains('zjtable_row_delete')) {self.deleteRow(trEl);return;}
+				if(clist.contains('zjtable_row_up')) {self.rangeRow(trEl,true);return;}
+				if(clist.contains('zjtable_row_down')) {self.rangeRow(trEl);return;}
 			});
 		},
 		getTargetTr:function(el){
@@ -277,16 +294,15 @@ var zjTable = (function(){
 				}
 			});
 		},
-		addNewRow:function(el){
-			var trEl = this.getTargetTr(el);
+		addNewRow:function(trEl){
 			var temp = document.createElement('tbody');
 			temp.innerHTML = rowFun({ tbData:this.tData, edit:true, operate:this.tableData.operate }, this.getEmptyTrData());
 			if(trEl.nextElementSibling) trEl.parentElement.insertBefore(temp.firstChild,trEl.nextElementSibling);
 			else trEl.parentElement.appendChild(temp.firstChild);
 		},
-		modifyRow:function(el){
-			var trEl = this.getTargetTr(el);
+		modifyRow:function(trEl){
 			var arr = this.tData[this.tData.length-1];
+			var el = trEl.querySelector('.zjtable_row_update');
 			if(trEl.classList.contains('edit')){
 				var subData=this.getRowData(trEl);
 				var index = trEl.sindex('tr.tbData');
@@ -330,9 +346,8 @@ var zjTable = (function(){
 				}
 			}
 		},
-		deleteRow:function(el){
+		deleteRow:function(trEl){
 			var self = this;
-			var trEl = this.getTargetTr(el);
 			if(trEl.parentNode.querySelectorAll('tr.tbData').length===1){ self.showTip('最后一行不能删除'); return; }
 			var isNew = trEl.classList.contains('newRow');
 			if(isNew) { this.removeTr(trEl);return; }
@@ -351,8 +366,7 @@ var zjTable = (function(){
 			trEl.classList.add('deleted');
 			setTimeout(function(){ trEl.parentElement.removeChild(trEl); },500);
 		},
-		rangeRow:function(el,isup){
-			var trEl = this.getTargetTr(el);
+		rangeRow:function(trEl,isup){
 			if(trEl.classList.contains('edit')) return;
 			var index = trEl.sindex('tr.tbData');
 			if(index===0 && isup || !trEl.nextElementSibling.classList.contains('tbData') && !isup) return;
@@ -373,6 +387,22 @@ var zjTable = (function(){
 					if(nextEl.nextElementSibling) tbody.insertBefore(cpTr,nextEl.nextElementSibling);
 					else tbody.appendChild(cpTr);
 				}
+			});
+		},
+		update_all:function(trEl){
+			var self = this;
+			eachList(this.containerEl,'.tbData .fa-pencil-square-o',function(el,index){self.modifyRow(self.getTargetTr(el));});
+		},
+		save_all:function(trEl){
+			var self = this;
+			eachList(this.containerEl,'.tbData .fa-check',function(el,index){
+				self.modifyRow(self.getTargetTr(el)); 
+			});
+		},
+		delete_all:function(trEl){
+			var self = this;
+			eachList(this.containerEl,'.tbData .zjtable_row_delete',function(el,index){
+				self.deleteRow(self.getTargetTr(el)); 
 			});
 		}
 	}

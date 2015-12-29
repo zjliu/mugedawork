@@ -56,6 +56,7 @@
 .zjtable tr.edit .zjtable_row_update,
 .zjtable td.zjtable_row_empty i:hover,
 .zjtable td.zjtable_opr_data i:hover, 
+.zjtable td.zjtable_opr_all i:hover,
 .zjtable td.zjtable_opr_move i:hover{ color:red; }
 
 .zjtable tr.edit td input:not(.Wdate):focus{ color:#fff; font-size:30px; }
@@ -84,4 +85,6 @@
 .zjtable tr.tbData td span{ display:inline-block; width:50px; height:10px; vertical-align: middle; border-radius:5px; }
 
 .zjtable .zjtable_tip_tr{ height:25px; line-height:25px; text-align:left; padding:0 5px; color:rgba(255,255,255,.5); }
+
+.zjtable .zjtable_opr_all{padding:10px 0;}
 
