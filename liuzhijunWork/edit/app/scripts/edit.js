@@ -1,6 +1,4 @@
-function G(id){ 
-	return document.getElementById(id);
-}
+var G=(id)=>document.getElementById(id);
 
 HTMLElement.prototype.Q=function(selector){
 	return this.querySelector(selector);

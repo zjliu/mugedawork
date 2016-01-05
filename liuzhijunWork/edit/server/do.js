@@ -1,22 +1,12 @@
+"use strict";
+
 var sqlite3 = require('sqlite3').verbose();
 
 var db = new sqlite3.Database('./server/db.sqlite3');
 
-var userType={
-	'admin':0,
-	'user':1
-}
-
-var catType={
-	'public':0,
-	'private':1
-}
-
-var articleType={
-	'public':0,
-	'private':1,
-	'website':2
-}
+var userType={ 'admin':0, 'user':1 };
+var catType={ 'public':0, 'private':1 };
+var articleType={ 'public':0, 'private':1, 'website':2 };
 
 function getInsertSql(table,obj,fileds){
 	var sql = "insert into "+table+"("+Object.keys(fileds)+") values(";
@@ -131,9 +121,7 @@ function addArticle(uid,params,callback){
 				data && data.length && callback(true,data[0]);
 			});
 		}
-		else{
-			callback(false);
-		}
+		else callback(false);
 	});
 }
 
@@ -307,6 +295,31 @@ function deleteCategory(params,callback){
 }
 
 function createDBTable(params,callback){
+	var querySql = 'select * from db where id=1';
+	query(querySql,(data)=>{
+		let row=data[0],stct=JSON.parse(row.stct),mdata=JSON.parse(row.data);
+		let tbData = stct[stct.length-1];
+		/*
+		let cdata = mdata.map(item=>tbData.map((p,index)=>p.type==='list'?p.data[item[index]]:item[index]));
+		let names = tbData.map(p=>p.name);
+		cdata.map((row)=>{
+			return row.map(item=>{
+
+			});
+		});
+		*/
+		var carr=['name','text','type','data'];
+		mdata.map(row=>{
+			let obj={};
+			carr.forEach((name,index)=>{
+			});
+			tbData.map((col,index)=>{
+			});
+		});
+
+		//callback && callback(true,tbData);
+	});
+	/*
 	params.udate = "datetime('now')";
 	var fileds = { 'stct':true,'data':true,'type':false,'udate':false};
 	var sql = getInsertSql('db',params,fileds);
@@ -322,6 +335,7 @@ function createDBTable(params,callback){
 			callback && callback(false);
 		}
 	});
+	*/
 }
 
 function getDBTable(param,callback){
@@ -340,15 +354,9 @@ function updateDBTable(param,callback){
 		if(rows.length){
 			var rowArr = JSON.parse(rows[0].data);
 			switch(type){
-				case 'add':
-					rowArr.splice(index,0,JSON.parse(param.data));
-				break;
-				case 'update':
-					rowArr[index]=JSON.parse(param.data);
-				break;
-				case 'delete':
-					rowArr.splice(index,1);
-				break;
+				case 'add': rowArr.splice(index,0,JSON.parse(param.data)); break;
+				case 'update': rowArr[index]=JSON.parse(param.data); break;
+				case 'delete': rowArr.splice(index,1); break;
 				case 'exchange':
 					var isup = ~~param.isup;
 					if(index===0 && isup || index===rowArr.length-1 && !isup) callbak && callback(false);
@@ -374,15 +382,13 @@ function dropDBTable(param,callback){
 }
 
 function queryTableList(param,callback){
-	var stctData = [
-		[
-			{"name":"stct","text":"表头","type":"string"},
-			{"name":"data","text":"数据","type":"string"},
-			{"name":"type","text":"类型","type":"shortInt"},
-			{"name":"operation","text":"操作","type":"string"},
-			{"name":"udate","text":"更新","type":"string"}
-		],
-	];
+	var stctData = [[
+		{"name":"stct","text":"表头","type":"string"},
+		{"name":"data","text":"数据","type":"string"},
+		{"name":"type","text":"类型","type":"shortInt"},
+		{"name":"operation","text":"操作","type":"string"},
+		{"name":"udate","text":"更新","type":"string"}
+	],];
 
 	var sql = 'select stct,data,type,operation,udate from db';
 	query(sql,function(rows){
@@ -427,11 +433,8 @@ exports.updatePen = updatePen;
 exports.deletePen = deletePen;
 exports.addCategory = addCategory;
 exports.deleteCategory = deleteCategory;
-
 exports.createDBTable = createDBTable;
 exports.updateDBTable = updateDBTable;
 exports.dropDBTable = dropDBTable;
-
 exports.getDBTable = getDBTable;
-
 exports.queryTableList = queryTableList;

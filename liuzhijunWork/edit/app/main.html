@@ -123,10 +123,41 @@
 		<div id="page4" class="page">
 			<input type="range" class="custom" />
 			<style>
-				input[type="range"].custom::-webkit-slider-runnable-track{ -webkit-appearance: none; background-color:red; }
+				input[type="range"].custom::-webkit-slider-runnable-track{ 
+					-webkit-appearance: none; 
+					background-color:red; 
+				}
 			</style>
 		</div>
-		<div id="page5" class="page"></div>
+		<div id="page5" class="page">
+			<style>
+				.addTableTip{font-size:30px;margin-top:10px;}
+				#addTableBtn{
+					padding:15px 30px;
+					display:inline-block;
+					text-align:center;
+					background-color:rgba(51,133,255,.4);
+					border-radius:5px;
+					cursor:pointer;
+					transition:all ease 0.5s;
+				}
+				#tableName{
+					padding:3px 5px;
+					width:150px;
+					height:35px;
+					line-height:35px;
+					font-size:30px;
+					background-color:#333;
+					color:#fff;
+					border:none;
+				}
+				#tableName:focus+span{ background-color:rgba(51,133,255,1); }
+			</style>
+			<p class="addTableTip">创建表</p>
+			<div class="addTable"></div>
+			<input type="text" id="tableName" />
+			<span id="addTableBtn">添加表</span>
+		</div>
 		<div id="page6" class="page">
 		</div>
 	</div>
@@ -192,7 +223,6 @@
 	<script src="scripts/customDom.js"></script>
 	<script src="scripts/registerDom.js"></script>
 	<script src="scripts/main.js"></script>
-
 	<script src="scripts/blog.js"></script>
 </body>
 </html>

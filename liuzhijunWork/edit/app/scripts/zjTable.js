@@ -23,25 +23,24 @@ var mdata = [
 */
 
 function ajax(opt){
-	var isPost = opt.type.toLowerCase()==='post';
-	opt.data._=+new Date;
-	var paramStr = ''; for(var key in opt.data) paramStr=[paramStr,'&',key,'=',opt.data[key]].join('');
-	var xhr = new XMLHttpRequest();
-	xhr.onreadystatechange=function(){
-		if(this.readyState!==4) return;
-		if(this.status===200) opt.success && opt.success(JSON.parse(this.responseText));
-		else this.error && this.error(this.responseText);
-	}
-	if(isPost){
-		xhr.open(opt.type,opt.url);
-		xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-		xhr.send(paramStr.replace(/^./,''));
-	}
-	else {
-		opt.url = opt.url.indexOf('?')>0?opt.url+paramStr:opt.url+paramStr.replace(/^./,'?');
-		xhr.open(opt.type,opt.url);
-		xhr.send(null);
-	}
+	return new Promise(function(resolve,reject){
+		var isPost = opt.type.toLowerCase()==='post';
+			opt.data._=+new Date;
+		var paramStr = ''; for(var key in opt.data) paramStr=[paramStr,'&',key,'=',opt.data[key]].join('');
+		var xhr = new XMLHttpRequest();
+		xhr.onload=()=>xhr.status===200 && resolve(JSON.parse(xhr.responseText));
+		xhr.onerror=()=>reject(xhr.responseText);
+		if(isPost){
+			xhr.open(opt.type,opt.url);
+			xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+			xhr.send(paramStr.replace(/^./,''));
+		}
+		else {
+			opt.url = opt.url.indexOf('?')>0?opt.url+paramStr:opt.url+paramStr.replace(/^./,'?');
+			xhr.open(opt.type,opt.url);
+			xhr.send(null);
+		}
+	});
 }
 
 function eachList(dom,selector,callback){
@@ -197,7 +196,7 @@ var zjTable = (function(){
 		},
 		queryData:function(callback){
 			var data = {pid:this.opts["tableId"]};
-			ajax({ type:'POST', url:this.opts.queryUrl, data:data, success:callback });
+			ajax({type:'POST',url:this.opts.queryUrl,data:data}).then(callback);
 		},
 		showTip:function(tip){
 			var tipEl = this.containerEl.querySelector('.zjtable_tip_tr');
@@ -221,6 +220,7 @@ var zjTable = (function(){
 				switch(tData[i].type){
 					case 'int':case'shortInt':case 'list':
 						value = ~~value;
+					break;
 					default:
 						value = escape(value);
 					break;
@@ -261,18 +261,21 @@ var zjTable = (function(){
 			this.initOperate();	
 		},
 		initOperate:function(){
-			var self = this;
-			this.containerEl.addEventListener('click',function(e){
+			this.containerEl.addEventListener('click',(e)=>{
 				var target = e.target,clist=target.classList;
-				if(clist.contains('update_all')) {self.update_all();return;}
-				if(clist.contains('save_all')) {self.save_all();return;}
-				if(clist.contains('delete_all')) {self.delete_all();return;}
-				var trEl = self.getTargetTr(target);
-				if(clist.contains('zjtable_row_add')) {self.addNewRow(trEl);return;}
-				if(clist.contains('zjtable_row_update')){self.modifyRow(trEl);return;}
+				if(clist.contains('update_all')) {this.update_all();return;}
+				if(clist.contains('save_all')) {this.save_all();return;}
+				if(clist.contains('delete_all')) {this.delete_all();return;}
+				var trEl = this.getTargetTr(target);
+				if(clist.contains('zjtable_row_add')) {this.addNewRow(trEl);return;}
+				if(clist.contains('zjtable_row_update')){this.modifyRow(trEl);return;}
 				if(clist.contains('zjtable_row_delete')) {self.deleteRow(trEl);return;}
 				if(clist.contains('zjtable_row_up')) {self.rangeRow(trEl,true);return;}
 				if(clist.contains('zjtable_row_down')) {self.rangeRow(trEl);return;}
+			});
+			this.containerEl.addEventListener('dblclick',(e)=>{
+				var tr = this.getTargetTr(e.target);
+				tr && !tr.classList.contains('edit') && this.modifyRow(tr);
 			});
 		},
 		getTargetTr:function(el){
@@ -284,14 +287,14 @@ var zjTable = (function(){
 		},
 		data_save:function(data,index,isNew,callback){
 			var self = this;
-			ajax({
+			var promise = ajax({
 				url:self.opts.updateUrl,
 				type:'POST',
-				data:self.getQueryData(JSON.stringify(data),isNew?"add":"update",index),
-				success:function(info){
-					self.showTip(`数据${isNew?"添加":"更新"}${info.success?"成功":"失败"}`);
-					if(info.success && callback) callback();
-				}
+				data:self.getQueryData(JSON.stringify(data),isNew?"add":"update",index)
+			});
+			promise.then(function(info){
+				self.showTip(`数据${isNew?"添加":"更新"}${info.success?"成功":"失败"}`);
+				if(info.success && callback) callback();
 			});
 		},
 		addNewRow:function(trEl){
@@ -300,110 +303,122 @@ var zjTable = (function(){
 			if(trEl.nextElementSibling) trEl.parentElement.insertBefore(temp.firstChild,trEl.nextElementSibling);
 			else trEl.parentElement.appendChild(temp.firstChild);
 		},
-		modifyRow:function(trEl){
-			var arr = this.tData[this.tData.length-1];
-			var el = trEl.querySelector('.zjtable_row_update');
-			if(trEl.classList.contains('edit')){
-				var subData=this.getRowData(trEl);
-				var index = trEl.sindex('tr.tbData');
-				var isNew = trEl.classList.contains('newRow');
-				this.data_save(subData,index,isNew,function(){
-					var tds = trEl.querySelectorAll('.field');
-					for(var i=0,l=arr.length;i<l;i++){
-						var td = tds[i],value = td.querySelector('input,select').value;
-						if(arr[i].type==='color') td.innerHTML = `<span style="background-color:${value}"></span>`;
-						else if(arr[i].type==='list') td.innerText = arr[i].data[~~value];
-						else td.innerText = value;
-					}
-					trEl.classList.remove('edit');
-					el.classList.remove('fa-check');
-					el.classList.add('fa-pencil-square-o');
-				});
-				return;
-			}
-			trEl.classList.add('edit');
-			el.classList.remove('fa-pencil-square-o');
-			el.classList.add('fa-check');
-			el.setAttribute('title','保存');
-			for(var i=0,l=arr.length;i<l;i++){
-				var item = arr[i];
-				var td = trEl.children[i+1];
-				switch(item.type){
-					case 'list':
-						td.innerHTML = selectFun(item.data,~~td.getAttribute('sindex'));
-					break;
-					case 'datetime':
-					case 'date':
-						td.innerHTML = `<input type="text" class="Wdate" readonly="readonly" onclick="WdatePicker()" value="${td.innerText}" >`;
-					break;
-					case 'color':
-						var color = getHEX(td.querySelector('span'),'background-color');
-						td.innerHTML = `<input type="color" value="${color}">`;
-					break;
-					default:
-						td.innerHTML = `<input type="text" value="${td.innerText}">`;
-					break;
+		modifyRow:function(trEl,genObj){
+			var promise = new Promise((resolve,reject)=>{
+				var arr = this.tData[this.tData.length-1];
+				var el = trEl.querySelector('.zjtable_row_update');
+				if(trEl.classList.contains('edit')){
+					var subData=this.getRowData(trEl);
+					var index = trEl.sindex('tr.tbData');
+					var isNew = trEl.classList.contains('newRow');
+					this.data_save(subData,index,isNew,function(){
+						var tds = trEl.querySelectorAll('.field');
+						for(var i=0,l=arr.length;i<l;i++){
+							var td = tds[i],value = td.querySelector('input,select').value;
+							if(arr[i].type==='color') td.innerHTML = `<span style="background-color:${value}"></span>`;
+							else if(arr[i].type==='list') td.innerText = arr[i].data[~~value];
+							else td.innerText = value;
+						}
+						trEl.classList.remove('edit');
+						trEl.classList.remove('newRow');
+						el.classList.remove('fa-check');
+						el.classList.add('fa-pencil-square-o');
+						resolve();
+					});
+					return;
 				}
-			}
-		},
-		deleteRow:function(trEl){
-			var self = this;
-			if(trEl.parentNode.querySelectorAll('tr.tbData').length===1){ self.showTip('最后一行不能删除'); return; }
-			var isNew = trEl.classList.contains('newRow');
-			if(isNew) { this.removeTr(trEl);return; }
-			var index = trEl.sindex('tr.tbData');
-			ajax({
-				url:self.opts.updateUrl,
-				type:'POST',
-				data:self.getQueryData([],'delete',index),
-				success:function(info){
-					if(info.success) self.removeTr(trEl);
-					self.showTip(`删除${info.success?"成功":"失败"}！`);
+				trEl.classList.add('edit');
+				el.classList.remove('fa-pencil-square-o');
+				el.classList.add('fa-check');
+				el.setAttribute('title','保存');
+				for(var i=0,l=arr.length;i<l;i++){
+					var item = arr[i];
+					var td = trEl.children[i+1];
+					switch(item.type){
+						case 'list':
+							td.innerHTML=selectFun(item.data,~~td.getAttribute('sindex'));
+						break;
+						case 'datetime':
+						case 'date':
+							td.innerHTML=`<input type="text" class="Wdate" readonly="readonly" onclick="WdatePicker()" value="${td.innerText}" >`;
+						break;
+						case 'color':
+							var color = getHEX(td.querySelector('span'),'background-color');
+							td.innerHTML=`<input type="color" value="${color}">`;
+						break;
+						default:
+							td.innerHTML=`<input type="text" value="${td.innerText}">`;
+						break;
+					}
 				}
 			});
+			genObj && promise.then(()=>genObj.next());
+			return promise;
+		},
+		deleteRow:function(trEl,genObj){
+			var promise = new Promise((resolve,reject)=>{
+				if(trEl.parentNode.querySelectorAll('tr.tbData').length===1){ this.showTip('最后一行不能删除'); return; }
+				var isNew = trEl.classList.contains('newRow');
+				if(isNew) { this.removeTr(trEl);return; }
+				var index = trEl.sindex('tr.tbData');
+				var promise = ajax({
+					url:this.opts.updateUrl,
+					type:'POST',
+					data:this.getQueryData([],'delete',index)
+				});
+				promise.then(info=>{
+					if(info.success) this.removeTr(trEl);
+					this.showTip(`删除${info.success?"成功":"失败"}！`);
+					resolve();
+				});
+			});
+			genObj && promise.then(()=>genObj.next());
+			return promise;
 		},
 		removeTr:function(trEl){
 			trEl.classList.add('deleted');
-			setTimeout(function(){ trEl.parentElement.removeChild(trEl); },500);
+			trEl.parentElement.removeChild(trEl);
 		},
 		rangeRow:function(trEl,isup){
 			if(trEl.classList.contains('edit')) return;
 			var index = trEl.sindex('tr.tbData');
 			if(index===0 && isup || !trEl.nextElementSibling.classList.contains('tbData') && !isup) return;
 			var queryData = this.getQueryData([],'exchange',index); queryData.isup = ~~isup;
-			var self = this;
-			ajax({
-				url:self.opts.updateUrl,
-				type:'POST',
-				data:queryData,
-				success:function(info){
-					self.showTip(`排序${info.success?"成功":"失败"}！`);
-					if(!info.success) return;
-					var cpTr = trEl.cloneNode(true);
-					var tbody=trEl.parentNode,preEl = trEl.previousElementSibling,nextEl=trEl.nextElementSibling;
-					if(!trEl.parentNode) return;
-					trEl.parentNode.removeChild(trEl);
-					if(isup) { tbody.insertBefore(cpTr,preEl); return;}
-					if(nextEl.nextElementSibling) tbody.insertBefore(cpTr,nextEl.nextElementSibling);
-					else tbody.appendChild(cpTr);
-				}
+			var promise = ajax({ url:this.opts.updateUrl, type:'POST', data:queryData });
+			promise.then(info=>{
+				this.showTip(`排序${info.success?"成功":"失败"}！`);
+				if(!info.success) return;
+				var cpTr = trEl.cloneNode(true);
+				var tbody=trEl.parentNode,preEl = trEl.previousElementSibling,nextEl=trEl.nextElementSibling;
+				if(!trEl.parentNode) return;
+				trEl.parentNode.removeChild(trEl);
+				if(isup) { tbody.insertBefore(cpTr,preEl); return;}
+				if(nextEl.nextElementSibling) tbody.insertBefore(cpTr,nextEl.nextElementSibling);
+				else tbody.appendChild(cpTr);
 			});
 		},
 		update_all:function(trEl){
-			var self = this;
-			eachList(this.containerEl,'.tbData .fa-pencil-square-o',function(el,index){self.modifyRow(self.getTargetTr(el));});
+			eachList(this.containerEl,'.tbData .fa-pencil-square-o',(el,index)=>this.modifyRow(this.getTargetTr(el)));
 		},
 		save_all:function(trEl){
+			"use strict";
 			var self = this;
-			eachList(this.containerEl,'.tbData .fa-check',function(el,index){
-				self.modifyRow(self.getTargetTr(el)); 
-			});
+			var genObj;
+			function* iterTree(arr){
+				for(let i=0,l=arr.length;i<l;i++) yield self.modifyRow(self.getTargetTr(arr[i]),genObj);
+			}
+			genObj=iterTree(this.containerEl.querySelectorAll('.tbData .fa-check'));
+			genObj.next();
 		},
 		delete_all:function(trEl){
+			"use strict";
 			var self = this;
-			eachList(this.containerEl,'.tbData .zjtable_row_delete',function(el,index){
-				self.deleteRow(self.getTargetTr(el)); 
-			});
+			var genObj;
+			function* iterTree(arr){
+				for(let i=0,l=arr.length;i<l;i++) yield self.deleteRow(self.getTargetTr(arr[i]),genObj);
+			}
+			genObj=iterTree(this.containerEl.querySelectorAll('.tbData .zjtable_row_delete'));
+			genObj.next();
 		}
 	}
 	return table;
