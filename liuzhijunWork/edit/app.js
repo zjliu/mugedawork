@@ -243,6 +243,13 @@ app.post('/db/update',function(req,res){
 	});
 });
 
+app.post('/db/updateTb',function(req,res){
+	var Q = require('./server/do');
+	Q.updateDBTableAll(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
 app.post('/db/delete',function(req,res){
 	var Q = require('./server/do');
 	Q.dropDBTable(req.body,function(success,data){

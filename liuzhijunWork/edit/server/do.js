@@ -387,24 +387,27 @@ function dropDBTable(param,callback){
 
 function queryTableList(param,callback){
 	var stctData = [[
-		{"name":"stct","text":"表头","type":"string"},
-		{"name":"data","text":"数据","type":"string"},
-		{"name":"type","text":"类型","type":"shortInt"},
-		{"name":"operation","text":"操作","type":"string"},
-		{"name":"udate","text":"更新","type":"string"}
-	],];
+		{"name":"id","text":"ID","type":"int"},
+		{"name":"name","text":"表名","type":"string"},
+		{"name":"type","text":"类型","type":"int"},
+		{"name":"udate","text":"更新日期","type":"datetime"}
+	]];
 
-	var sql = 'select stct,data,type,operation,udate from db';
+	var sql = 'select id,name,type,udate from db where id>1';
 	query(sql,function(rows){
-		var arr = rows.map(p=>[p.stct,p.data,p.type,p.operation,p.udate]);
+		var arr = rows.map(p=>[p.id,p.name,p.type,p.udate]);
 		var obj = {};
 		obj.stct = JSON.stringify(stctData);
 		obj.data = JSON.stringify(arr);
 		obj.type = 1;
-		obj.operation = JSON.stringify({"add":1,"update":1,"drop":1,"up":1,"down":1});
+		obj.operation = JSON.stringify({"add":0,"update":1,"drop":1,"up":0,"down":0});
 		obj.udate = "";
 		callback && callback(true,obj);
 	});
+}
+
+function updateDBTableAll(param,callback){
+	console.log(param);
 }
 
 function query(sql,callback){
@@ -443,3 +446,4 @@ exports.dropDBTable = dropDBTable;
 exports.getDBTable = getDBTable;
 exports.getDBTableByName = getDBTableByName;
 exports.queryTableList = queryTableList;
+exports.updateDBTableAll = updateDBTableAll;

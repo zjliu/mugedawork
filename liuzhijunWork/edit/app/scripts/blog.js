@@ -1,5 +1,12 @@
 !function(){
 	'use strict'
+	//--all tables tblist
+	var all_tb = new zjTable({
+		container:'#allTableContainer',
+		queryUrl:'/db/tblist',
+		updateUrl:'/db/updateTb'
+	});
+
 	//--page5--
 	var tb=new zjTable({
 		container:'#addTable',

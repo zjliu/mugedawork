@@ -36,7 +36,7 @@
 
 </head>
 <body>
-	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"},{"href":"#page5","value":"创建表"},{"href":"#page6","value":"表管理"}]'>
+	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"},{"href":"#page5","value":"表管理"}]'>
 	</list-menu>
 	<div class="content">
 		<div id="page1" data-fun="penlist" class="page codepenList slideleft">
@@ -134,10 +134,6 @@
 			</style>
 		</div>
 		<div id="page5" class="page">
-			<style>
-			</style>
-		</div>
-		<div id="page6" class="page">
 			<ul class="menu">
 				<li><label for="radio_all">所有表</label></li>
 				<li><label for="radio_add">添加表</label></li>
@@ -146,9 +142,8 @@
 				<li class="slider"></li>
 			</ul>
 			<div class="tableList" id="tableList">
-				<input type="radio" name="tbRadio" id="radio_all">
-				<div id="allTableContainer">
-				</div>
+				<input type="radio" name="tbRadio" id="radio_all" checked="checked">
+				<div id="allTableContainer"></div>
 				<input type="radio" name="tbRadio" id="radio_add">
 				<div id="addTableContainer">
 					<div id="addTable"></div>

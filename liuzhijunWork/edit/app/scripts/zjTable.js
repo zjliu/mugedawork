@@ -1,3 +1,4 @@
+
 function ajax(opt){
 	return new Promise(function(resolve,reject){
 		var isPost = opt.type.toLowerCase()==='post';
@@ -54,7 +55,7 @@ var zjTable = (function(){
 	`;
 	//data,item,edit
 	var rowDataTemplate = `
-		<tr class="tbData<%=data.edit?" edit newRow":""%>">
+		<tr class="tbData<%=data.edit?" edit newRow":""%>"<%=attr("tableId",!data.edit && 1)%>>
 			<td></td>
 			<%if(data.edit){for(var value of item){switch(value.type){%>
 				<%case 'color':%>
@@ -245,9 +246,9 @@ var zjTable = (function(){
 				var trEl = this.getTargetTr(target);
 				if(clist.contains('zjtable_row_add')) {this.addNewRow(trEl);return;}
 				if(clist.contains('zjtable_row_update')){this.modifyRow(trEl);return;}
-				if(clist.contains('zjtable_row_delete')) {self.deleteRow(trEl);return;}
-				if(clist.contains('zjtable_row_up')) {self.rangeRow(trEl,true);return;}
-				if(clist.contains('zjtable_row_down')) {self.rangeRow(trEl);return;}
+				if(clist.contains('zjtable_row_delete')) {this.deleteRow(trEl);return;}
+				if(clist.contains('zjtable_row_up')) {this.rangeRow(trEl,true);return;}
+				if(clist.contains('zjtable_row_down')) {this.rangeRow(trEl);return;}
 			});
 			this.containerEl.addEventListener('dblclick',(e)=>{
 				var tr = this.getTargetTr(e.target);
