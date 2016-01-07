@@ -16,7 +16,10 @@
 	<!--dialog-->
     <link href="styles/dialog.css" rel="stylesheet" />
 	<script src="scripts/dialog.js"></script>
+
+	<!--table-->
     <link href="styles/zjTable.css" rel="stylesheet" />
+    <link href="styles/table.css" rel="stylesheet" />
 	<script src="scripts/zjTable.js"></script>
 
 	<!--layout-->
@@ -30,6 +33,7 @@
 	<!--My97DatePicker-->
 	<link href="scripts/My97DatePicker/WdatePicker.css" />
 	<script src="scripts/My97DatePicker/WdatePicker.js"></script>
+
 </head>
 <body>
 	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"},{"href":"#page5","value":"创建表"},{"href":"#page6","value":"表管理"}]'>
@@ -131,34 +135,38 @@
 		</div>
 		<div id="page5" class="page">
 			<style>
-				.addTableTip{font-size:30px;margin-top:10px;}
-				#addTableBtn{
-					padding:15px 30px;
-					display:inline-block;
-					text-align:center;
-					background-color:rgba(51,133,255,.4);
-					border-radius:5px;
-					cursor:pointer;
-					transition:all ease 0.5s;
-				}
-				#tableName{
-					padding:3px 5px;
-					width:150px;
-					height:35px;
-					line-height:35px;
-					font-size:30px;
-					background-color:#333;
-					color:#fff;
-					border:none;
-				}
-				#tableName:focus+span{ background-color:rgba(51,133,255,1); }
 			</style>
-			<p class="addTableTip">创建表</p>
-			<div class="addTable"></div>
-			<input type="text" id="tableName" />
-			<span id="addTableBtn">添加表</span>
 		</div>
 		<div id="page6" class="page">
+			<ul class="menu">
+				<li><label for="radio_all">所有表</label></li>
+				<li><label for="radio_add">添加表</label></li>
+			    <li><label for="radio_stct">修改表结构</label></li>
+				<li><label for="radio_data">修改表数据</label></li>
+				<li class="slider"></li>
+			</ul>
+			<div class="tableList" id="tableList">
+				<input type="radio" name="tbRadio" id="radio_all">
+				<div id="allTableContainer">
+				</div>
+				<input type="radio" name="tbRadio" id="radio_add">
+				<div id="addTableContainer">
+					<div id="addTable"></div>
+					<input type="text" id="tableName" class="tableName"/>
+					<span id="addTableBtn" class="tableBtn">添加表</span>
+				</div>
+				<input type="radio" name="tbRadio" id="radio_stct">
+				<div id="modifyStctContainer">
+				</div>
+				<input type="radio" name="tbRadio" id="radio_data">
+				<div id="modifyDataContainer">
+					<div class="btnDiv">
+						<input type="text" id="tableNameInput" class="tableName"/>
+						<span id="queryTableBtn" class="tableBtn">查询</span>
+					</div>
+					<div id="updateTable"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div id="dialog" class="dialog">

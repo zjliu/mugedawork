@@ -222,6 +222,13 @@ app.post('/db/get',function(req,res){
 	});
 });
 
+app.post('/db/getId',function(req,res){
+	var Q = require('./server/do');
+	Q.getDBTableByName(req.body,function(success,data){
+		res.json({'success':success,'data':data});
+	});
+});
+
 app.post('/db/add',function(req,res){
 	var Q = require('./server/do');
 	Q.createDBTable(req.body,function(success,data){

@@ -1,27 +1,3 @@
-/*
-var zjData= [ 
-	[
-		{name:"table", text:"表字段", colspan:4}
-	],
-	[
-		{name:"field",text:"属姓名",type:"string",hidden:false},
-		{name:"type",text:"类型",type:"list", data:['int','shortInt','string','date'],hidden:false },
-		{name:"color",text:"顔色",type:"color",hidden:false},
-		{name:"udate",text:"更新日期",type:"date",hidden:false}
-	]
-];
-
-var mdata = [
-	['name',0,'#33FF33','2015-03-14'],
-	['sex',1,'rgba(23,233,78,0.5)','2015-03-14'],
-	['region',2,'red','2015-03-14'],
-	['city',0,'hsl(0, 50%, 50%)','2015-03-14'],
-	['cuntry',1,'red','2015-03-14'],
-	['area',1,'red','2015-03-14'],
-	['date',2,'red','2015-03-14']
-];
-*/
-
 function ajax(opt){
 	return new Promise(function(resolve,reject){
 		var isPost = opt.type.toLowerCase()==='post';
@@ -128,7 +104,7 @@ var zjTable = (function(){
 					<%}%>
 					<%jtem.forEach(function(item){%>
 						<th<%=attr("type",item.type)%><%=attr("rowspan",item.rowspan)%><%=attr("colspan",item.colspan)%>>
-							<%=item.text%>
+							<%=unescape(item.text)%>
 						</th>
 					<%});%>
 					<%if(jndex===0 && data.operate){with(data.operate){%>
@@ -184,7 +160,7 @@ var zjTable = (function(){
 				var data = info.data;
 				var tData = JSON.parse(data.stct);
 				var operation = JSON.parse(data.operation);
-				var data = JSON.parse(data.data);
+				var data = JSON.parse(data.data||'[]');
 				self.operation = operation;
 				self.tData = tData;
 				if(!data || !data.length) data = [self.getEmptyTrData().map(p=>p.type==="list"?0:p.value)];
@@ -282,8 +258,7 @@ var zjTable = (function(){
 			return el.closest(p=>p.tagName.toLowerCase()==='tr');
 		},
 		getQueryData:function(data,type,index){
-			var tableId = 1;
-			return {data:data,type:type,index:index,id:tableId};
+			return {data:data,type:type,index:index,id:this.opts["tableId"]};
 		},
 		data_save:function(data,index,isNew,callback){
 			var self = this;
