@@ -345,6 +345,45 @@ function getDBTable(param,callback){
 	});
 }
 
+function getDBTableStct(param,callback){
+	var sql = `select stct from db where id=1 or id=${param.pid}`;
+	query(sql,function(rows){
+		var stct = rows[0].stct;
+		var stctArr = JSON.parse(stct);
+		var stctNameArr = stctArr[stctArr.length-1];
+		var row1=rows.length===1 && rows[0] || rows[1];
+		var orgData = JSON.parse(row1.stct);
+			orgData.forEach((arr,jndex,larr)=>{ 
+				arr.map((row,index)=>{
+					row.newline=~~(index===arr.length-1 && jndex!==larr.length-1);
+				});
+			});
+		var data =orgData.reduce((a,b)=>a.concat(b));
+			data = JSON.stringify(data.map(row=>stctNameArr.map((col,index)=>{
+				var value = row[col.name];
+				switch(col.name){
+					case 'type':
+						value=col.data.indexOf(value);
+					break;
+					case 'hidden':
+					case 'colspan':
+					case 'rowspan':
+						value = ~~value;
+					break;
+					default:
+					break;
+				}
+				return value;
+			})));
+		var reObj={ 
+			stct:stct,
+			data:data,
+			operation:JSON.stringify({"add":0,"update":1,"drop":1,"up":0,"down":0})
+		};
+		callback && callback(~~rows.length,reObj);
+	});
+}
+
 function getDBTableByName(param,callback){
 	var sql = `select id from db where name='${param.pname}'`;
 	query(sql,function(rows){
@@ -406,8 +445,27 @@ function queryTableList(param,callback){
 	});
 }
 
-function updateDBTableAll(param,callback){
-	console.log(param);
+function updateDBTableAll(params,callback){
+	var type = params.type;
+	if(type==='update'){
+		let data = JSON.parse(params.data);
+		params.name = data[1];
+		params.type = data[2];
+		params.udate = "datetime('now')";
+		let fileds = { 'name':true,'udate':false,'type':false };
+		let whereSql = 'where id='+params.id;
+		let updateSql = getUpdateSql('db',params,fileds,whereSql);
+		exec(updateSql,function(error){
+			callback && callback(error===null);
+		});
+		return;
+	}
+	if(type==='delete'){
+		let sql = 'delete from db where id='+params.id;
+		exec(sql,function(error){
+			callback && callback(error===null);
+		});
+	}
 }
 
 function query(sql,callback){
@@ -447,3 +505,4 @@ exports.getDBTable = getDBTable;
 exports.getDBTableByName = getDBTableByName;
 exports.queryTableList = queryTableList;
 exports.updateDBTableAll = updateDBTableAll;
+exports.getDBTableStct = getDBTableStct;

@@ -55,13 +55,16 @@ var zjTable = (function(){
 	`;
 	//data,item,edit
 	var rowDataTemplate = `
-		<tr class="tbData<%=data.edit?" edit newRow":""%>"<%=attr("tableId",!data.edit && 1)%>>
+		<tr class="tbData<%=data.edit?" edit newRow":""%>"<%=attr("table_id",!data.edit && data.type==='row' && item[0])%>>
 			<td></td>
 			<%if(data.edit){for(var value of item){switch(value.type){%>
 				<%case 'color':%>
 					<td class="field"><input type="color" value="<%=value.value%>" /></td>
 				<%break;case 'date':%>
 					<td class="field"><input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" value="<%=value.value%>"/></td>
+				<%break;case 'datetime':%>
+					<td class="field"><input type="text" readonly="readonly" class="Wdate" 
+						onClick="WdatePicker({dateFmt:"yyyy-MM-dd HH:mm:ss"})" value="<%=value.value%>"/></td>
 				<%break;case "list":%>
 					<td class="field"><select>
 						<%for(var i=0,l=value.value.length;i<l;i++){%>
@@ -136,7 +139,9 @@ var zjTable = (function(){
 		queryUrl:'/db/get',
 		updateUrl:'/db/update',
 		showops:true,
-		tableId:null
+		tableId:null,
+		//type: table or row 指表是一行为一个表还是整个表是一个表
+		type:'table'
 	};
 	var table = function(opts){
 		this.opts = {};
@@ -165,7 +170,7 @@ var zjTable = (function(){
 				self.operation = operation;
 				self.tData = tData;
 				if(!data || !data.length) data = [self.getEmptyTrData().map(p=>p.type==="list"?0:p.value)];
-				self.tableData = { fields:tData, data:data, operate:operation, tableWidth:self.getTableWidth() };
+				self.tableData = { fields:tData, data:data, operate:operation, tableWidth:self.getTableWidth(), type:self.opts.type };
 				self.show(self.data);
 				if(!info.success){ self.showTip('数据请求失败！'); return; }
 				else self.showTip('数据请求成功！'); 
@@ -251,8 +256,9 @@ var zjTable = (function(){
 				if(clist.contains('zjtable_row_down')) {this.rangeRow(trEl);return;}
 			});
 			this.containerEl.addEventListener('dblclick',(e)=>{
-				var tr = this.getTargetTr(e.target);
-				tr && !tr.classList.contains('edit') && this.modifyRow(tr);
+				var el = e.target,trEl = el.parentElement;
+				if(!el.classList.contains('field') || trEl.classList.contains('edit')) return;
+				this.modifyRow(trEl);
 			});
 		},
 		getTargetTr:function(el){
@@ -273,6 +279,9 @@ var zjTable = (function(){
 				if(info.success && callback) callback();
 			});
 		},
+		resetTableId:function(trEl){
+			if(this.opts.type==='row') this.opts.tableId=~~(trEl.getAttribute('table_id'));
+		},
 		addNewRow:function(trEl){
 			var temp = document.createElement('tbody');
 			temp.innerHTML = rowFun({ tbData:this.tData, edit:true, operate:this.tableData.operate }, this.getEmptyTrData());
@@ -287,6 +296,7 @@ var zjTable = (function(){
 					var subData=this.getRowData(trEl);
 					var index = trEl.sindex('tr.tbData');
 					var isNew = trEl.classList.contains('newRow');
+					this.resetTableId(trEl);
 					this.data_save(subData,index,isNew,function(){
 						var tds = trEl.querySelectorAll('.field');
 						for(var i=0,l=arr.length;i<l;i++){
@@ -315,6 +325,9 @@ var zjTable = (function(){
 							td.innerHTML=selectFun(item.data,~~td.getAttribute('sindex'));
 						break;
 						case 'datetime':
+							td.innerHTML=`<input type="text" class="Wdate" readonly="readonly" 
+								onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" value="${td.innerText}" >`;
+						break;
 						case 'date':
 							td.innerHTML=`<input type="text" class="Wdate" readonly="readonly" onclick="WdatePicker()" value="${td.innerText}" >`;
 						break;
@@ -334,6 +347,7 @@ var zjTable = (function(){
 		deleteRow:function(trEl,genObj){
 			var promise = new Promise((resolve,reject)=>{
 				if(trEl.parentNode.querySelectorAll('tr.tbData').length===1){ this.showTip('最后一行不能删除'); return; }
+				this.resetTableId(trEl);
 				var isNew = trEl.classList.contains('newRow');
 				if(isNew) { this.removeTr(trEl);return; }
 				var index = trEl.sindex('tr.tbData');
@@ -359,6 +373,7 @@ var zjTable = (function(){
 			if(trEl.classList.contains('edit')) return;
 			var index = trEl.sindex('tr.tbData');
 			if(index===0 && isup || !trEl.nextElementSibling.classList.contains('tbData') && !isup) return;
+			this.resetTableId(trEl);
 			var queryData = this.getQueryData([],'exchange',index); queryData.isup = ~~isup;
 			var promise = ajax({ url:this.opts.updateUrl, type:'POST', data:queryData });
 			promise.then(info=>{
