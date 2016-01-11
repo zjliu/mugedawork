@@ -201,74 +201,29 @@ app.get('/pen/:pid',function(req,res){
 	Q.getPen(pid,res,req.query);
 });
 
-app.post('/cat/add',function(req,res){
-	var Q = require('./server/do');
-	Q.addCategory(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
+var routeArr = [
+	{"url":"/cat/add",		"method":"post",	"fun":"addCategory"			},
+	{"url":"/cat/delete",	"method":"post",	"fun":"deleteCategory"		},
+	{"url":"/db/get",		"method":"post",	"fun":"getDBTable"			},
+	{"url":"/db/getStct",	"method":"post",	"fun":"getDBTableStct"		},
+	{"url":"/db/getId",		"method":"post",	"fun":"getDBTableByName"	},
+	{"url":"/db/add",		"method":"post",	"fun":"createDBTable"		},
+	{"url":"/db/update",	"method":"post",	"fun":"updateDBTable"		},
+	{"url":"/db/updateTb",	"method":"post",	"fun":"updateDBTableAll"	},
+	{"url":"/db/delete",	"method":"post",	"fun":"dropDBTable"			},
+	{"url":"/db/tblist",	"method":"post",	"fun":"queryTableList"		},
+	{"url":"/db/updateStct","method":"post",	"fun":"updateDBTableStct"	}
+];
 
-app.post('/cat/delete',function(req,res){
+!function reqfun(routeArr,app){
 	var Q = require('./server/do');
-	Q.deleteCategory(req.body,function(success,data){
-		res.json({'success':success,'data':data});
+	routeArr.forEach(obj=>{
+		app.post(obj.url,(req,res)=>{
+			Q[obj.fun] && Q[obj.fun](req.body,(success,data)=>{
+				res.json({'success':success,'data':data});
+			});
+		});
 	});
-});
-
-app.post('/db/get',function(req,res){
-	var Q = require('./server/do');
-	Q.getDBTable(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
-
-app.post('/db/getStct',(req,res)=>{
-	var Q = require('./server/do');
-	Q.getDBTableStct(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
-
-app.post('/db/getId',function(req,res){
-	var Q = require('./server/do');
-	Q.getDBTableByName(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
-
-app.post('/db/add',function(req,res){
-	var Q = require('./server/do');
-	Q.createDBTable(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
-
-app.post('/db/update',function(req,res){
-	var Q = require('./server/do');
-	Q.updateDBTable(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
-
-app.post('/db/updateTb',function(req,res){
-	var Q = require('./server/do');
-	Q.updateDBTableAll(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
-
-app.post('/db/delete',function(req,res){
-	var Q = require('./server/do');
-	Q.dropDBTable(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
-
-app.post('/db/tblist',function(req,res){
-	var Q = require('./server/do');
-	Q.queryTableList(req.body,function(success,data){
-		res.json({'success':success,'data':data});
-	});
-});
+}(routeArr,app);
 
 app.listen(4000);

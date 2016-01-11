@@ -298,7 +298,7 @@ function createDBTable(params,callback){
 	var querySql = 'select * from db where id=1';
 	query(querySql,(data)=>{
 		let row=data[0],stct=JSON.parse(row.stct),mdata=JSON.parse(row.data);
-		let tbData = stct[stct.length-1];
+		//let tbData = stct.splice
 		let rData = mdata.map(row=>{
 			var obj={};
 			row.forEach((col,index)=>{
@@ -307,17 +307,9 @@ function createDBTable(params,callback){
 			});
 			return obj;
 		});
-		var cols=[],tmp=[];
-		rData.forEach(row=>{
-			let newline = row.newline;
-			delete row.newline;
-			tmp.push(row);
-			if(newline){ cols.push(tmp); tmp=[]; }
-		});
-		cols.push(tmp);
 		params.udate = "datetime('now')";
 		params.data = "";
-		params.stct = JSON.stringify(cols);
+		params.stct = data[0].data;
 		params.type = 1;
 		params.operation = '{"add":1,"update":1,"drop":1,"up":1,"down":1}';
 		var fileds = {'stct':true,'data':true,'type':false,'udate':false,'operation':true,'name':true};
@@ -349,32 +341,26 @@ function getDBTableStct(param,callback){
 	var sql = `select stct from db where id=1 or id=${param.pid}`;
 	query(sql,function(rows){
 		var stct = rows[0].stct;
-		var stctArr = JSON.parse(stct);
-		var stctNameArr = stctArr[stctArr.length-1];
+		var stctNameArr = JSON.parse(stct);
 		var row1=rows.length===1 && rows[0] || rows[1];
-		var orgData = JSON.parse(row1.stct);
-			orgData.forEach((arr,jndex,larr)=>{ 
-				arr.map((row,index)=>{
-					row.newline=~~(index===arr.length-1 && jndex!==larr.length-1);
-				});
-			});
-		var data =orgData.reduce((a,b)=>a.concat(b));
-			data = JSON.stringify(data.map(row=>stctNameArr.map((col,index)=>{
-				var value = row[col.name];
-				switch(col.name){
-					case 'type':
-						value=col.data.indexOf(value);
-					break;
-					case 'hidden':
-					case 'colspan':
-					case 'rowspan':
-						value = ~~value;
-					break;
-					default:
-					break;
-				}
-				return value;
-			})));
+		var data = JSON.parse(row1.stct);
+		data = JSON.stringify(data.map(row=>stctNameArr.map((col,index)=>{
+			var value = row[col.name];
+			switch(col.name){
+				case 'type':
+					value=col.data.indexOf(value);
+				break;
+				case 'hidden':
+				case 'colspan':
+				case 'rowspan':
+				case 'newline':
+					value = ~~value;
+				break;
+				default:
+				break;
+			}
+			return value;
+		})));
 		var reObj={ 
 			stct:stct,
 			data:data,
@@ -421,17 +407,52 @@ function updateDBTable(param,callback){
 	});
 }
 
+function updateDBTableStct(param,callback){
+	var index = parseInt(param.index);
+	var type = param.type;
+	var sql = 'select stct from db where id='+param.id;
+	query(sql,function(rows){
+		if(rows.length){
+			var rowArr = JSON.parse(rows[0].data||'[]');
+			switch(type){
+				case 'add': rowArr.splice(index,0,JSON.parse(param.data)); break;
+				case 'update': rowArr[index]=JSON.parse(param.data); break;
+				case 'delete': rowArr.splice(index,1); break;
+				case 'exchange':
+					var isup = ~~param.isup;
+					if(index===0 && isup || index===rowArr.length-1 && !isup) callbak && callback(false);
+					rowArr.splice(index+(isup?-1:1),0,rowArr.splice(index,1)[0]);
+				break;
+				default:
+				break;
+			}
+			var fields = {'data':true,'udate':false};
+			var pd = {udate:"datetime('now')",data:JSON.stringify(rowArr)};
+			var whereSql = 'where id='+param.id;
+			var updateSql = getUpdateSql('db',pd,fields,whereSql);
+			exec(updateSql,(error)=>callback && callback(error===null));
+		}else{
+			callback && callback(false);
+		}
+	});
+}
+
+function updateDBTableStct(param,callback){
+}
+
+function dropDBTable(param,callback){
+}
+
 function dropDBTable(param,callback){
 }
 
 function queryTableList(param,callback){
-	var stctData = [[
+	var stctData = [
 		{"name":"id","text":"ID","type":"int"},
 		{"name":"name","text":"表名","type":"string"},
 		{"name":"type","text":"类型","type":"int"},
 		{"name":"udate","text":"更新日期","type":"datetime"}
-	]];
-
+	];
 	var sql = 'select id,name,type,udate from db where id>1';
 	query(sql,function(rows){
 		var arr = rows.map(p=>[p.id,p.name,p.type,p.udate]);
@@ -500,6 +521,7 @@ exports.addCategory = addCategory;
 exports.deleteCategory = deleteCategory;
 exports.createDBTable = createDBTable;
 exports.updateDBTable = updateDBTable;
+exports.updateDBTableStct = updateDBTableStct;
 exports.dropDBTable = dropDBTable;
 exports.getDBTable = getDBTable;
 exports.getDBTableByName = getDBTableByName;

@@ -61,7 +61,7 @@
 			updateStct=new zjTable({ 
 				container:'#updateTable_stct', 
 				queryUrl:'/db/getStct', 
-				updateUrl:'/db/update', 
+				updateUrl:'/db/updateStct', 
 				tableId:data.data.id, 
 				type:'table' 
 			});
