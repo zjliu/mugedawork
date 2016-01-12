@@ -294,11 +294,21 @@ function deleteCategory(params,callback){
 	});
 }
 
+function array_lastIndexOf(arr,item){
+	var lastIndex = -1;
+	var isfun = typeof item === 'function';
+	arr.forEach((p,index)=>{
+		if(isfun && item(p) || !isfun && p===item)  lastIndex = index;
+	});
+	return lastIndex;
+}
+
 function createDBTable(params,callback){
 	var querySql = 'select * from db where id=1';
 	query(querySql,(data)=>{
 		let row=data[0],stct=JSON.parse(row.stct),mdata=JSON.parse(row.data);
-		//let tbData = stct.splice
+		let lastIndex = array_lastIndexOf(stct,a=>!!a.newline);
+		let tbData = stct.slice(lastIndex===-1?0:lastIndex,stct.length);
 		let rData = mdata.map(row=>{
 			var obj={};
 			row.forEach((col,index)=>{
@@ -309,7 +319,7 @@ function createDBTable(params,callback){
 		});
 		params.udate = "datetime('now')";
 		params.data = "";
-		params.stct = data[0].data;
+		params.stct = JSON.stringify(rData);
 		params.type = 1;
 		params.operation = '{"add":1,"update":1,"drop":1,"up":1,"down":1}';
 		var fileds = {'stct':true,'data':true,'type':false,'udate':false,'operation':true,'name':true};
@@ -364,7 +374,7 @@ function getDBTableStct(param,callback){
 		var reObj={ 
 			stct:stct,
 			data:data,
-			operation:JSON.stringify({"add":0,"update":1,"drop":1,"up":0,"down":0})
+			operation:JSON.stringify({"add":1,"update":1,"drop":1,"up":1,"down":1})
 		};
 		callback && callback(~~rows.length,reObj);
 	});
@@ -381,6 +391,39 @@ function updateDBTable(param,callback){
 	var index = parseInt(param.index);
 	var type = param.type;
 	var sql = 'select data from db where id='+param.id;
+	var optFun = {
+		'add':function(data,index,type){
+			var typeDefaultObj={
+				int:0, shortInt:0, string:'', shortString:'',
+				list:0, color:'#000000', date:'1970-01-01',
+				datetime:'1970-01-01 00:00:00'
+			};
+			var value = typeDefaultObj[type];
+			data.forEach((row,i)=>{
+				row.splice(index,0,value);
+			});
+			return data;
+		},
+		'update':function(data,index,type){
+			return [];
+		},
+		'delete':function(data,index){
+			data.forEach((row,i)=>{
+				row.splice(index,1);
+			});
+			return data;
+		},
+		'exchange':function(data,index,isup){
+			if(index===0 && isup || index===data.length-1 && !isup) return;
+			var i=index,j=isup?i-1:i+1;
+			data.forEach(row=>{
+				let vi = row[i];
+				row[i]=row[j];
+				row[j]=vi;
+			});
+			return data;
+		}
+	};
 	query(sql,function(rows){
 		if(rows.length){
 			var rowArr = JSON.parse(rows[0].data||'[]');
@@ -396,6 +439,7 @@ function updateDBTable(param,callback){
 				default:
 				break;
 			}
+			//optFun(type) && optFun(type)(rowArr);
 			var fields = {'data':true,'udate':false};
 			var pd = {udate:"datetime('now')",data:JSON.stringify(rowArr)};
 			var whereSql = 'where id='+param.id;
@@ -410,13 +454,21 @@ function updateDBTable(param,callback){
 function updateDBTableStct(param,callback){
 	var index = parseInt(param.index);
 	var type = param.type;
-	var sql = 'select stct from db where id='+param.id;
+	var sql = `select stct from db where id=1 or id=${param.id}`;
 	query(sql,function(rows){
 		if(rows.length){
-			var rowArr = JSON.parse(rows[0].data||'[]');
+			var obj = {},row = [];
+			if(param.data){
+				row = JSON.parse(param.data);
+				var tbData = JSON.parse(rows[0].stct);
+				tbData.forEach((rowObj,index)=>{
+					obj[rowObj.name]=rowObj.name==='type'?rowObj.data[row[index]]:row[index];
+				});
+			}
+			var rowArr = JSON.parse(rows[rows.length-1].stct||'[]');
 			switch(type){
-				case 'add': rowArr.splice(index,0,JSON.parse(param.data)); break;
-				case 'update': rowArr[index]=JSON.parse(param.data); break;
+				case 'add': rowArr.splice(index,0,obj); break;
+				case 'update': rowArr[index]=obj; break;
 				case 'delete': rowArr.splice(index,1); break;
 				case 'exchange':
 					var isup = ~~param.isup;
@@ -426,8 +478,8 @@ function updateDBTableStct(param,callback){
 				default:
 				break;
 			}
-			var fields = {'data':true,'udate':false};
-			var pd = {udate:"datetime('now')",data:JSON.stringify(rowArr)};
+			var fields = {'stct':true,'udate':false};
+			var pd = {udate:"datetime('now')",stct:JSON.stringify(rowArr)};
 			var whereSql = 'where id='+param.id;
 			var updateSql = getUpdateSql('db',pd,fields,whereSql);
 			exec(updateSql,(error)=>callback && callback(error===null));
@@ -435,9 +487,6 @@ function updateDBTableStct(param,callback){
 			callback && callback(false);
 		}
 	});
-}
-
-function updateDBTableStct(param,callback){
 }
 
 function dropDBTable(param,callback){

@@ -169,13 +169,14 @@ var zjTable = (function(){
 				var data = JSON.parse(data.data||'[]');
 				self.operation = operation;
 				self.tData = tData;
-				if(!data || !data.length) data = [self.getEmptyTrData().map(p=>p.type==="list"?0:p.value)];
 				var sdata = [],temp=[];
 				tData.forEach((p,index,arr)=>{
 					temp.push(p);
 					if(p.newline) {sdata.push(temp);temp=[];}
 					if(temp.length && index===arr.length-1) sdata.push(temp);
 				});
+				self.dealTData = sdata[sdata.length-1];
+				if(!data || !data.length) data = [self.getEmptyTrData().map(p=>p.type==="list"?0:p.value)];
 				self.tableData = { fields:sdata, data:data, operate:operation, tableWidth:self.getTableWidth(), type:self.opts.type };
 				self.show(self.data);
 				if(!info.success){ self.showTip('数据请求失败！'); return; }
@@ -200,7 +201,7 @@ var zjTable = (function(){
 		},
 		getRowData:function(trEl){
 			var tds = trEl.children;
-			var tData = this.tData;
+			var tData = this.dealTData;
 			var arr = [],td,value;
 			for(var i=0,l=tData.length;i<l;i++){
 				td = tds[i+1];
@@ -218,7 +219,8 @@ var zjTable = (function(){
 			return arr;
 		},
 		getTableWidth:function(){
-			var arr = this.tData.map(p=>twObj[p.type]);
+			var tData = this.dealTData;
+			var arr = tData.map(p=>twObj[p.type]);
 			var optW = 41; //顺号宽
 			with(this.operation){
 				switch(add+update+drop){ case 3: optW+=100; break; case 2: optW+=80; break; case 1: optW+=60; break; }
@@ -228,7 +230,7 @@ var zjTable = (function(){
 			return arr.reduce((a,b)=>a+b);
 		},
 		getEmptyTrData:function(){
-			var tData = this.tData;
+			var tData =  this.dealTData;
 			var arr=[],obj;
 			for(var item of tData){
 				obj = {};
@@ -296,7 +298,7 @@ var zjTable = (function(){
 		},
 		modifyRow:function(trEl,genObj){
 			var promise = new Promise((resolve,reject)=>{
-				var arr = this.tData;
+				var arr = this.dealTData;
 				var el = trEl.querySelector('.zjtable_row_update');
 				if(trEl.classList.contains('edit')){
 					var subData=this.getRowData(trEl);

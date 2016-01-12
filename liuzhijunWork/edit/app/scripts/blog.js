@@ -27,8 +27,7 @@
 		var value = inputName.value.trim();
 		if(!/^[a-z]+$/.test(value)) return;
 		var promise = ajax({ url:'/db/add', type:'POST', data:{name:value} });
-		promise.then(()=>{
-		});
+		promise.then(()=>{ });
 	});
 
 	//--update data--
