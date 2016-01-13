@@ -39,6 +39,7 @@ HTMLElement.prototype.sindex=function(selector){
 }
 
 var zjTable = (function(){
+	"use strict";
 	var twObj={'int':70,'shortInt':40,'string':70,'color':70,'shortString':40,'date':120,'datetime':150,'list':120};
 	function getNowString(ctime){
 		var d = new Date;
@@ -79,56 +80,57 @@ var zjTable = (function(){
 					<td class="field"><span style="background-color:<%=item[i]%>"></span></td>
 				<%}else{%><td class="field"><%=unescape(item[i])%></td> <%}%>
 			<%}}%>
-			<%if(data.operate){with(data.operate){%>
-				<%if(add+update+drop>0){%>
-					<td class="zjtable_opr_data ow<%=add+update+drop%>">
-						<%if(add){%> <i class="zjtable_row_add fa fa-plus" title="添加"></i> <%}%>
-						<%if(update){%> 
+			<%if(data.operate){var op=data.operate;if(op.add+op.update+op.drop>0){%>
+					<td class="zjtable_opr_data ow<%=op.add+op.update+op.drop%>">
+						<%if(op.add){%> <i class="zjtable_row_add fa fa-plus" title="添加"></i> <%}%>
+						<%if(op.update){%> 
 							<%if(data.edit){%> <i class="zjtable_row_update fa fa-check" title="保存"></i> 
 							<%}else{%> <i class="zjtable_row_update fa fa-pencil-square-o" title="修改"></i> <%}%>
 						<%}%>
-						<%if(drop){%> <i class="zjtable_row_delete fa fa-times" title="删除"></i> <%}%>
+						<%if(op.drop){%> <i class="zjtable_row_delete fa fa-times" title="删除"></i> <%}%>
 					</td>
 				<%}%>
-				<%if(up+down>0){%>
-					<td class="zjtable_opr_move ow<%=up+down%>">
-						<%if(up){%> <i class="zjtable_row_up fa fa-arrow-up" title="上移"></i><%}%>
-						<%if(down){%> <i class="zjtable_row_down fa fa-arrow-down" title="下移"></i> <%}%>
+				<%if(op.up+op.down>0){%>
+					<td class="zjtable_opr_move ow<%=op.up+op.down%>">
+						<%if(op.up){%> <i class="zjtable_row_up fa fa-arrow-up" title="上移"></i><%}%>
+						<%if(op.down){%> <i class="zjtable_row_down fa fa-arrow-down" title="下移"></i> <%}%>
 					</td>
 				<%}%>
-			<%}}%>
+			<%}%>
 		</tr>
 	`;
 	var headerTemptStr = `
 		<table class="zjtable" width="<%=data.tableWidth%>px">
+			<%var fieldLen=data.fields.length;%>
 			<%data.fields.forEach(function(jtem,jndex){%>
-				<tr<%=attr("class",(jndex===data.fields.length-1)?"fields":"header")%>>
+				<tr<%=attr("class",(jndex===fieldLen-1)?"fields":"header")%>>
 					<%if(jndex===0){%>
-						<th type="index"<%=attr("rowspan",data.fields.length)%>>序号</th>
+						<th type="index"<%=attr("rowspan",fieldLen)%>>序号</th>
 					<%}%>
 					<%jtem.forEach(function(item){%>
 						<th<%=attr("type",item.type)%><%=attr("rowspan",item.rowspan)%><%=attr("colspan",item.colspan)%>>
 							<%=unescape(item.text)%>
 						</th>
 					<%});%>
-					<%if(jndex===0 && data.operate){with(data.operate){%>
-						<%if(add+update+drop+up+down>0){%>
-							<th<%=attr("colspan",~~!!(add+update+drop) + ~~!!(up+down)===2?2:0)%> rowspan="<%=data.fields.length%>">操作</th>
+					<%if(jndex===0 && data.operate){var op=data.operate;%>
+						<%if(op.add+op.update+op.drop+op.up+op.down>0){%>
+							<th<%=attr("colspan",~~!!(op.add+op.update+op.drop) + ~~!!(op.up+op.down)===2?2:0)%> rowspan="<%=fieldLen%>">操作</th>
 						<%}%>
-					<%}}%>
+					<%}%>
 				</tr>
 			<%});%>
 			<%data.data.forEach(function(item){%> ${rowDataTemplate} <%});%>
-			<%if(data.operate){with(data.operate){if(add+update+drop+up+down>0){%>
+			<%if(data.operate){var op=data.operate;%>
+				<%if(op.add+op.update+op.drop+op.up+op.down>0){%>
 				<tr class="tipTr">
-					<td class="zjtable_tip_tr" colspan="<%=data.fields[data.fields.length-1].length+1%>"></td>
+					<td class="zjtable_tip_tr" colspan="<%=data.fields[fieldLen-1].length+1%>"></td>
 					<td colspan="2" class="zjtable_opr_all">
 						<i class="zjtable_row_update fa fa-pencil-square-o update_all" title="修改全部"></i>
 						<i class="zjtable_row_update fa fa-check save_all" title="保存全部"></i>
 						<i class="zjtable_row_delete fa fa-times delete_all" title="清空数据"></i>
 					</td>
 				</tr>
-			<%}}}%>
+			<%}}%>
 		</table>
 	`;
 	var selectFun = template(selectTemplate,'data,value');
@@ -143,23 +145,24 @@ var zjTable = (function(){
 		//type: table or row 指表是一行为一个表还是整个表是一个表
 		type:'table'
 	};
-	var table = function(opts){
-		this.opts = {};
-		for(var key in options) 
-			this.opts[key]=opts[key]||options[key];
-		this.init();
-	}
-	table.prototype={
-		init:function(){
+
+	class table{
+		constructor(opts){
+			this.opts = {};
+			for(var key in options) this.opts[key]=opts[key]||options[key];
+			this.init();
+		}
+		init(){
 			var opt = this.opts;
 			if(!opt.container) return;
-			this.containerEl = document.querySelector(opt.container);
+			var containerType = Object.prototype.toString.call(opt.container);
+			if(opt.container instanceof HTMLElement || containerType==="[object ShadowRoot]") this.containerEl = opt.container;
+			else this.containerEl = document.querySelector(opt.container);
 			if(!this.containerEl) return;
-
 			this.initData();
 			this.initEvent();
-		},
-		initData:function(){
+		}
+		initData(){
 			var self = this;
 			this.queryData(function(info){
 				if(!info.success) return;
@@ -182,24 +185,21 @@ var zjTable = (function(){
 				if(!info.success){ self.showTip('数据请求失败！'); return; }
 				else self.showTip('数据请求成功！'); 
 			});
-		},
-		queryData:function(callback){
+		}
+		queryData(callback){
 			var data = {pid:this.opts["tableId"]};
 			ajax({type:'POST',url:this.opts.queryUrl,data:data}).then(callback);
-		},
-		showTip:function(tip){
+		}
+		showTip(tip){
 			var tipEl = this.containerEl.querySelector('.zjtable_tip_tr');
 			if(!tipEl) return;
 			tipEl.innerText =  tip;
 			setTimeout(function(){ tipEl.innerText = ''; },1000);
-		},
-		show:function(){
-			this.containerEl.innerHTML = headerFun(this.tableData);
-		},
-		getColData:function(tdEl){
-			return this.tData[tdEl.index()];
-		},
-		getRowData:function(trEl){
+		}
+		show(){ this.containerEl.innerHTML = headerFun(this.tableData); }
+		update(){ this.initData(); }
+		getColData(tdEl){ return this.tData[tdEl.index()]; }
+		getRowData(trEl){
 			var tds = trEl.children;
 			var tData = this.dealTData;
 			var arr = [],td,value;
@@ -207,29 +207,24 @@ var zjTable = (function(){
 				td = tds[i+1];
 				value = td.querySelector('input,select').value;
 				switch(tData[i].type){
-					case 'int':case'shortInt':case 'list':
-						value = ~~value;
-					break;
-					default:
-						value = escape(value);
-					break;
+					case 'int':case'shortInt':case 'list': value = ~~value; break;
+					default: value = escape(value); break;
 				}
 				arr.push(value);
 			}
 			return arr;
-		},
-		getTableWidth:function(){
+		}
+		getTableWidth(){
 			var tData = this.dealTData;
 			var arr = tData.map(p=>twObj[p.type]);
 			var optW = 41; //顺号宽
-			with(this.operation){
-				switch(add+update+drop){ case 3: optW+=100; break; case 2: optW+=80; break; case 1: optW+=60; break; }
-				switch(up+down){ case 2: optW+=80; break; case 1: optW+=60; break; }
-			}
+			var op=this.operation ;
+			switch(op.add+op.update+op.drop){ case 3: optW+=100; break; case 2: optW+=80; break; case 1: optW+=60; break; }
+			switch(op.up+op.down){ case 2: optW+=80; break; case 1: optW+=60; break; }
 			arr.push(optW);
 			return arr.reduce((a,b)=>a+b);
-		},
-		getEmptyTrData:function(){
+		}
+		getEmptyTrData(){
 			var tData =  this.dealTData;
 			var arr=[],obj;
 			for(var item of tData){
@@ -246,11 +241,11 @@ var zjTable = (function(){
 				arr.push(obj);
 			}
 			return arr;
-		},
-		initEvent:function(){
+		}
+		initEvent(){
 			this.initOperate();	
-		},
-		initOperate:function(){
+		}
+		initOperate(){
 			this.containerEl.addEventListener('click',(e)=>{
 				var target = e.target,clist=target.classList;
 				if(clist.contains('update_all')) {this.update_all();return;}
@@ -268,14 +263,10 @@ var zjTable = (function(){
 				if(!el.classList.contains('field') || trEl.classList.contains('edit')) return;
 				this.modifyRow(trEl);
 			});
-		},
-		getTargetTr:function(el){
-			return el.closest(p=>p.tagName.toLowerCase()==='tr');
-		},
-		getQueryData:function(data,type,index){
-			return {data:data,type:type,index:index,id:this.opts["tableId"]};
-		},
-		data_save:function(data,index,isNew,callback){
+		}
+		getTargetTr(el){ return el.closest(p=>p.tagName.toLowerCase()==='tr'); }
+		getQueryData(data,type,index){ return {data:data,type:type,index:index,id:this.opts["tableId"]}; }
+		data_save(data,index,isNew,callback){
 			var self = this;
 			var promise = ajax({
 				url:self.opts.updateUrl,
@@ -286,17 +277,15 @@ var zjTable = (function(){
 				self.showTip(`数据${isNew?"添加":"更新"}${info.success?"成功":"失败"}`);
 				if(info.success && callback) callback();
 			});
-		},
-		resetTableId:function(trEl){
-			if(this.opts.type==='row') this.opts.tableId=~~(trEl.getAttribute('table_id'));
-		},
-		addNewRow:function(trEl){
+		}
+		resetTableId(trEl){ if(this.opts.type==='row') this.opts.tableId=~~(trEl.getAttribute('table_id')); }
+		addNewRow(trEl){
 			var temp = document.createElement('tbody');
 			temp.innerHTML = rowFun({ tbData:this.tData, edit:true, operate:this.tableData.operate }, this.getEmptyTrData());
 			if(trEl.nextElementSibling) trEl.parentElement.insertBefore(temp.firstChild,trEl.nextElementSibling);
 			else trEl.parentElement.appendChild(temp.firstChild);
-		},
-		modifyRow:function(trEl,genObj){
+		}
+		modifyRow(trEl,genObj){
 			var promise = new Promise((resolve,reject)=>{
 				var arr = this.dealTData;
 				var el = trEl.querySelector('.zjtable_row_update');
@@ -351,8 +340,8 @@ var zjTable = (function(){
 			});
 			genObj && promise.then(()=>genObj.next());
 			return promise;
-		},
-		deleteRow:function(trEl,genObj){
+		}
+		deleteRow(trEl,genObj){
 			var promise = new Promise((resolve,reject)=>{
 				if(trEl.parentNode.querySelectorAll('tr.tbData').length===1){ this.showTip('最后一行不能删除'); return; }
 				this.resetTableId(trEl);
@@ -372,12 +361,9 @@ var zjTable = (function(){
 			});
 			genObj && promise.then(()=>genObj.next());
 			return promise;
-		},
-		removeTr:function(trEl){
-			trEl.classList.add('deleted');
-			trEl.parentElement.removeChild(trEl);
-		},
-		rangeRow:function(trEl,isup){
+		}
+		removeTr(trEl){ trEl.classList.add('deleted'); trEl.parentElement.removeChild(trEl); }
+		rangeRow(trEl,isup){
 			if(trEl.classList.contains('edit')) return;
 			var index = trEl.sindex('tr.tbData');
 			if(index===0 && isup || !trEl.nextElementSibling.classList.contains('tbData') && !isup) return;
@@ -395,12 +381,9 @@ var zjTable = (function(){
 				if(nextEl.nextElementSibling) tbody.insertBefore(cpTr,nextEl.nextElementSibling);
 				else tbody.appendChild(cpTr);
 			});
-		},
-		update_all:function(trEl){
-			eachList(this.containerEl,'.tbData .fa-pencil-square-o',(el,index)=>this.modifyRow(this.getTargetTr(el)));
-		},
-		save_all:function(trEl){
-			"use strict";
+		}
+		update_all(trEl){ eachList(this.containerEl,'.tbData .fa-pencil-square-o',(el,index)=>this.modifyRow(this.getTargetTr(el))); }
+		save_all(trEl){
 			var self = this;
 			var genObj;
 			function* iterTree(arr){
@@ -408,9 +391,8 @@ var zjTable = (function(){
 			}
 			genObj=iterTree(this.containerEl.querySelectorAll('.tbData .fa-check'));
 			genObj.next();
-		},
-		delete_all:function(trEl){
-			"use strict";
+		}
+		delete_all(trEl){
 			var self = this;
 			var genObj;
 			function* iterTree(arr){
@@ -420,6 +402,20 @@ var zjTable = (function(){
 			genObj.next();
 		}
 	}
+
+	var zjTBPro=Object.create(HTMLDivElement.prototype);
+	zjTBPro.createdCallback=function(){
+		var root = this.createShadowRoot();
+		var tbOpt ={
+			container:root,
+			queryUrl:this.getAttribute("get_url"),
+			updateUrl:this.getAttribute("update_url"),
+			showops:true,
+			tableId:this.getAttribute("table_id")||null,
+			type:this.getAttribute("table_type")
+		};
+		this.table = new table(tbOpt);
+	}
+	var zjTB = document.registerElement('x-zjtable',{prototype:zjTBPro});
 	return table;
 })();
-

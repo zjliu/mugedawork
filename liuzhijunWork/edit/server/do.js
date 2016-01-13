@@ -235,7 +235,7 @@ function getPen(pid,res,params){
 		var stopJs = '<script class="noscriptlink" src="/article/45?type=js&min=true"></script>';
 		
 		var cheerio = require('cheerio');
-		$ = cheerio.load(html);
+		var $ = cheerio.load(html);
 
 		var isIframe = params.type==="iframe";
 		var $head = $('head');
@@ -391,39 +391,6 @@ function updateDBTable(param,callback){
 	var index = parseInt(param.index);
 	var type = param.type;
 	var sql = 'select data from db where id='+param.id;
-	var optFun = {
-		'add':function(data,index,type){
-			var typeDefaultObj={
-				int:0, shortInt:0, string:'', shortString:'',
-				list:0, color:'#000000', date:'1970-01-01',
-				datetime:'1970-01-01 00:00:00'
-			};
-			var value = typeDefaultObj[type];
-			data.forEach((row,i)=>{
-				row.splice(index,0,value);
-			});
-			return data;
-		},
-		'update':function(data,index,type){
-			return [];
-		},
-		'delete':function(data,index){
-			data.forEach((row,i)=>{
-				row.splice(index,1);
-			});
-			return data;
-		},
-		'exchange':function(data,index,isup){
-			if(index===0 && isup || index===data.length-1 && !isup) return;
-			var i=index,j=isup?i-1:i+1;
-			data.forEach(row=>{
-				let vi = row[i];
-				row[i]=row[j];
-				row[j]=vi;
-			});
-			return data;
-		}
-	};
 	query(sql,function(rows){
 		if(rows.length){
 			var rowArr = JSON.parse(rows[0].data||'[]');
@@ -439,7 +406,6 @@ function updateDBTable(param,callback){
 				default:
 				break;
 			}
-			//optFun(type) && optFun(type)(rowArr);
 			var fields = {'data':true,'udate':false};
 			var pd = {udate:"datetime('now')",data:JSON.stringify(rowArr)};
 			var whereSql = 'where id='+param.id;
@@ -451,13 +417,48 @@ function updateDBTable(param,callback){
 	});
 }
 
+var updateStctFun = {
+	'add':function(data,index,type){
+		var typeDefaultObj={
+			int:0, shortInt:0, string:"", shortString:"",
+			list:0, color:'#000000', date:"1970-01-01",
+			datetime:"1970-01-01 00:00:00"
+		};
+		var value = typeDefaultObj[type];
+		data.forEach((row,i)=>{
+			row.splice(index,0,value);
+		});
+		return data;
+	},
+	'update':function(data,index,type){
+		return [];
+	},
+	'delete':function(data,index){
+		data.forEach((row,i)=>{
+			row.splice(index,1);
+		});
+		return data;
+	},
+	'exchange':function(data,index,isup){
+		if(index===0 && isup || index===data.length-1 && !isup) return data;
+		var i=index,j=isup?i-1:i+1;
+		data.forEach(row=>{
+			let vi = row[i];
+			row[i]=row[j];
+			row[j]=vi;
+		});
+		return data;
+	}
+};
+
 function updateDBTableStct(param,callback){
 	var index = parseInt(param.index);
 	var type = param.type;
-	var sql = `select stct from db where id=1 or id=${param.id}`;
+	var sql = `select stct,data from db where id=1 or id=${param.id}`;
 	query(sql,function(rows){
 		if(rows.length){
 			var obj = {},row = [];
+			var row0 = rows[0],row1=rows[rows.length-1];
 			if(param.data){
 				row = JSON.parse(param.data);
 				var tbData = JSON.parse(rows[0].stct);
@@ -465,21 +466,24 @@ function updateDBTableStct(param,callback){
 					obj[rowObj.name]=rowObj.name==='type'?rowObj.data[row[index]]:row[index];
 				});
 			}
-			var rowArr = JSON.parse(rows[rows.length-1].stct||'[]');
+			var rowArr = JSON.parse(row1.stct);
+			var realType = '';
 			switch(type){
-				case 'add': rowArr.splice(index,0,obj); break;
-				case 'update': rowArr[index]=obj; break;
+				case 'add': rowArr.splice(index,0,obj); realType=obj.type; break;
+				case 'update': rowArr[index]=obj; realType=obj.type; break;
 				case 'delete': rowArr.splice(index,1); break;
 				case 'exchange':
 					var isup = ~~param.isup;
 					if(index===0 && isup || index===rowArr.length-1 && !isup) callbak && callback(false);
 					rowArr.splice(index+(isup?-1:1),0,rowArr.splice(index,1)[0]);
+					realType=isup; 
 				break;
 				default:
 				break;
 			}
-			var fields = {'stct':true,'udate':false};
-			var pd = {udate:"datetime('now')",stct:JSON.stringify(rowArr)};
+			var realData = updateStctFun[type] && updateStctFun[type](JSON.parse(row1.data||'[]'),index,obj && realType);
+			var fields = {"stct":true,"udate":false,"data":true};
+			var pd = {udate:"datetime('now')",stct:JSON.stringify(rowArr),data:JSON.stringify(realData)};
 			var whereSql = 'where id='+param.id;
 			var updateSql = getUpdateSql('db',pd,fields,whereSql);
 			exec(updateSql,(error)=>callback && callback(error===null));

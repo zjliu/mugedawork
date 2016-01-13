@@ -143,10 +143,12 @@
 			</ul>
 			<div class="tableList" id="tableList">
 				<input type="radio" name="tbRadio" id="radio_all" checked="checked">
-				<div id="allTableContainer"></div>
+				<div id="allTableContainer">
+					<x-zjtable get_url="/db/tblist" update_url="/db/updateTb" table_type="row"></x-zjtable>
+				</div>
 				<input type="radio" name="tbRadio" id="radio_add">
 				<div id="addTableContainer">
-					<div id="addTable"></div>
+					<x-zjtable get_url="/db/get" update_url="/db/update" table_type="table" table_id="1"></x-zjtable>
 					<input type="text" id="tableName" class="tableName"/>
 					<span id="addTableBtn" class="tableBtn">添加表</span>
 				</div>
@@ -156,7 +158,7 @@
 						<input type="text" id="tableNameInput_stct" class="tableName"/>
 						<span id="queryTableBtn_stct" class="tableBtn">查询</span>
 					</div>
-					<div id="updateTable_stct"></div>
+					<!--<x-zjtable id="data_db" get_url="/db/getStct" update_url="/db/updateStct" table_type="table"></x-zjtable>-->
 				</div>
 				<input type="radio" name="tbRadio" id="radio_data">
 				<div id="modifyDataContainer">
