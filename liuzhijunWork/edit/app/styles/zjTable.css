@@ -88,14 +88,13 @@
 
 .zjtable .zjtable_opr_all{padding:10px 0;}
 
-x-zjtable {overflow:hidden;}
+x-zjtable {overflow:hidden;display:block;margin:1em 0;}
 x-zjtable /deep/ .zjtable{
 	font-size:14px;
 	background: #34495E;
 	color: #fff;
 	border-radius: .4em;
 	overflow: hidden;
-	margin: 1em 0;
     min-width: 300px;
 	cursor:default;
 	border-collapse: collapse; 

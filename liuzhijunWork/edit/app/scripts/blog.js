@@ -10,8 +10,8 @@
 	Array.prototype.forEach.call(document.querySelectorAll('#tableList input[name=tbRadio]'),el=>el.onchange=e=>{
 		localStorage.setItem('last_tbRadio',e.target.id);
 		setActiveLable(e.target.id);
-		var key = e.target.id.split('_')[1],tb=key+'_tb';
-		if(tableObj[tb]) tableObj[tb].update();
+		var tb = el.nextElementSibling.querySelector('x-zjtable');
+		tb && tb.table.update();
 	});
 	var lastTbRadio = localStorage.getItem('last_tbRadio');
 	if(lastTbRadio){
@@ -30,40 +30,13 @@
 		});
 	});
 
-	//--update data--
-	var tableNameInput = G('tableNameInput');
-	function queryTable(name){
-		var promise = ajax({ url:'/db/getId', type:'POST', data:{pname:name} });
-		promise.then((data)=>{
-			if(!data.success) return;
-			//tableObj.data_tb=new zjTable({container:'#updateTable',queryUrl:'/db/get',updateUrl:'/db/update',tableId:data.data.id});
-			//G('data_db').setAttribute('table_id',data.data.id);
-			localStorage.setItem('zjTable_tbName',name);
-		});
-	}
-	G('queryTableBtn').addEventListener('click',(e)=>{
-		var value = tableNameInput.value.trim();
-		if(!/^[a-z]+$/.test(value)) value='0';
-		queryTable(value);
-	});
-	var localTbName = localStorage.getItem('zjTable_tbName');
-	if(localTbName){ tableNameInput.value = localTbName; queryTable(localTbName); }
-
-
 	//--update stct--
-	var updateStct;
 	var tableNameInput_stct = G('tableNameInput_stct');
 	function queryStct(name){
 		var promise = ajax({ url:'/db/getId', type:'POST', data:{pname:name} });
 		promise.then((data)=>{
 			if(!data.success) return;
-			tableObj.stct_tb=new zjTable({ 
-				container:'#updateTable_stct', 
-				queryUrl:'/db/getStct', 
-				updateUrl:'/db/updateStct', 
-				tableId:data.data.id, 
-				type:'table' 
-			});
+			var stct_tb = G('stct_tb'); stct_tb.setAttribute('x_table_id',data.data.id);
 			localStorage.setItem('zjTable_tbName_stct',name);
 		});
 	}
@@ -74,4 +47,23 @@
 	});
 	var localTbName_stct = localStorage.getItem('zjTable_tbName_stct');
 	if(localTbName_stct){ tableNameInput_stct.value = localTbName_stct; queryStct(localTbName_stct); }
+
+	//--update data--
+	var tableNameInput = G('tableNameInput');
+	function queryTable(name){
+		var promise = ajax({ url:'/db/getId', type:'POST', data:{pname:name} });
+		promise.then((data)=>{
+			if(!data.success) return;
+			var data_db = G('data_tb');
+				data_db.setAttribute('x_table_id',data.data.id);
+			localStorage.setItem('zjTable_tbName',name);
+		});
+	}
+	G('queryTableBtn').addEventListener('click',(e)=>{
+		var value = tableNameInput.value.trim();
+		if(!/^[a-z]+$/.test(value)) value='0';
+		queryTable(value);
+	});
+	var localTbName = localStorage.getItem('zjTable_tbName');
+	if(localTbName){ tableNameInput.value = localTbName; queryTable(localTbName); }
 }();

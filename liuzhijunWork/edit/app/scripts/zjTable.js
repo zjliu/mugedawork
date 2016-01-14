@@ -1,4 +1,3 @@
-
 function ajax(opt){
 	return new Promise(function(resolve,reject){
 		var isPost = opt.type.toLowerCase()==='post';
@@ -38,7 +37,7 @@ HTMLElement.prototype.sindex=function(selector){
 	return Array.prototype.indexOf.call(this.parentNode.querySelectorAll(selector),this);
 }
 
-var zjTable = (function(){
+!(function(){
 	"use strict";
 	var twObj={'int':70,'shortInt':40,'string':70,'color':70,'shortString':40,'date':120,'datetime':150,'list':120};
 	function getNowString(ctime){
@@ -143,7 +142,8 @@ var zjTable = (function(){
 		showops:true,
 		tableId:null,
 		//type: table or row 指表是一行为一个表还是整个表是一个表
-		type:'table'
+		type:'table',
+		delayInit:false
 	};
 
 	class table{
@@ -159,8 +159,8 @@ var zjTable = (function(){
 			if(opt.container instanceof HTMLElement || containerType==="[object ShadowRoot]") this.containerEl = opt.container;
 			else this.containerEl = document.querySelector(opt.container);
 			if(!this.containerEl) return;
-			this.initData();
 			this.initEvent();
+			if(!opt.delayInit) this.initData();
 		}
 		initData(){
 			var self = this;
@@ -408,14 +408,23 @@ var zjTable = (function(){
 		var root = this.createShadowRoot();
 		var tbOpt ={
 			container:root,
-			queryUrl:this.getAttribute("get_url"),
-			updateUrl:this.getAttribute("update_url"),
+			queryUrl:this.getAttribute("x_get_url"),
+			updateUrl:this.getAttribute("x_update_url"),
 			showops:true,
-			tableId:this.getAttribute("table_id")||null,
-			type:this.getAttribute("table_type")
+			tableId:this.getAttribute("x_table_id")||null,
+			type:this.getAttribute("x_table_type"),
+			delayInit:this.getAttribute("x_delay_init")==="true"
 		};
 		this.table = new table(tbOpt);
 	}
-	var zjTB = document.registerElement('x-zjtable',{prototype:zjTBPro});
-	return table;
+	zjTBPro.attributeChangedCallback=function(attrName, oldVal, newVal){
+		switch(attrName){
+			case "x_table_id":
+				this.table.opts.tableId = newVal;
+				this.table.update();
+			break;
+		}
+	}
+	var zjTB=document.registerElement('x-zjtable',{prototype:zjTBPro});
+	window.HTMLZJTableElement = zjTB;
 })();

@@ -348,6 +348,7 @@ function getDBTable(param,callback){
 }
 
 function getDBTableStct(param,callback){
+	if(!param.pid){ console.log('getDBTableStct',param);callback && callback(false); return; }
 	var sql = `select stct from db where id=1 or id=${param.pid}`;
 	query(sql,function(rows){
 		var stct = rows[0].stct;
@@ -454,6 +455,7 @@ var updateStctFun = {
 function updateDBTableStct(param,callback){
 	var index = parseInt(param.index);
 	var type = param.type;
+	if(!param.id){ console.log('updateDBTableStct',param);callback && callback(false); return; }
 	var sql = `select stct,data from db where id=1 or id=${param.id}`;
 	query(sql,function(rows){
 		if(rows.length){
@@ -529,16 +531,12 @@ function updateDBTableAll(params,callback){
 		let fileds = { 'name':true,'udate':false,'type':false };
 		let whereSql = 'where id='+params.id;
 		let updateSql = getUpdateSql('db',params,fileds,whereSql);
-		exec(updateSql,function(error){
-			callback && callback(error===null);
-		});
+		exec(updateSql,error=>callback && callback(error===null));
 		return;
 	}
 	if(type==='delete'){
 		let sql = 'delete from db where id='+params.id;
-		exec(sql,function(error){
-			callback && callback(error===null);
-		});
+		exec(sql,error=>callback && callback(error===null));
 	}
 }
 
