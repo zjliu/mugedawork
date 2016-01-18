@@ -23,7 +23,7 @@
 	var inputName = G('tableName');
 	G('addTableBtn').addEventListener('click',(e)=>{
 		var value = inputName.value.trim();
-		if(!/^[a-z]+$/.test(value)) return;
+		if(!/^[a-zA-Z]+$/.test(value)) return;
 		var promise = ajax({ url:'/db/add', type:'POST', data:{name:value} });
 		promise.then((info)=>{
 			alert(`添加表${value}${info.success?"成功":"失败"}`);
@@ -42,7 +42,7 @@
 	}
 	G('queryTableBtn_stct').addEventListener('click',(e)=>{
 		var value = tableNameInput_stct.value.trim();
-		if(!/^[a-z]+$/.test(value)) value='0';
+		if(!/^[a-zA-Z]+$/.test(value)) value='0';
 		queryStct(value);
 	});
 	var localTbName_stct = localStorage.getItem('zjTable_tbName_stct');
@@ -61,7 +61,7 @@
 	}
 	G('queryTableBtn').addEventListener('click',(e)=>{
 		var value = tableNameInput.value.trim();
-		if(!/^[a-z]+$/.test(value)) value='0';
+		if(!/^[a-zA-Z]+$/.test(value)) value='0';
 		queryTable(value);
 	});
 	var localTbName = localStorage.getItem('zjTable_tbName');

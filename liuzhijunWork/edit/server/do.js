@@ -59,6 +59,7 @@ function getArticle(aid,callback,queryObj,res){
 	var sql = 'select title,content,cid,(select type from cat where cid=a.cid) type from article a where aid='+aid;
 	var type = queryObj.type;
 	var min = queryObj.min === "true";
+	var blog = queryObj.blog === "true";
 	query(sql,function(data){
 		if(type && data && data.length){
 			var contentValue = '';
@@ -86,6 +87,17 @@ function getArticle(aid,callback,queryObj,res){
 							console.log(e.message);
 						}
 					}
+				break;
+				case 'md':
+					if(blog){
+						try{
+							var md = require("node-markdown").Markdown;
+							value = md(value);
+						}catch(e){
+							console.log(e.message);
+						}
+					}
+					contentValue =  'text/html';
 				break;
 				case 'html':
 					contentValue =  'text/html';
@@ -495,12 +507,6 @@ function updateDBTableStct(param,callback){
 	});
 }
 
-function dropDBTable(param,callback){
-}
-
-function dropDBTable(param,callback){
-}
-
 function queryTableList(param,callback){
 	var stctData = [
 		{"name":"id","text":"ID","type":"int"},
@@ -540,6 +546,36 @@ function updateDBTableAll(params,callback){
 	}
 }
 
+//转化为DB数据[{key:value,key1:value1}]形式
+function queryObjDBData(params,callback){
+	if(!params.name) { callback(false); return; }
+	var sql = `select stct,data from db where name='${params.name}'`;
+	query(sql,function(rows){
+		if(!rows.length){ callback(false); return;}
+		let stct = JSON.parse(rows[0].stct);
+		let data = JSON.parse(rows[0].data);
+		//处理列
+		let lastIndex = array_lastIndexOf(stct,a=>!!a.newline);
+		let tbData = stct.slice(lastIndex===-1?0:lastIndex,stct.length);
+		let rData = data.map(row=>{
+			var obj={};
+			row.forEach((col,index)=>{
+				let c = tbData[index];
+				obj[c.name]=(c.name==='type'?c.data[col]:col);
+			});
+			return obj;
+		});
+		//处理where
+		try{ var whereObj = JSON.parse(params.where||'{}'); }
+		catch(e){callback(false); return;}
+		let reData = rData.filter(row=>{
+			for(var key in whereObj) if(whereObj[key]!==row[key]) return false;
+			return true;
+		});
+		callback(true,reData);
+	});
+}
+
 function query(sql,callback){
 	db.serialize(function(){
 		db.all(sql,function(err,rows){
@@ -573,9 +609,9 @@ exports.deleteCategory = deleteCategory;
 exports.createDBTable = createDBTable;
 exports.updateDBTable = updateDBTable;
 exports.updateDBTableStct = updateDBTableStct;
-exports.dropDBTable = dropDBTable;
 exports.getDBTable = getDBTable;
 exports.getDBTableByName = getDBTableByName;
 exports.queryTableList = queryTableList;
 exports.updateDBTableAll = updateDBTableAll;
 exports.getDBTableStct = getDBTableStct;
+exports.queryObjDBData = queryObjDBData;

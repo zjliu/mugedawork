@@ -210,9 +210,9 @@ var routeArr = [
 	{"url":"/db/add",		"method":"post",	"fun":"createDBTable"		},
 	{"url":"/db/update",	"method":"post",	"fun":"updateDBTable"		},
 	{"url":"/db/updateTb",	"method":"post",	"fun":"updateDBTableAll"	},
-	{"url":"/db/delete",	"method":"post",	"fun":"dropDBTable"			},
 	{"url":"/db/tblist",	"method":"post",	"fun":"queryTableList"		},
-	{"url":"/db/updateStct","method":"post",	"fun":"updateDBTableStct"	}
+	{"url":"/db/updateStct","method":"post",	"fun":"updateDBTableStct"	},
+	{"url":"/db/getObjData","method":"post",	"fun":"queryObjDBData"		}
 ];
 
 !function reqfun(routeArr,app){
