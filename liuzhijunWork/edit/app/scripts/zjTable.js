@@ -56,7 +56,7 @@ HTMLElement.prototype.sindex=function(selector){
 	//data,item,edit
 	var rowDataTemplate = `
 		<tr class="tbData<%=data.edit?" edit newRow":""%>"<%=attr("table_id",!data.edit && data.type==='row' && item[0])%>>
-			<td></td>
+			<td type="index"></td>
 			<%if(data.edit){for(var value of item){switch(value.type){%>
 				<%case 'color':%>
 					<td class="field"><input type="color" value="<%=value.value%>" /></td>
@@ -74,10 +74,10 @@ HTMLElement.prototype.sindex=function(selector){
 				<%break;default:%><td class="field"><input type="text" value="<%=value.value%>" /></td><%break;%>
 			<%}}}else{var fields=data.fields[data.fields.length-1];for(var i=0,l=item.length;i<l;i++){var field=fields[i];%>
 				<%if(field.type==="list"){%>
-					<td class="field" sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
+					<td type="list" class="field" sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
 				<%}else if(field.type==="color"){%>
-					<td class="field"><span style="background-color:<%=item[i]%>"></span></td>
-				<%}else{%><td class="field"><%=unescape(item[i])%></td> <%}%>
+					<td type="color" class="field"><span style="background-color:<%=item[i]%>"></span></td>
+				<%}else{%><td type="<%=field.type%>" class="field"><%=unescape(item[i])%></td> <%}%>
 			<%}}%>
 			<%if(data.operate){var op=data.operate;if(op.add+op.update+op.drop>0){%>
 					<td class="zjtable_opr_data ow<%=op.add+op.update+op.drop%>">
@@ -99,7 +99,8 @@ HTMLElement.prototype.sindex=function(selector){
 		</tr>
 	`;
 	var headerTemptStr = `
-		<table class="zjtable" width="<%=data.tableWidth%>px">
+		<table class="zjtable" width="<%=data.tableWidth.w%>px">
+			<thead>
 			<%var fieldLen=data.fields.length;%>
 			<%data.fields.forEach(function(jtem,jndex){%>
 				<tr<%=attr("class",(jndex===fieldLen-1)?"fields":"header")%>>
@@ -112,24 +113,25 @@ HTMLElement.prototype.sindex=function(selector){
 						</th>
 					<%});%>
 					<%if(jndex===0 && data.operate){var op=data.operate;%>
-						<%if(op.add+op.update+op.drop+op.up+op.down>0){%>
-							<th<%=attr("colspan",~~!!(op.add+op.update+op.drop) + ~~!!(op.up+op.down)===2?2:0)%> rowspan="<%=fieldLen%>">操作</th>
-						<%}%>
+						<%if(op.add+op.update+op.drop+op.up+op.down>0){%> <th width="<%=data.tableWidth.o+2%>">操作</th> <%}%>
 					<%}%>
 				</tr>
 			<%});%>
-			<%data.data.forEach(function(item){%> ${rowDataTemplate} <%});%>
+			</thead><tfoot>
 			<%if(data.operate){var op=data.operate;%>
 				<%if(op.add+op.update+op.drop+op.up+op.down>0){%>
-				<tr class="tipTr">
-					<td class="zjtable_tip_tr" colspan="<%=data.fields[fieldLen-1].length+1%>"></td>
-					<td colspan="2" class="zjtable_opr_all">
+				<tr class="tipTr"><td>
+					<div class="zjtable_tip_tr" style="width:calc(100% - <%=data.tableWidth.o+3%>px);"></div>
+					<div class="zjtable_opr_all" style="width:<%=data.tableWidth.o%>px">
 						<i class="zjtable_row_update fa fa-pencil-square-o update_all" title="修改全部"></i>
 						<i class="zjtable_row_update fa fa-check save_all" title="保存全部"></i>
 						<i class="zjtable_row_delete fa fa-times delete_all" title="清空数据"></i>
-					</td>
-				</tr>
+					</div>
+				</td></tr>
 			<%}}%>
+			</tfoot><tbody style="width:<%=data.tableWidth.w+2%>px;">
+				<%data.data.forEach(function(item){%> ${rowDataTemplate} <%});%>
+			</tbody>
 		</table>
 	`;
 	var selectFun = template(selectTemplate,'data,value');
@@ -180,7 +182,7 @@ HTMLElement.prototype.sindex=function(selector){
 				});
 				self.dealTData = sdata[sdata.length-1];
 				if(!data || !data.length) data = [self.getEmptyTrData().map(p=>p.type==="list"?0:p.value)];
-				self.tableData = { fields:sdata, data:data, operate:operation, tableWidth:self.getTableWidth(), type:self.opts.type };
+				self.tableData = { fields:sdata, data:data, operate:operation,tableWidth:self.getTableWidth(), type:self.opts.type };
 				self.show(self.data);
 				if(!info.success){ self.showTip('数据请求失败！'); return; }
 				else self.showTip('数据请求成功！'); 
@@ -217,12 +219,13 @@ HTMLElement.prototype.sindex=function(selector){
 		getTableWidth(){
 			var tData = this.dealTData;
 			var arr = tData.map(p=>twObj[p.type]);
-			var optW = 41; //顺号宽
+				arr.push(41);//顺号宽
+			var optW = 0; //顺号宽
 			var op=this.operation ;
 			switch(op.add+op.update+op.drop){ case 3: optW+=100; break; case 2: optW+=80; break; case 1: optW+=60; break; }
 			switch(op.up+op.down){ case 2: optW+=80; break; case 1: optW+=60; break; }
 			arr.push(optW);
-			return arr.reduce((a,b)=>a+b);
+			return {o:optW,w:arr.reduce((a,b)=>a+b)};
 		}
 		getEmptyTrData(){
 			var tData =  this.dealTData;

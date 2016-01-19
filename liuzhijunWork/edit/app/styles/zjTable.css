@@ -111,11 +111,23 @@ x-zjtable /deep/ .zjtable th[type=image]{ width:150px; }
 x-zjtable /deep/ .zjtable th[type=list]{ width:120px; }
 x-zjtable /deep/ .zjtable th[type=index]{width:40px;}
 
-x-zjtable /deep/ .zjtable tr { border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; border-color: #46637f; }
+x-zjtable /deep/ .zjtable td[type=shortString]{ width:40px; }
+x-zjtable /deep/ .zjtable td[type=string]{ width:70px; }
+x-zjtable /deep/ .zjtable td[type=color]{ width:70px; }
+x-zjtable /deep/ .zjtable td[type=int]{ width:70px; }
+x-zjtable /deep/ .zjtable td[type=shortInt]{ width:40px; }
+x-zjtable /deep/ .zjtable td[type=date]{ width:120px; }
+x-zjtable /deep/ .zjtable td[type=datetime]{ width:150px; }
+x-zjtable /deep/ .zjtable td[type=image]{ width:150px; }
+x-zjtable /deep/ .zjtable td[type=list]{ width:120px; }
+x-zjtable /deep/ .zjtable td[type=index]{width:40px;}
+
+x-zjtable /deep/ .zjtable tr { border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; border-color: #46637f;position:relative;}
+x-zjtable /deep/ .zjtable thead tr {border-bottom: none;}
+x-zjtable /deep/ .zjtable .tbData:last-child {border-bottom:none;}
 
 x-zjtable /deep/ .zjtable th,x-zjtable /deep/ .zjtable td:before { color: #dd5; }
 x-zjtable /deep/ .zjtable th,x-zjtable /deep/ .zjtable td{ 
-	padding:2px 0;
 	border-right:1px solid #46637f; 
 	text-align: center; 
 	display: table-cell; 
@@ -174,9 +186,18 @@ x-zjtable /deep/ .zjtable tr.tbData{ transition:transform ease 0.5s;transform:sc
 x-zjtable /deep/ .zjtable tr.tbData.deleted {transform:scaleY(0);}
 x-zjtable /deep/ .zjtable tr.tbData td{ height:44px; vertical-align: middle; }
 x-zjtable /deep/ .zjtable tr.tbData td span{ display:inline-block; width:50px; height:10px; vertical-align: middle; border-radius:5px; }
-x-zjtable /deep/ .zjtable .zjtable_tip_tr{ height:25px; line-height:25px; text-align:left; padding:0 5px; color:rgba(255,255,255,.5); }
-x-zjtable /deep/ .zjtable .zjtable_opr_all{padding:10px 0;}
 
+x-zjtable /deep/ .zjtable .tipTr td{padding:0;}
+x-zjtable /deep/ .zjtable .tipTr td>div{height:35px;vertical-align: middle;}
+x-zjtable /deep/ .zjtable .zjtable_tip_tr{ 
+	display:block;
+	float:left;
+	text-align:left;
+	color:rgba(255,255,255,.5);
+	height:35px;
+}
+x-zjtable /deep/ .zjtable .zjtable_opr_all{display:table-cell;padding:0;width:100px;border-left:1px solid #46637f;}
+x-zjtable /deep/ .zjtable .zjtable_opr_all>i{vertical-align:middle;}
 x-zjtable /deep/ .fa { 
 	display: inline-block; 
 	font: normal normal normal 14px/1 FontAwesome; 
@@ -193,3 +214,14 @@ x-zjtable /deep/ .fa-arrow-up:before { content: "\f062"; }
 x-zjtable /deep/ .fa-arrow-down:before { content: "\f063"; }
 x-zjtable /deep/ .fa-check:before { content: "\f00c" }
 x-zjtable /deep/ input, x-zjtable /deep/ select { vertical-align: middle; }
+
+x-zjtable /deep/ .zjtable thead{display:block;/*box-shadow:0px 0 100px 1px red inset;*/}
+x-zjtable /deep/ .zjtable tbody{ display:block;max-height:264px; overflow-y:scroll; }
+
+x-zjtable /deep/ .zjtable tbody::-webkit-scrollbar { width: 2px; position:absolute;} 
+/* 滚动槽 */
+x-zjtable /deep/ .zjtable tbody::-webkit-scrollbar-track { -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.3); }
+/* 滚动条滑块 */
+x-zjtable /deep/ .zjtable tbody::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); -webkit-box-shadow: inset 0 0 6px rgba(255,255,255,0.8);}
+
+
