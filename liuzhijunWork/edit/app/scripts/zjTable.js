@@ -39,7 +39,7 @@ HTMLElement.prototype.sindex=function(selector){
 
 !(function(){
 	"use strict";
-	var twObj={'int':70,'shortInt':40,'string':70,'color':70,'shortString':40,'date':120,'datetime':150,'list':120};
+	var twObj={'int':70,'shortInt':40,'string':70,'color':70,'shortString':40,'date':120,'datetime':150,'list':120,'listdata':120};
 	function getNowString(ctime){
 		var d = new Date;
 		var str = [d.getFullYear(),d.getMonth()+1,d.getDate()].join('-');
@@ -72,13 +72,21 @@ HTMLElement.prototype.sindex=function(selector){
 						<%}%>
 					</select></td>
 				<%break;default:%><td class="field"><input type="text" value="<%=value.value%>" /></td><%break;%>
-			<%}}}else{var fields=data.fields[data.fields.length-1];for(var i=0,l=item.length;i<l;i++){var field=fields[i];%>
-				<%if(field.type==="list"){%>
-					<td type="list" class="field" sindex="<%=item[i]%>"><%=field.data[item[i]]%></td>
-				<%}else if(field.type==="color"){%>
-					<td type="color" class="field"><span style="background-color:<%=item[i]%>"></span></td>
-				<%}else{%><td type="<%=field.type%>" class="field"><%=unescape(item[i])%></td> <%}%>
-			<%}}%>
+			<%}}}else{var fields=data.fields[data.fields.length-1];for(var i=0,l=item.length;i<l;i++){%>
+				<%var field=fields[i];if(item[i]===null) item[i]="";%>
+				<%switch(field.type){%>
+					<%case "list":%>
+						<td type="list" class="field" sindex="<%=item[i]%>"><%=unescape(field.data[item[i]])%></td>
+					<%break; case "color":%>
+						<td type="color" class="field"><span style="background-color:<%=item[i]%>"></span></td>
+					<%break; case "string": case "listdata":%>
+						<td type="<%=field.type%>" class="field">
+							<input class="stringinput" readonly="readonly" value="<%=unescape(item[i])%>"/>
+						</td>
+					<%break; default:%>
+						<td type="<%=field.type%>" class="field"><%=unescape(item[i])%></td> 
+					<%break;%>
+			<%}}}%>
 			<%if(data.operate){var op=data.operate;if(op.add+op.update+op.drop>0){%>
 					<td class="zjtable_opr_data ow<%=op.add+op.update+op.drop%>">
 						<%if(op.add){%> <i class="zjtable_row_add fa fa-plus" title="添加"></i> <%}%>
@@ -210,6 +218,7 @@ HTMLElement.prototype.sindex=function(selector){
 				value = td.querySelector('input,select').value;
 				switch(tData[i].type){
 					case 'int':case'shortInt':case 'list': value = ~~value; break;
+					case 'listdata':value=value.split(',').map(p=>escape(p)); break;
 					default: value = escape(value); break;
 				}
 				arr.push(value);
@@ -262,7 +271,7 @@ HTMLElement.prototype.sindex=function(selector){
 				if(clist.contains('zjtable_row_down')) {this.rangeRow(trEl);return;}
 			});
 			this.containerEl.addEventListener('dblclick',(e)=>{
-				var el = e.target,trEl = el.parentElement;
+				var el=e.target.closest(p=>p.tagName==='TD'),trEl=el.parentElement;
 				if(!el.classList.contains('field') || trEl.classList.contains('edit')) return;
 				this.modifyRow(trEl);
 			});
@@ -336,7 +345,8 @@ HTMLElement.prototype.sindex=function(selector){
 							td.innerHTML=`<input type="color" value="${color}">`;
 						break;
 						default:
-							td.innerHTML=`<input type="text" value="${td.innerText}">`;
+							let input = td.querySelector('input'),value=input && input.value || td.innerText;
+							td.innerHTML=`<input type="text" value="${value}">`;
 						break;
 					}
 				}

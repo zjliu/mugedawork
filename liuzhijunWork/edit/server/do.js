@@ -379,6 +379,10 @@ function getDBTableStct(param,callback){
 				case 'newline':
 					value = ~~value;
 				break;
+				case 'data':
+					if(value) value = value.join(',');
+					else value = '';
+				break;
 				default:
 				break;
 			}
