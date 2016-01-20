@@ -95,7 +95,6 @@ x-zjtable /deep/ .zjtable{
 	color: #fff;
 	border-radius: .4em;
 	overflow: hidden;
-    min-width: 300px;
 	cursor:default;
 	border-collapse: collapse; 
 	border-spacing: 0;
@@ -236,5 +235,7 @@ x-zjtable /deep/ .zjtable .stringinput{
 	text-align:center; 
 	-webkit-user-select: none;
 }
+
+x-zjtable /deep/ .zjtable tr.edit td.error{ background-color:red; }
 
 

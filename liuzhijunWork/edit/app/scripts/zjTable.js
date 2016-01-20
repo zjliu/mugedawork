@@ -40,6 +40,17 @@ HTMLElement.prototype.sindex=function(selector){
 !(function(){
 	"use strict";
 	var twObj={'int':70,'shortInt':40,'string':70,'color':70,'shortString':40,'date':120,'datetime':150,'list':120,'listdata':120};
+	var checkExpObj={
+		'int':/^-?\d+$/,
+		'shortInt':/^-?\d+$/,
+		'string':/^.+$/,
+		'color':/^#[0-9a-fA-F]{6}$/,
+		'shortString':/^.+$/,
+		'date':/^[12]\d{3}-((0?[1-9])|1[12])-((0?[1-9])|([1-2]\d)|(3[01]))$/,
+		'datetime':/^[12]\d{3}-((0?[1-9])|1[12])-((0?[1-9])|([1-2]\d)|(3[01])) (([0-1]?\d)|(2[0-3])):[0-5]?\d:[0-5]?\d$/,
+		'list':/^\d+$/,
+		'listdata':/^(([^,]+,)*[^,]+)?$/
+	};
 	function getNowString(ctime){
 		var d = new Date;
 		var str = [d.getFullYear(),d.getMonth()+1,d.getDate()].join('-');
@@ -49,7 +60,7 @@ HTMLElement.prototype.sindex=function(selector){
 	var selectTemplate = `
 		<select>
 			<%for(var i=0,l=data.length;i<l;i++){%>
-				<option value="<%=i%>"<%=attr('selected',value===i)%>><%=data[i]%></option>
+				<option value="<%=i%>"<%=attr('selected',value===i)%>><%=unescape(data[i])%></option>
 			<%}%>
 		</select>
 	`;
@@ -59,19 +70,23 @@ HTMLElement.prototype.sindex=function(selector){
 			<td type="index"></td>
 			<%if(data.edit){for(var value of item){switch(value.type){%>
 				<%case 'color':%>
-					<td class="field"><input type="color" value="<%=value.value%>" /></td>
+					<td type="color" class="field"><input type="color" value="<%=value.value%>" /></td>
 				<%break;case 'date':%>
-					<td class="field"><input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" value="<%=value.value%>"/></td>
+					<td type="date" class="field">
+						<input type="text" readonly="readonly" class="Wdate" onClick="WdatePicker()" value="<%=value.value%>"/></td>
 				<%break;case 'datetime':%>
-					<td class="field"><input type="text" readonly="readonly" class="Wdate" 
+					<td type="datetime" class="field"><input type="text" readonly="readonly" class="Wdate" 
 						onClick="WdatePicker({dateFmt:"yyyy-MM-dd HH:mm:ss"})" value="<%=value.value%>"/></td>
 				<%break;case "list":%>
-					<td class="field"><select>
+					<td type="list" class="field"><select>
 						<%for(var i=0,l=value.value.length;i<l;i++){%>
-							<option value="<%=i%>"><%=value.value[i]%></option>
+							<option value="<%=i%>"><%=unescape(value.value[i])%></option>
 						<%}%>
 					</select></td>
-				<%break;default:%><td class="field"><input type="text" value="<%=value.value%>" /></td><%break;%>
+					<%break;default:%>
+						<td type="<%=value.type%>" class="field">
+							<input type="text" value="<%=unescape(value.value)%>" /> </td>
+					<%break;%>
 			<%}}}else{var fields=data.fields[data.fields.length-1];for(var i=0,l=item.length;i<l;i++){%>
 				<%var field=fields[i];if(item[i]===null) item[i]="";%>
 				<%switch(field.type){%>
@@ -297,11 +312,23 @@ HTMLElement.prototype.sindex=function(selector){
 			if(trEl.nextElementSibling) trEl.parentElement.insertBefore(temp.firstChild,trEl.nextElementSibling);
 			else trEl.parentElement.appendChild(temp.firstChild);
 		}
+		checkSave(trEl){
+			var tds = trEl.querySelectorAll('.field');
+			return Array.prototype.filter.call(tds,(td)=>{
+				td.classList.remove('error');
+				return !checkExpObj[td.getAttribute('type')].test(td.querySelector('input,select').value);
+			});
+		}
 		modifyRow(trEl,genObj){
 			var promise = new Promise((resolve,reject)=>{
 				var arr = this.dealTData;
 				var el = trEl.querySelector('.zjtable_row_update');
 				if(trEl.classList.contains('edit')){
+					var errorArray = this.checkSave(trEl);
+					if(errorArray.length){
+						errorArray.forEach(el=>el.classList.add('error'));
+						return;
+					}
 					var subData=this.getRowData(trEl);
 					var index = trEl.sindex('tr.tbData');
 					var isNew = trEl.classList.contains('newRow');
@@ -311,8 +338,8 @@ HTMLElement.prototype.sindex=function(selector){
 						for(var i=0,l=arr.length;i<l;i++){
 							var td = tds[i],value = td.querySelector('input,select').value;
 							if(arr[i].type==='color') td.innerHTML = `<span style="background-color:${value}"></span>`;
-							else if(arr[i].type==='list') td.innerText = arr[i].data[~~value];
-							else td.innerText = value;
+							else if(arr[i].type==='list') td.innerText = unescape(arr[i].data[~~value]);
+							else td.innerText = unescape(value);
 						}
 						trEl.classList.remove('edit');
 						trEl.classList.remove('newRow');
