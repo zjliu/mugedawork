@@ -218,8 +218,10 @@ var routeArr = [
 !function reqfun(routeArr,app){
 	var Q = require('./server/do');
 	routeArr.forEach(obj=>{
-		app.post(obj.url,(req,res)=>{
-			Q[obj.fun] && Q[obj.fun](req.body,(success,data)=>{
+		var method = obj.method.toLowerCase();
+		app[method](obj.url,(req,res)=>{
+			var params = method==='post' && req.body || req.query;
+			Q[obj.fun] && Q[obj.fun](params,(success,data)=>{
 				res.json({'success':success,'data':data});
 			});
 		});

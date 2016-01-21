@@ -22,6 +22,10 @@
     <link href="styles/table.css" rel="stylesheet" />
 	<script src="scripts/zjTable.js"></script>
 
+	<!--select-->
+    <link href="styles/zjSelect.css" rel="stylesheet" />
+	<script src="scripts/zjSelect.js"></script>
+
 	<!--layout-->
     <link href="styles/menu.css" rel="stylesheet" />
 
@@ -132,6 +136,7 @@
 					background-color:red; 
 				}
 			</style>
+			<x-zjselect id="abx" x_get_url="/db/getObjData" x_tb_name="keyValue" x_tb_where={"name":"type"} width="120"></x-zjselect>
 		</div>
 		<div id="page5" class="page">
 			<ul class="menu">
