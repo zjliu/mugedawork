@@ -3,7 +3,9 @@ x-zjselect /deep/ div{
 	position: relative;
 	display: inline-block;
 	width: 150px; height: 30px;
-	line-height: 32px; text-align: left; border:none;
+	border: 1px solid #ddd;
+	box-sizing:border-box;
+	line-height: 32px; text-align: left;
 	text-indent: 2px; vertical-align: middle;
 	margin:0; padding:0; background: #ececec;
 	overflow: hidden; border-radius:1px;
