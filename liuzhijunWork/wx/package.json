@@ -13,8 +13,10 @@
   "license": "ISC",
   "devDependencies": {
     "express": "^4.13.4",
+    "formidable": "^1.0.17",
     "https": "^1.0.0",
     "jssha": "^2.0.2",
+    "multer": "^1.1.0",
     "nodegrass": "0.0.3"
   }
 }
