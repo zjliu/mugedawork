@@ -1,0 +1,20 @@
+{
+  "name": "wx_signature",
+  "version": "1.0.0",
+  "description": "wx_signature",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wx"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "express": "^4.13.4",
+    "https": "^1.0.0",
+    "jssha": "^2.0.2",
+    "nodegrass": "0.0.3"
+  }
+}
