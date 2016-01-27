@@ -11,9 +11,9 @@ router.get('/', function(req, res) {
   res.render('index', { title: '' });
 });
 
-function getSignature(appid,secret,callback){
+function getSignature(appid,secret,url,callback){
     function calcSignature(ticket, noncestr, ts) {
-        var str = 'jsapi_ticket=' + ticket + '&noncestr=' + noncestr + '&timestamp='+ ts;
+		var str = `jsapi_ticket=${ticket}&noncestr=${noncestr}&timestamp=${ts}&url=${url}`;
         var shaObj = new jsSHA("SHA-1", 'TEXT');
 			shaObj.update(str);
         return shaObj.getHash('HEX');
@@ -42,7 +42,8 @@ function getSignature(appid,secret,callback){
 app.get('/querySignture',function(req,res){ 
 	var appid = 'wx501b4f006c6939be';
 	var secret = 'ba7448218aef98f28f1b95e13374358d';
-	getSignature(appid,secret,function(signObj){
+	var url = req.query.url;
+	getSignature(appid,secret,url,function(signObj){
 		res.json(signObj);
 	});
 });
@@ -54,11 +55,8 @@ app.post('/photos/upload',function(res,req){
 		form.keepExtensions = true;				//保留后缀
 		form.maxFieldsSize = 2 * 1024 * 1024;   //文件大小
 	
-	  console.log(1);
 	  form.parse(req, function(error, fields, files) {
-		console.log(2);
 		if (error)  return;		
-		console.log(3);
 		/*
 		var extName = '';  //后缀名
 		console.log(err,fields,files);
