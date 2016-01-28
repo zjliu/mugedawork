@@ -269,9 +269,7 @@ HTMLElement.prototype.sindex=function(selector){
 			}
 			return arr;
 		}
-		initEvent(){
-			this.initOperate();	
-		}
+		initEvent(){this.initOperate();}
 		initOperate(){
 			this.containerEl.addEventListener('click',(e)=>{
 				var target = e.target,clist=target.classList;
@@ -325,10 +323,7 @@ HTMLElement.prototype.sindex=function(selector){
 				var el = trEl.querySelector('.zjtable_row_update');
 				if(trEl.classList.contains('edit')){
 					var errorArray = this.checkSave(trEl);
-					if(errorArray.length){
-						errorArray.forEach(el=>el.classList.add('error'));
-						return;
-					}
+					if(errorArray.length){ errorArray.forEach(el=>el.classList.add('error')); return; }
 					var subData=this.getRowData(trEl);
 					var index = trEl.sindex('tr.tbData');
 					var isNew = trEl.classList.contains('newRow');
