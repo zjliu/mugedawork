@@ -47,6 +47,9 @@
 	<script src="scripts/codemirror/mode/css/css.js"></script>
 	<!--Html 混合模式-->
 	<script src="scripts/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+	<!--markdown-->
+	<script src="scripts/codemirror/addon/edit/continuelist.js"></script>
+	<script src="scripts/codemirror/mode/markdown/markdown.js"></script>
 
 	<!--menu-->
     <link href="styles/menu.css" rel="stylesheet" />
@@ -101,9 +104,8 @@
 			<div class="tools">
 				<label>背景颜色:</label><input id="color" type="color" value="#000000" />
 				<label>文件类型:</label>
-					<select id="lang" ></select>
-					<x-zjselect id="abx" x_get_url="/db/getObjData" x_tb_name="keyValue" 
-						x_tb_where={"name":"type"} width="120"></x-zjselect>
+					<x-zjselect id="lang" class="dark" x_get_url="/db/getObjData" x_tb_name="keyValue" 
+						x_tb_where={"name":"aType"} width="100"></x-zjselect>
 				<label>vim模式:</label><input id="vim" type="checkbox" value="vim" />
 				<input id="reset" type="button" value="重新设置" />
 			</div>

@@ -1,41 +1,3 @@
-var G=(id)=>document.getElementById(id);
-
-HTMLElement.prototype.Q=function(selector){
-	return this.querySelector(selector);
-}
-
-HTMLElement.prototype.QA=function(selector){
-	return this.querySelectorAll(selector);
-}
-
-if(!HTMLElement.prototype.appendHTML){
-	HTMLElement.prototype.appendHTML = function(html) {
-	    var fragment = GetHTMLFragment(html);
-	    this.appendChild(fragment);
-	    fragment = null;
-	}
-}
-if(!HTMLElement.prototype.insertBeforeHTML){
-	HTMLElement.prototype.insertBeforeHTML = function(html,existingElement) {
-		var fragment = GetHTMLFragment(html);
-	    this.insertBefore(fragment,existingElement)
-	    fragment = null;
-	}
-}
-if(!HTMLElement.prototype.insertAfterHTML){
-	HTMLElement.prototype.insertAfterHTML = function(html,existingElement) {
-		var el = existingElement.nextElementSibling;
-		if(el) this.insertBeforeHTML(html,el);
-		else this.appendHTML(html);
-	}
-}
-
-if(!String.prototype.trim){
-	String.prototype.trim=function(){
-	　　   return this.replace(/(^\s*)|(\s*$)/g, "");
-	}
-}
-
 //进入全屏
 function requestFullScreen() {
    var de = document.documentElement;
@@ -97,12 +59,13 @@ function notify(title,body){
 }
 
 !function(win){
+	var G=(id)=>document.getElementById(id);
+	var Q=(selector)=>document.querySelector(selector);
+	HTMLElement.prototype.Q=function(selector){ return this.querySelector(selector); }
+	HTMLElement.prototype.QA=function(selector){ return this.querySelectorAll(selector); }
+
 	var tokenFiled = 'access-token';
 	AjaxUtil.options.tokenFiled = tokenFiled;
-
-	var Q=function(selector){
-		return document.querySelector(selector);
-	}
 
 	function animate(el){
 		var animateName = el.dataset.animate;
@@ -115,7 +78,7 @@ function notify(title,body){
 	var code = G('code');
 	var defOpt = {
 		lineNumbers: true,
-		mode: 'javascript',
+		mode: 'markdown',
 		lineWrapping: true,
 		extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
 		foldGutter: true,
@@ -128,13 +91,8 @@ function notify(title,body){
 	var editor = CodeMirror.fromTextArea(code,defOpt);
 	win.editor = editor;
 
-	function setValue(value){
-		editor.setValue(unescape(value));
-	}
-
-	function getValue(){
-		return editor.getValue();
-	}
+	function setValue(value){ editor.setValue(unescape(value)); }
+	function getValue(){ return editor.getValue(); }
 
 	var lang = G('lang');
 	var titleEl = G('title');
@@ -148,7 +106,7 @@ function notify(title,body){
 
 	//遮罩
 	doMask();
-	var messageTip = document.querySelector('.messageTip');
+	var messageTip = Q('.messageTip');
 
 	function showMessageTip(html){
 		messageTip.innerHTML = html;
@@ -194,6 +152,15 @@ function notify(title,body){
 
 	function changeMode(){
 		editor.setOption("mode",this.value);
+		if(this.value==="markdown"){
+			editor.setOption("theme","default");
+			Q('.CodeMirror').style.backgroundColor = "#ffffff";
+		}
+		else{
+			editor.setOption("theme","3024-night");
+			Q('.CodeMirror').classList.remove('markdown');
+			Q('.CodeMirror').style.backgroundColor = "#000000";
+		}
 		localStorage.codemirrormode=this.value;
 	}
 

@@ -253,6 +253,8 @@ body {
 	border:rgba(255,255,255,0.1) 1px solid;
 }
 
+.CodeMirror.markdown{ background-color:#ffffff; }
+
 /*editorFullScreen*/
 #editorFullScreen:checked~.frame{
 	display:none;
