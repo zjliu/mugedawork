@@ -11,7 +11,19 @@ app.set('jwtTokenSecret', 'liuzhijunToken9527@beijing');
 
 app.use(bodyParser());
 
-app.use(express.static(__dirname + '/app'));
+var staticPath = __dirname + '/app';
+app.use(express.static(staticPath));
+
+var routeGetArray = [
+	{"key":"/","path":"/login.html"},
+	{"key":"/login","path":"/login.html"}
+];
+
+routeGetArray.forEach(obj=>{
+	app.get(obj.key,(req,res)=>{
+		res.sendFile(`${staticPath}${obj.path}`);
+	});
+});
 
 app.param(function(name, fn){
 	if (fn instanceof RegExp) {
