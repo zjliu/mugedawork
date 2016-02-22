@@ -7,9 +7,7 @@ var formidable = require("formidable");
 
 app.use(express.static(__dirname + '/app'));
 
-router.get('/', function(req, res) {
-  res.render('index', { title: '' });
-});
+router.get('/', function(req, res) { res.render('index', { title: '' }); });
 
 function getSignature(appid,secret,url,callback){
     function calcSignature(ticket, noncestr, ts) {
