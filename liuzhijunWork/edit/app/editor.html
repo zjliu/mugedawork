@@ -67,6 +67,13 @@
 
 	<!--download-->
     <script src="scripts/download.js"></script>
+
+	<!-- template.js -->
+	<script src="article/35?type=js&min=false"></script>
+
+	<!--zjselect-->
+    <link href="styles/zjSelect.css" rel="stylesheet" />
+	<script src="scripts/zjSelect.js"></script>
 </head>
 <body>
 	<div id="edit" class="page slidedown">
@@ -95,6 +102,8 @@
 				<label>背景颜色:</label><input id="color" type="color" value="#000000" />
 				<label>文件类型:</label>
 					<select id="lang" ></select>
+					<x-zjselect id="abx" x_get_url="/db/getObjData" x_tb_name="keyValue" 
+						x_tb_where={"name":"type"} width="120"></x-zjselect>
 				<label>vim模式:</label><input id="vim" type="checkbox" value="vim" />
 				<input id="reset" type="button" value="重新设置" />
 			</div>

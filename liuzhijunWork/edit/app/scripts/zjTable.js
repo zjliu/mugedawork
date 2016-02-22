@@ -1,24 +1,3 @@
-function ajax(opt){
-	return new Promise(function(resolve,reject){
-		var isPost = opt.type.toLowerCase()==='post';
-			opt.data._=+new Date;
-		var paramStr = ''; for(var key in opt.data) paramStr=[paramStr,'&',key,'=',opt.data[key]].join('');
-		var xhr = new XMLHttpRequest();
-		xhr.onload=()=>xhr.status===200 && resolve(JSON.parse(xhr.responseText));
-		xhr.onerror=()=>reject(xhr.responseText);
-		if(isPost){
-			xhr.open(opt.type,opt.url);
-			xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-			xhr.send(paramStr.replace(/^./,''));
-		}
-		else {
-			opt.url = opt.url.indexOf('?')>0?opt.url+paramStr:opt.url+paramStr.replace(/^./,'?');
-			xhr.open(opt.type,opt.url);
-			xhr.send(null);
-		}
-	});
-}
-
 function eachList(dom,selector,callback){
 	if(!callback) return;
 	Array.prototype.forEach.call(dom.querySelectorAll(selector),callback);

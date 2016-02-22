@@ -8,7 +8,12 @@
 	transform:translate(-50%,-50%);
 	-webkit-transform:translate(-50%,-50%);
 	z-index:1;
+	opacity:0;
+	transition:opacity ease 1.5s;
+	-webkit-transition:opacity ease 1.5s;
 }
+
+.loginwrapper.active, .loginwrapper:hover{ opacity:1; }
 
  .loginwrapper h1 {
 	color: #fff;

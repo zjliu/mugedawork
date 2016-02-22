@@ -55,4 +55,8 @@
 		}
 	}
 
+	setTimeout(function(){
+		Q('.loginwrapper').classList.add('active');
+	},10000);
+
 })(this);

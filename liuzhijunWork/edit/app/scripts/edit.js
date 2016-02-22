@@ -82,54 +82,6 @@ var replace = function(html){
 	return html;
 }
 
-//模板功能
-function template(tempStr,dataParam){
-	var html='var html="";';
-	tempStr.split(/(\<%[^<%]*%\>)/).map(function(item,index){
-		var r = /^<%(=?.*)%>$/.exec(item);
-		var value = '';
-		if(r && r.length){
-			value = r[1]; 
-			if(value[0]=='=') html+=' html+'+value+';';
-			else html+=value;
-		}
-		else{
-			value = item.replace(/[\n\t]/g,'');
-			html+=" html+='"+value+"';";
-		}
-	});
-	html+=" return html;";
-	var fun = new Function(dataParam || "data",html);
-	return fun;
-}
-
-function GetHTMLFragment(html){ 
-    var divTemp = document.createElement("div"), 
-    	nodes = null,
-        fragment = document.createDocumentFragment();// 文档片段，一次性append，提高性能
-
-    divTemp.innerHTML = html;
-    nodes = divTemp.childNodes;
-    for (var i=0, length=nodes.length; i<length; i+=1) {
-       fragment.appendChild(nodes[i].cloneNode(true));
-    }
-    return fragment;	
-}
-
-function applyTemplate(data,templateId,el){ 
-	var scriptTemplate = G(templateId).innerHTML,
-		compiled = template(scriptTemplate),
-		html = compiled(data);
-	el.appendHTML(html);
-}
-
-function applyInsertAfterTemplate(data,templateId,el,existingElement){ 
-	var scriptTemplate = G(templateId).innerHTML,
-		compiled = template(scriptTemplate),
-		html = compiled(data);
-	el.insertAfterHTML(html,existingElement);
-}
-
 function notify(title,body){
 	if(window.currentNotify) window.currentNotify.close();
 	if(Notification.permission !== 'denied'){
@@ -145,7 +97,6 @@ function notify(title,body){
 }
 
 !function(win){
-	
 	var tokenFiled = 'access-token';
 	AjaxUtil.options.tokenFiled = tokenFiled;
 
