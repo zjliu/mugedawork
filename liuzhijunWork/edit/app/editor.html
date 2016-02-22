@@ -69,7 +69,7 @@
     <script src="scripts/download.js"></script>
 </head>
 <body>
-	<div id="edit" class="page">
+	<div id="edit" class="page slidedown">
 		<input id="editorFullScreen" type="checkbox" class="hidden" />
 		<p class="progress"></p>
 		<div id="frame" class="frame"></div>
@@ -101,25 +101,6 @@
 			<label class="toolsTogger" for="toolsCB" title="显示设置"><span></span></label>
 			<textarea id="code"></textarea>
 		</div>
-	</div>
-	<div id="login" class="page">
-		<div class="loginwrapper">
-		  <h1>Editor     Login</h1>
-		  <section>
-			<form action="javascript:login()">
-				<input class="main-form" type="text" name="username" placeholder="liuzhijunsw@126.com"/>
-				<input class="main-form" type="password" name="password" placeholder="password"/>
-				<input type="submit" value="Sign in"/>
-			<form>
-		  </section>
-		  <!--
-		  <footer>
-		    <input class="yolo" name="" value="" type="checkbox"/><h6>Remember me</h6>
-		  </footer>
-		  -->
-		</div>
-		<canvas id="loginBgCanvas"></canvas>
-		<script src="scripts/water.js"></script>
 	</div>
 	<script type="text/template" id="tree_template">
 		<nav class="tree_menu">

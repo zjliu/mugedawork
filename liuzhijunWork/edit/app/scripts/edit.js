@@ -67,6 +67,11 @@ var getParam = function (name) {
 	if (arr) return arr[2];
 }
 
+var getAid = function (){
+	var arr = /^\/editor\/(\d+)$/.exec(location.pathname);
+	if(arr && arr.length===2) return arr[1];
+}
+
 //字符替换方法
 var replace = function(html){ 
 	if(!html || arguments.length<2) return;
@@ -316,7 +321,7 @@ function notify(title,body){
 				}
 				obj[cid].children.push({
 					'text':item.title,
-					'url':'/index.html?aid='+item.aid
+					'url':'/editor?aid='+item.aid
 				});
 			});
 			for(var key in obj){
@@ -329,7 +334,7 @@ function notify(title,body){
 		}
 	});
 
-	var aid = getParam('aid');
+	var aid = getAid() || getParam('aid');
 	var cid = null;
 	var categoryData=null;
 
@@ -626,64 +631,11 @@ function notify(title,body){
 		}
 	});
 
-/*===============login=============*/
-	function doLogin(){
-		var el = G('login');
-		var nameEl = el.Q('input[name="username"]');
-		var pwdEl= el.Q('input[name="password"]');
-		var name = nameEl.value.trim();
-		var pwd = pwdEl.value.trim();
-		if(!name) {
-			nameEl.focus();
-			return;
-		}
-		if(!pwd){
-			pwdEl.focus();
-			return;
-		}
-		var mdata={'name':name,'pwd':pwd,'_':Math.random()};
-		AjaxUtil.ajax({
-			url:'/login',
-			type:'post',
-			data:mdata,
-			dataType:'json',
-			success:function(data){
-				if(data.success) {
-					localStorage[tokenFiled] = data.token;
-					localStorage.userName = name;
-					initLogin();
-					notify('用户登录',data.success?'用户登录成功！':data.message);
-					window.location.href='main.html';
-				}
-				else pwdEl.focus();
-			}
-		});
-	}
-	win.login = doLogin;
-
 	function exitLogin(){
 		delete localStorage[tokenFiled];
 		delete localStorage.userName;
 		window.location.href="#login";
 	}
-
-	var orgHash = location.hash;
-	function hashchange(){
-		hash=location.hash || '#edit';
-		if(orgHash && Q(orgHash)){
-			var orgPage = Q(orgHash);
-			orgPage.classList.remove('slidedown');
-		}
-		if(hash && Q(hash)){
-			var curPage = Q(hash);
-			setTimeout(function(){
-				curPage.classList.add('slidedown');
-			});
-		}
-		orgHash = hash;
-	}
-	window.onhashchange=hashchange;
-	hashchange();
 
 	function initLogin(){
 		var userInfo = G('userInfo');

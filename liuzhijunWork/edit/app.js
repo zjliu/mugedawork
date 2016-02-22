@@ -16,7 +16,8 @@ app.use(express.static(staticPath));
 
 var routeGetArray = [
 	{"key":"/","path":"/login.html"},
-	{"key":"/login","path":"/login.html"}
+	{"key":"/login","path":"/login.html"},
+	{"key":"/editor","path":"/editor.html"}
 ];
 
 routeGetArray.forEach(obj=>{
