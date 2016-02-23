@@ -196,22 +196,12 @@
 			<input class="articleTitle" type="text" value="<%=data.title%>" />
 			<br>
 			<label>类型：</label>
-			<label for="articleType" class="articleCategory select">
-				<select id="articleType">
-					<option value="1">私有文件</option>
-					<option value="0">公有文件</option>
-					<option value="2">网站本身</option>
-				</select>
-			</label>
+			<x-zjselect id="articleType" x_get_url="/db/getObjData" x_tb_name="keyValue" x_tb_where={"name":"aMode"} >
+			</x-zjselect>
 			<br>
 			<label>分类：</label>
-			<label for="articleCategory" class="articleCategory select">
-				<select id="articleCategory">
-					<%data.list.forEach(function(item){%>
-						<option <%=item.cid===data.cid?"selected":""%> value="<%=item.cid%>"><%=item.text%></option>
-					<%});%>
-				</select>
-			</label>
+			<x-zjselect id="articleCategory" x_get_url="/db/getObjData" x_tb_name="keyValue" x_tb_where={"name":"aType"} 
+				value="<%=data.cid%>"></x-zjselect>
 			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
 			<div data-type="concel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
 		</div>

@@ -8,6 +8,13 @@ var userType={ 'admin':0, 'user':1 };
 var catType={ 'public':0, 'private':1 };
 var articleType={ 'public':0, 'private':1, 'website':2 };
 
+function queryArticleType(callback){
+	var sql = "select data from db where name='keyValue'";
+	query(sql,function(data){
+		callback && callback(JSON.parse(data[0].data).filter(p=>p[0]==='aType'));
+	});
+}
+
 function getInsertSql(table,obj,fileds){
 	var sql = "insert into "+table+"("+Object.keys(fileds)+") values(";
 	var values = [];
@@ -42,21 +49,26 @@ function doLogin(name,pwd,callback){
 }
 
 function getCategoryList(callback){
-	var sql = 'select cid,text,type,(select count(*) from article where cid=c.cid) count from cat c';
-	query(sql,function(data){
-		callback && callback(data);
+	queryArticleType(function(arr){
+		callback && callback(arr.map((p,index)=>{return {cid:index,text:p[1],value:p[2],checked:p[3]};}));
 	});
 }
 
 function getArticleList(callback){
-	var sql = 'select c.cid,c.text cname,a.aid,a.title from article a,cat c where a.cid = c.cid and a.type='+articleType.public;
-	query(sql,function(data){
-		callback && callback(data);
+	queryArticleType(function(arr){
+		for(var obj={},i=0,l=arr.length;i<l;i++){
+			obj[i]=arr[i][1];
+		}
+		var sql = "select cid,aid,title from article";
+		query(sql,function(data){
+			data.forEach(p=>p.cname=obj[p.cid]);
+			callback && callback(data);
+		});
 	});
 }
 
 function getArticle(aid,callback,queryObj,res){ 
-	var sql = 'select title,content,cid,(select type from cat where cid=a.cid) type from article a where aid='+aid;
+	var sql = `select title,content,cid from article a where aid=${aid}`;
 	var type = queryObj.type;
 	var min = queryObj.min === "true";
 	var blog = queryObj.blog === "true";
@@ -91,8 +103,9 @@ function getArticle(aid,callback,queryObj,res){
 				case 'md':
 					if(blog){
 						try{
-							var md = require("node-markdown").Markdown;
-							value = md(value);
+							var MarkdownIt = require('markdown-it');
+							var md = new MarkdownIt();
+							value = md.render(value);
 						}catch(e){
 							console.log(e.message);
 						}
@@ -104,7 +117,7 @@ function getArticle(aid,callback,queryObj,res){
 				break;
 			}
 			if(contentValue){
-				res.writeHead(200,{"Content-Type":	contentValue});
+				res.writeHead(200,{"Content-Type":`${contentValue};charset=utf-8`});
 				res.write(value);
 				res.end();
 			}
@@ -124,16 +137,19 @@ function addArticle(uid,params,callback){
 		"content":true,"cdate":false,"udate":false
 	};
 	params.content = escape(params.content);
-	var sql = getInsertSql('article',params,fileds);
-	exec(sql,function(error){
-		if(!callback) return;
-		if(error===null){
-			var sql = "select max(aid) aid from article";
-			query(sql,function(data){
-				data && data.length && callback(true,data[0]);
-			});
-		}
-		else callback(false);
+	queryArticleType(function(arr){
+		for(var i=0,l=arr.length;i<l;i++) if(arr[i][2]===params.cid) params.cid=i;
+		var sql = getInsertSql('article',params,fileds);
+		exec(sql,function(error){
+			if(!callback) return;
+			if(error===null){
+				var sql = "select max(aid) aid from article";
+				query(sql,function(data){
+					data && data.length && callback(true,data[0]);
+				});
+			}
+			else callback(false);
+		});
 	});
 }
 
@@ -596,7 +612,7 @@ function exec(sql,callback){
 	});
 }
 
-exports.getCategoryList = getCategoryList;
+//exports.getCategoryList = getCategoryList;
 exports.getArticleList = getArticleList;
 exports.getArticle = getArticle;
 exports.addArticle = addArticle;
@@ -608,8 +624,10 @@ exports.getPenList= getPenList;
 exports.getPen = getPen;
 exports.updatePen = updatePen;
 exports.deletePen = deletePen;
-exports.addCategory = addCategory;
-exports.deleteCategory = deleteCategory;
+
+//exports.addCategory = addCategory;
+//exports.deleteCategory = deleteCategory;
+
 exports.createDBTable = createDBTable;
 exports.updateDBTable = updateDBTable;
 exports.updateDBTableStct = updateDBTableStct;

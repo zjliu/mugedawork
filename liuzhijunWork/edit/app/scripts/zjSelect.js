@@ -31,16 +31,32 @@
 		};
 		ajax(opt).then(data=>{
 			if(!data.success) return;
+			var checkedValue = this.getAttribute('value');
+			if(checkedValue) data.data.map(p=>{if(p.value==checkedValue){p.checked=1;return true;}});
 			root.innerHTML= selectFun({data:data.data,id:"abc"});
 			var selectEl = root.querySelector('select');
 			var self = this;
 			selectEl.onchange=function(e){
-				root.querySelector('a').innerText = this.selectedOptions[0].innerText; 
-				self.value = this.value;
+				//如果无e则为js触发
+				if(e) self.value = this.value;
 				if(self.onchange) self.onchange(e);
 			}
 			selectEl.onchange();
+			this.el = selectEl;
+			Object.defineProperty(this,'value',{
+				get:()=>selectEl.value,
+				set:(value)=>{
+					var tiggerChange = value!==selectEl.value;
+					selectEl.value = value;
+					tiggerChange && selectEl.onchange();
+					if(selectEl.selectedOptions.length===1){
+						root.querySelector('a').innerText = selectEl.selectedOptions[0].innerText;
+					}
+				}
+			});
+			this.value = this.value;
 			this.setSize();
+			this.getOption=(index)=>this.el.querySelector(`option:nth-of-type(${index})`);
 		});
 	}
 	zjSelectPro.attributeChangedCallback=function(attrName, oldVal, newVal){

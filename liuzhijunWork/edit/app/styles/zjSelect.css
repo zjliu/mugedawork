@@ -3,7 +3,7 @@ x-zjselect /deep/ div{
 	position: relative;
 	display: inline-block;
 	width: 150px; height: 30px;
-	/*border: 1px solid #ddd;*/
+	border: 1px solid #ddd;
 	box-sizing:border-box;
 	line-height: 32px; text-align: left;
 	text-indent: 2px; vertical-align: middle;
@@ -15,6 +15,7 @@ x-zjselect /deep/ span{
 	background-position:-218px -214px;
 }
 x-zjselect.dark /deep/ div,x-zjselect.dark /deep/ span{
+	border:none;
 	background:transparent;
 }
 x-zjselect /deep/ span:after{

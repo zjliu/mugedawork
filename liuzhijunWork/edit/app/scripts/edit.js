@@ -218,7 +218,7 @@ function notify(title,body){
 		}
 	}
 
-	var ajaxCompleteObj={count:0,'category':false,'categoryList':false,'article':false};
+	var ajaxCompleteObj={count:0,'category':false,'article':false};
 
 	//初使化分类树
 	AjaxUtil.ajax({
@@ -228,8 +228,7 @@ function notify(title,body){
 		dataType:'json',
 		success:function(data){
 			var containner = G('frame');
-			var obj={};
-			var arr=[];
+			var obj={},arr=[];
 			data.forEach(function(item){
 				var cid = item.cid;
 				if(!obj[cid]){
@@ -237,14 +236,9 @@ function notify(title,body){
 					cObj.children=[];
 					obj[cid]=cObj;
 				}
-				obj[cid].children.push({
-					'text':item.title,
-					'url':'/editor?aid='+item.aid
-				});
+				obj[cid].children.push({'text':item.title, 'url':'/editor?aid='+item.aid});
 			});
-			for(var key in obj){
-				arr.push(obj[key]);
-			}
+			for(var key in obj) arr.push(obj[key]);
 			applyTemplate(arr,'tree_template',containner);
 			ajaxCompleteObj.category=true;
 			ajaxCompleteObj.count++;
@@ -252,58 +246,31 @@ function notify(title,body){
 		}
 	});
 
-	var aid = getAid() || getParam('aid');
-	var cid = null;
-	var categoryData=null;
-
-	AjaxUtil.ajax({
-		url:'/categoryList',
-		type:'get',
-		data:{'_':Math.random()},
-		dataType:'json',
-		success:function(data){
-			categoryData = data;
-			var langData = data.filter(function(item){
-				return item.type===0;
-			});
-			applyTemplate(langData,'langTemplate',lang);
-			initArticle(aid);
-			ajaxCompleteObj.categoryList=true;
-			ajaxCompleteObj.count++;
-			unMask();
-			init();
-		}
-	});
-
 	function initArticle(aid){
-		if(aid){
-			AjaxUtil.ajax({
-				url:'/article/'+aid,
-				type:'get',
-				dataType:'json',
-				success:function(data){
-					var title = data.title;
-					setTitle(title);
-					setValue(data.content);
-					var type = title.substr(title.lastIndexOf('.')+1,title.length-title.lastIndexOf('.'));
-					if(TypeObj[type]){
-						lang.value = TypeObj[type];
-						lang.onchange();
-					}
-					ajaxCompleteObj.article=true;
-					ajaxCompleteObj.count++;
-					unMask();
-				}
-			});
-		}
-		else{
+		if(!aid) {
 			ajaxCompleteObj.count++;
 			unMask();
+			return;
 		}
+		AjaxUtil.ajax({
+			url:'/article/'+aid,
+			type:'get',
+			dataType:'json',
+			success:function(data){
+				var title = data.title;
+				setTitle(title);
+				setValue(data.content);
+				var option = lang.getOption(data.cid+1);
+				if(option) lang.value = option.value;
+				ajaxCompleteObj.article=true;
+				ajaxCompleteObj.count++;
+				unMask();
+			}
+		});
 	}
 
 	function unMask(){
-		if(ajaxCompleteObj.count>=3){
+		if(ajaxCompleteObj.count>=2){
 			maskEl.style.display='none';
 			maskEl.classList.remove('active');
 		}
@@ -314,12 +281,15 @@ function notify(title,body){
 		maskEl.classList.add('active');
 	}
 
+	var aid = getParam('aid');
+	initArticle(aid);
+	unMask();
+	init();
+
 	var rightMenu = G('rightMenu');
 	var baseLiHeight = 35;
 	var rightMenuHeight = rightMenu.querySelectorAll('li').length * baseLiHeight;
-	win.oncontextmenu = function(e){
-		e.preventDefault();
-	}
+	win.oncontextmenu=e=>e.preventDefault();
 	G('edit').oncontextmenu=function(e){
 		e.preventDefault();
 		if(/^(mask)|(dialog)$/.test(e.target.className)) return;
@@ -329,18 +299,13 @@ function notify(title,body){
 		var bodyH = clientObject.height;
 		var contextW = parseInt(contextStyleObj['width']);
 		var contextH = parseInt(contextStyleObj['height']) || rightMenuHeight;
-
 		//默认在鼠标位置右下方
 		rightMenu.style.top = e.pageY+'px';
 		rightMenu.style.left = e.pageX+'px';
 		//显示在左方
-		if(e.pageX+contextW>bodyW){
-			rightMenu.style.left = (e.pageX-contextW)+'px';
-		}
+		if(e.pageX+contextW>bodyW) rightMenu.style.left = (e.pageX-contextW)+'px';
 		//显示在上方
-		if(e.pageY+contextH>bodyH){
-			rightMenu.style.top = (e.pageY-contextH)+'px';
-		}
+		if(e.pageY+contextH>bodyH) rightMenu.style.top = (e.pageY-contextH)+'px';
 		showContextMenu();
 	}
 
@@ -389,7 +354,7 @@ function notify(title,body){
 		newPage:function(){
 			hideContextMenu();
 			openConfirm('如果未保存的文件,确定打开新页面?',function(isOk){
-				isOk &&	(win.location.href="/index.html");
+				isOk &&	(win.location.href="/editor");
 			});
 		},
 		openFile:function(){
@@ -436,8 +401,8 @@ function notify(title,body){
 		},
 		saveAs:function(){
 			hideContextMenu();
-			if(!categoryData) return;
-			var data={'ok':'确定','cancel':'取消','list':categoryData,'title':getTitle()||'','cid':cid||''};
+			var cid = lang.el.selectedIndex;
+			var data={'ok':'确定','cancel':'取消','list':null,'title':getTitle()||'','cid':cid||''};
 			var content = encodeURIComponent(getValue());
 			var mdata = {'content':content};
 			dialog.openFromTemplate(data,'saveAsTemplate',300,200,function(isOk){
@@ -453,7 +418,7 @@ function notify(title,body){
 					success:function(data){
 						hideContextMenu();
 						notify('另存文件',data.success?'文件另存成功！':data.message);
-						data.success && (win.location.href='index.html?aid='+data.data.aid);
+						data.success && (win.location.href='/editor?aid='+data.data.aid);
 					}
 				});
 			});
@@ -471,7 +436,7 @@ function notify(title,body){
 					dataType:'json',
 					success:function(data){
 						notify('删除文件',data.success?'文件删除成功！':data.message);
-						data.success && (win.location.href='index.html');
+						data.success && (win.location.href='/editor');
 					}
 				});
 			});
