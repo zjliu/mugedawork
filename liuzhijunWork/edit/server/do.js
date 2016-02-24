@@ -68,14 +68,15 @@ function getArticleList(callback){
 }
 
 function getArticle(aid,callback,queryObj,res){ 
-	var sql = `select title,content,cid from article a where aid=${aid}`;
+	var sql = `select title,content,cid,cdate,udate from article a where aid=${aid}`;
 	var type = queryObj.type;
 	var min = queryObj.min === "true";
 	var blog = queryObj.blog === "true";
 	query(sql,function(data){
 		if(type && data && data.length){
 			var contentValue = '';
-			var value = unescape(data[0].content);
+			var articleData = data[0];
+			var value = unescape(articleData.content);
 			switch(type){
 				case 'js':
 					contentValue = "application/x-javascript";
@@ -106,6 +107,7 @@ function getArticle(aid,callback,queryObj,res){
 							var MarkdownIt = require('markdown-it');
 							var md = new MarkdownIt();
 							value = md.render(value);
+							value = createBlog(articleData.title,value,articleData.cdate,articleData.udate);
 						}catch(e){
 							console.log(e.message);
 						}
@@ -237,6 +239,52 @@ function deletePen(uid,pid,callback){
 			callback && callback(error===null);
 		});
 	});
+}
+
+function template(tempStr,dataParam){
+	var apiFun = [
+		function attr(name,value){ return value?[' ',name,'="',value,'"',' '].join(''):''; }
+	];
+	var html = apiFun+' var html="";';
+	tempStr.split(/(<%.+?%>)/).map(function(item){
+		if(!item) return;
+		var r = /^<%(=?.*)%>$/.exec(item);
+		var value = '';
+		if(r && r.length){
+		  value = r[1]; 
+		  if(value[0]=='=') html+=' html+'+value+';';
+		  else html+=value;
+		}
+		else{
+		  value = item.replace(/[\n\t]/g,'');
+		  if(value!=='') html+=" html+='"+value+"';";
+		}
+	});
+	html+=" return html;";
+	return new Function(dataParam || "data",html);
+}
+
+
+function createBlog(title,content,cdate,udate){
+	var htmlTemplate = `
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<title>小鱼空间--<%=data.title%></title>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+				<!--markdown.css-->
+				<link href="/article/63?type=css&min=true" rel="stylesheet">
+			</head>
+			<body>
+				<article class="markdown-body">
+					<%=data.content%>
+					<span class="udate_span"><i>更新时间：</i><%=data.udate%></span>
+				</article>
+			</body>
+		</html>
+	`;
+	return template(htmlTemplate)({title,content,cdate,udate});
 }
 
 function getPenList(uid,callback){
