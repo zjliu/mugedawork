@@ -73,6 +73,7 @@ function getArticle(aid,callback,queryObj,res){
 	var min = queryObj.min === "true";
 	var blog = queryObj.blog === "true";
 	query(sql,function(data){
+		//有type则为引用资源
 		if(type && data && data.length){
 			var contentValue = '';
 			var articleData = data[0];
@@ -124,7 +125,9 @@ function getArticle(aid,callback,queryObj,res){
 			}
 		}
 		else{
-			data && data.length && callback && callback(data[0]);
+			//编辑器读取article
+			if(data && data.length) callback(data[0]);
+			else callback(false);
 		}
 	});
 }

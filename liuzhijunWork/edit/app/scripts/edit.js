@@ -78,7 +78,7 @@ function notify(title,body){
 	var code = G('code');
 	var defOpt = {
 		lineNumbers: true,
-		mode: 'markdown',
+		mode: 'javascript',
 		lineWrapping: true,
 		extraKeys: {"Ctrl-Q": function(cm){ cm.foldCode(cm.getCursor()); }},
 		foldGutter: true,
@@ -161,7 +161,6 @@ function notify(title,body){
 			Q('.CodeMirror').classList.remove('markdown');
 			Q('.CodeMirror').style.backgroundColor = "#000000";
 		}
-		localStorage.codemirrormode=this.value;
 	}
 
 	lang.onchange = changeMode;
@@ -203,11 +202,6 @@ function notify(title,body){
 			var el_color = G('color');
 			el_color.value = localStorage.codemirrorbg || defColor;
 			el_color.onchange();
-		}
-		if(localStorage.codemirrormode){
-			var el = lang;
-			el.value = localStorage.codemirrormode;
-			el.onchange();
 		}
 		if(localStorage.showTools){
 			toolsCBEl.checked = !!~~localStorage.showTools;
@@ -257,11 +251,17 @@ function notify(title,body){
 			type:'get',
 			dataType:'json',
 			success:function(data){
-				var title = data.title;
-				setTitle(title);
-				setValue(data.content);
-				var option = lang.getOption(data.cid+1);
-				if(option) lang.value = option.value;
+				if(data){
+					var title = data.title;
+					setTitle(title);
+					setValue(data.content);
+					var option = lang.getOption(data.cid+1);
+					if(option) lang.value = option.value;
+				}
+				else{
+					notify('读取文档','读取文档失败！');
+					window.location.href = "/editor";
+				}
 				ajaxCompleteObj.article=true;
 				ajaxCompleteObj.count++;
 				unMask();
