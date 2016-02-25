@@ -104,9 +104,8 @@ function getArticle(aid,callback,queryObj,res){
 				case 'md':
 					if(blog){
 						try{
-							var MarkdownIt = require('markdown-it');
-							var md = new MarkdownIt();
-							value = md.render(value);
+							var md = require('markdown').markdown;
+							value = md.toHTML(value);
 							value = createBlog(articleData.title,value,articleData.cdate,articleData.udate);
 						}catch(e){
 							console.log(e.message);
@@ -132,8 +131,8 @@ function getArticle(aid,callback,queryObj,res){
 
 function addArticle(uid,params,callback){
 	params.uid = uid;
-	params.cdate = "datetime('now')";
-	params.udate = "datetime('now')";
+	params.cdate = "datetime('now','localtime')";
+	params.udate = "datetime('now','localtime')";
 	var fileds = {
 		"cid":false,"uid":false,"title":true,
 		"content":true,"cdate":false,"udate":false
@@ -159,7 +158,7 @@ function saveArticle(aid,title,content,callback){
 	var titleSql = !!title?"title='"+title+"'":"";
 	var splitStr = title && content ? ',' : '';
 	var contentSql = !!content?"content='"+escape(content)+"'":"";
-	var sql = 'update article set '+titleSql+splitStr+contentSql+' where aid='+aid;
+	var sql = "update article set "+titleSql+splitStr+contentSql+",udate=datetime('now','localtime') where aid="+aid;
 	exec(sql,function(error){
 		callback && callback(error===null);
 	});
@@ -176,8 +175,8 @@ function addPen(uid,params,callback){
 	params.userId = uid;
 	params.type = articleType.public;
 	params.sortcode = 0;
-	params.cdate = "datetime('now')";
-	params.udate = "datetime('now')";
+	params.cdate = "datetime('now','localtime')";
+	params.udate = "datetime('now','localtime')";
 	//false 代表不用引号包围
 	var fileds = {
 		'title':true,'desc':true,
@@ -216,7 +215,7 @@ function updatePen(uid,params,callback){
 			'htmlId':false,'cssId':false, 
 			'jsId':false,'udate':false
 		};
-		params.udate = "datetime('now')";
+		params.udate = "datetime('now','localtime')";
 		var whereSql = 'where pid='+pid;
 		var updateSql = getUpdateSql('codepen',params,fileds,whereSql);
 		exec(updateSql,function(error){
@@ -266,6 +265,26 @@ function template(tempStr,dataParam){
 
 
 function createBlog(title,content,cdate,udate){
+	//去除对html标签的转义
+	content = content.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&nbsp;/g,' ');
+	//添加目录
+	var cheerio = require('cheerio');
+	var $ = cheerio.load(content);
+	var els = $('h1,h2,h3,h4,h5,h6');
+	var menuTemplate = `
+		<%var getIndex=name=>name && parseInt(/^h(\d)$/.exec(name)[1]);%>
+		<ul class="menu">
+			<li class="root"><a href="#h0"><%=data[0].children[0].data%></a></li>
+			<%for(var i=1,l=data.length;i<l;i++){%>
+				<%var item=data[i],nItem=data[i+1],ic=item && ~~item.name[1],nc=nItem && ~~nItem.name[1];%>
+				<li><a href="#h<%=i%>"><%=item.children[0].data%></a>
+					<%if(nc && ic<nc){%><ul><%}%>
+					<%if(nc && ic>nc){%></ul><%}%>
+				</li>
+			<%}%>
+		</ul>
+	`;
+	var menu = template(menuTemplate)(els);
 	var htmlTemplate = `
 		<!DOCTYPE html>
 		<html>
@@ -277,14 +296,20 @@ function createBlog(title,content,cdate,udate){
 				<link href="/article/63?type=css&min=true" rel="stylesheet">
 			</head>
 			<body>
-				<article class="markdown-body">
-					<%=data.content%>
+				<div id="top"></div>
+				<article>
+					<p class="check_menu_p"><label for="check_menu">目录</label></p>
+					<input type="checkbox" id="check_menu" />
+					<div class="markdown-menu"><%=data.menu%></div>
+					<div class="markdown-body"> <%=data.content%> </div>
 					<span class="udate_span"><i>更新时间：</i><%=data.udate%></span>
 				</article>
+				<a class="toTopBtn" href="#top" title="返回顶部"></a>
 			</body>
+			<script src="/article/65?type=js&min=true"></script>
 		</html>
 	`;
-	return template(htmlTemplate)({title,content,cdate,udate});
+	return template(htmlTemplate)({title,content,cdate,udate,menu});
 }
 
 function getPenList(uid,callback){
@@ -335,7 +360,7 @@ function getPen(pid,res,params){
 }
 
 function addCategory(params,callback){
-	params.udate = "datetime('now')";
+	params.udate = "datetime('now','localtime')";
 	var fileds = {
 		'text':true,'udate':false
 	};
@@ -393,7 +418,7 @@ function createDBTable(params,callback){
 			});
 			return obj;
 		});
-		params.udate = "datetime('now')";
+		params.udate = "datetime('now','localtime')";
 		params.data = "";
 		params.stct = JSON.stringify(rData);
 		params.type = 1;
@@ -488,7 +513,7 @@ function updateDBTable(param,callback){
 				break;
 			}
 			var fields = {'data':true,'udate':false};
-			var pd = {udate:"datetime('now')",data:JSON.stringify(rowArr)};
+			var pd = {udate:"datetime('now','localtime')",data:JSON.stringify(rowArr)};
 			var whereSql = 'where id='+param.id;
 			var updateSql = getUpdateSql('db',pd,fields,whereSql);
 			exec(updateSql,(error)=>callback && callback(error===null));
@@ -565,7 +590,7 @@ function updateDBTableStct(param,callback){
 			}
 			var realData = updateStctFun[type] && updateStctFun[type](JSON.parse(row1.data||'[]'),index,obj && realType);
 			var fields = {"stct":true,"udate":false,"data":true};
-			var pd = {udate:"datetime('now')",stct:JSON.stringify(rowArr),data:JSON.stringify(realData)};
+			var pd = {udate:"datetime('now','localtime')",stct:JSON.stringify(rowArr),data:JSON.stringify(realData)};
 			var whereSql = 'where id='+param.id;
 			var updateSql = getUpdateSql('db',pd,fields,whereSql);
 			exec(updateSql,(error)=>callback && callback(error===null));
@@ -601,7 +626,7 @@ function updateDBTableAll(params,callback){
 		let data = JSON.parse(params.data);
 		params.name = data[1];
 		params.type = data[2];
-		params.udate = "datetime('now')";
+		params.udate = "datetime('now','localtime')";
 		let fileds = { 'name':true,'udate':false,'type':false };
 		let whereSql = 'where id='+params.id;
 		let updateSql = getUpdateSql('db',params,fileds,whereSql);
