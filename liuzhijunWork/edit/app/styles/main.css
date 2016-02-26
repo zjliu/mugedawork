@@ -1,6 +1,7 @@
 .hidden {display:none;}
 
 html, body {
+	font-family: 微软雅黑;
 	overflow: hidden;
 	height: 100%;
 	-webkit-overflow-scrolling: touch;

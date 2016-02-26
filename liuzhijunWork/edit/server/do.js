@@ -59,7 +59,7 @@ function getArticleList(callback){
 		for(var obj={},i=0,l=arr.length;i<l;i++){
 			obj[i]=arr[i][1];
 		}
-		var sql = "select cid,aid,title from article";
+		var sql = "select cid,aid,title from article where type>0";
 		query(sql,function(data){
 			data.forEach(p=>p.cname=obj[p.cid]);
 			callback && callback(data);
@@ -67,68 +67,89 @@ function getArticleList(callback){
 	});
 }
 
+function doArticle(type,min,value,articleData,res){
+	var contentValue = '';
+	switch(type.toLowerCase()){
+		case 'javascript':
+		case 'js':
+			contentValue = "application/x-javascript";
+			if(min){
+				try{
+					var UglifyJS = require("uglify-js");
+					var result = UglifyJS.minify(value, {fromString: true});
+					value = result.code;
+				}catch(e){
+					console.log(e.message);
+				}
+			}
+		break;
+		case 'css':
+			contentValue = 'text/css';
+			if(min){
+				try{
+					var uglifycss = require('uglifycss');
+					value = uglifycss.processString(value);
+				}catch(e){
+					console.log(e.message);
+				}
+			}
+		break;
+		case 'markdown':
+		case 'md':
+			if(blog){
+				try{
+					var md = require('markdown').markdown;
+					value = md.toHTML(value);
+					value = createBlog(articleData.title,value,articleData.cdate,articleData.udate);
+				}catch(e){
+					console.log(e.message);
+				}
+			}
+			contentValue =  'text/html';
+		break;
+		case 'html':
+			contentValue =  'text/html';
+		break;
+	}
+	if(contentValue){
+		res.writeHead(200,{"Content-Type":`${contentValue};charset=utf-8`});
+		res.write(value);
+		res.end();
+	}
+}
+
+function getSrc(filename,callback,res){
+	queryArticleType(function(arr){
+		var sql = `select cid,content from article where title='${filename}'`;
+		query(sql,function(data){
+			if(data && data.length){
+				var articleData = data[0];
+				var type = arr[articleData.cid||0][1];
+				var value = unescape(articleData.content);
+				doArticle(type,false,value,articleData,res);
+				return;
+			}
+			callback(false);
+		});
+	});
+}
+
 function getArticle(aid,callback,queryObj,res){ 
-	var sql = `select title,content,cid,cdate,udate from article a where aid=${aid}`;
+	var sql = `select title,content,cid,cdate,udate from article where aid=${aid}`;
 	var type = queryObj.type;
 	var min = queryObj.min === "true";
 	var blog = queryObj.blog === "true";
 	query(sql,function(data){
 		//有type则为引用资源
 		if(type && data && data.length){
-			var contentValue = '';
 			var articleData = data[0];
 			var value = unescape(articleData.content);
-			switch(type){
-				case 'js':
-					contentValue = "application/x-javascript";
-					if(min){
-						try{
-							var UglifyJS = require("uglify-js");
-							var result = UglifyJS.minify(value, {fromString: true});
-							value = result.code;
-						}catch(e){
-							console.log(e.message);
-						}
-					}
-				break;
-				case 'css':
-					contentValue = 'text/css';
-					if(min){
-						try{
-							var uglifycss = require('uglifycss');
-							value = uglifycss.processString(value);
-						}catch(e){
-							console.log(e.message);
-						}
-					}
-				break;
-				case 'md':
-					if(blog){
-						try{
-							var md = require('markdown').markdown;
-							value = md.toHTML(value);
-							value = createBlog(articleData.title,value,articleData.cdate,articleData.udate);
-						}catch(e){
-							console.log(e.message);
-						}
-					}
-					contentValue =  'text/html';
-				break;
-				case 'html':
-					contentValue =  'text/html';
-				break;
-			}
-			if(contentValue){
-				res.writeHead(200,{"Content-Type":`${contentValue};charset=utf-8`});
-				res.write(value);
-				res.end();
-			}
+			doArticle(type,min,value,articleData,res);
+			return;
 		}
-		else{
-			//编辑器读取article
-			if(data && data.length) callback(data[0]);
-			else callback(false);
-		}
+		//编辑器读取article
+		if(data && data.length) callback(data[0]);
+		else callback(false);
 	});
 }
 
@@ -138,13 +159,16 @@ function addArticle(uid,params,callback){
 	params.udate = "datetime('now','localtime')";
 	var fileds = {
 		"cid":false,"uid":false,"title":true,
-		"content":true,"cdate":false,"udate":false
+		"content":true,"cdate":false,"udate":false,
+		"type":false
 	};
 	params.content = escape(params.content);
 	queryArticleType(function(arr){
 		for(var i=0,l=arr.length;i<l;i++) if(arr[i][2]===params.cid) params.cid=i;
 		var sql = getInsertSql('article',params,fileds);
 		exec(sql,function(error){
+			callback(false);
+			return;
 			if(!callback) return;
 			if(error===null){
 				var sql = "select max(aid) aid from article";
@@ -688,28 +712,17 @@ function exec(sql,callback){
 	});
 }
 
-//exports.getCategoryList = getCategoryList;
-exports.getArticleList = getArticleList;
-exports.getArticle = getArticle;
-exports.addArticle = addArticle;
-exports.saveArticle = saveArticle;
-exports.deleteArticle = deleteArticle;
-exports.login = doLogin;
-exports.addPen = addPen;
-exports.getPenList= getPenList;
-exports.getPen = getPen;
-exports.updatePen = updatePen;
-exports.deletePen = deletePen;
+var funsObj={
+	doLogin,
+	getArticleList,getArticle,addArticle,saveArticle,deleteArticle,
+	addPen,getPenList,getPen,updatePen,deletePen,
+	createDBTable,updateDBTable,updateDBTableStct,updateDBTableAll,
+	getDBTableByName,queryTableList,getDBTableStct,queryObjDBData,getDBTable,
+	getSrc
+};
 
+for(var key in funsObj) exports[key]=funsObj[key];
+
+//exports.getCategoryList = getCategoryList;
 //exports.addCategory = addCategory;
 //exports.deleteCategory = deleteCategory;
-
-exports.createDBTable = createDBTable;
-exports.updateDBTable = updateDBTable;
-exports.updateDBTableStct = updateDBTableStct;
-exports.getDBTable = getDBTable;
-exports.getDBTableByName = getDBTableByName;
-exports.queryTableList = queryTableList;
-exports.updateDBTableAll = updateDBTableAll;
-exports.getDBTableStct = getDBTableStct;
-exports.queryObjDBData = queryObjDBData;

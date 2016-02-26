@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
     <title>管理中心</title>
 	<link rel="stylesheet" href="styles/fontAwesome/css/font-awesome.min.css"/>
-    <link href="article/38?type=css&min=false" rel="stylesheet" />
+    <link href="/src/reset.css" rel="stylesheet" />
 	<!-- AjaxUtile.js -->
-	<script src="article/22?type=js&min=false"></script>
+	<script src="/src/AjaxUtil.js"></script>
 	<!-- template.js -->
-	<script src="article/35?type=js&min=false"></script>
+	<script src="/src/JunTemplate.js"></script>
 	<!-- HTMLElement.js-->
-	<script src="article/36?type=js&min=true"></script>
+	<script src="/src/HTMLElement.js"></script>
 
 	<!--dialog-->
     <link href="styles/dialog.css" rel="stylesheet" />
@@ -37,11 +37,11 @@
 	<!--My97DatePicker-->
 	<link href="scripts/My97DatePicker/WdatePicker.css" />
 	<script src="scripts/My97DatePicker/WdatePicker.js"></script>
-
+	<script>
+	</script>
 </head>
 <body>
-	<list-menu class="listMenu" id="listMenu" data-bind='[{"href":"#page1","value":"作品列表2","active":true},{"href":"#page2","value":"分类管理"},{"href":"#page3","value":"个人信息"},{"href":"#page4","value":"统计信息"},{"href":"#page5","value":"表管理"}]'>
-	</list-menu>
+	<list-menu class="listMenu" id="listMenu" data-bind='menuData' data-bind-type="fun"></list-menu>
 	<div class="content">
 		<div id="page1" data-fun="penlist" class="page codepenList slideleft">
 			<div class="header">
@@ -99,6 +99,7 @@
 				</div>
 			</script>
 		</div>
+		<!--
 		<div id="page2" data-fun="catlist" class="page catList">
 			<div class="categoryContainer">
 				<form id="catForm" action="javascript:addCat()">
@@ -112,7 +113,8 @@
 				<%});%>
 			</script>
 		</div>
-		<div id="page3" data-fun="userinfo" class="page userInfoList">
+		-->
+		<div id="page2" data-fun="userinfo" class="page userInfoList">
 			<x-dialog data-color="green" data-title="web compontents">
 				<h2 class="cth2">content test!</h2>
 			</x-dialog>
@@ -128,7 +130,7 @@
 				x-dialog /deep/ h1{ font-size:20px; }
 			</style>
 		</div>
-		<div id="page4" class="page">
+		<div id="page3" class="page">
 			<input type="range" class="custom" />
 			<style>
 				input[type="range"].custom::-webkit-slider-runnable-track{ 
@@ -138,7 +140,7 @@
 			</style>
 			<x-zjselect id="abx" x_get_url="/db/getObjData" x_tb_name="keyValue" x_tb_where={"name":"type"} width="120"></x-zjselect>
 		</div>
-		<div id="page5" class="page">
+		<div id="page4" class="page">
 			<ul class="menu">
 				<li><label for="radio_all">所有表</label></li>
 				<li><label for="radio_add">添加表</label></li>

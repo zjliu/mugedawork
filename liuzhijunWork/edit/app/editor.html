@@ -4,79 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
     <title>LiuZhiJun Editor</title>
-    <link href="styles/reset.css" rel="stylesheet" />
+    <link href="/styles/reset.css" rel="stylesheet" />
 	<!--codemirror-->
-    <link href="scripts/codemirror/lib/codemirror.css" rel="stylesheet" />
-    <link href="scripts/codemirror/theme/3024-night.css" rel="stylesheet" />
-	<script src="scripts/codemirror/lib/codemirror.js"></script>
-
-	<!--代码折叠-->
-	<script src="scripts/codemirror/addon/fold/foldcode.js"></script>
-	<script src="scripts/codemirror/addon/fold/brace-fold.js"></script>
-	<script src="scripts/codemirror/addon/fold/foldgutter.js"></script>
-	<link href="scripts/codemirror/addon/fold/foldgutter.css" rel="stylesheet" />
-	<script src="scripts/codemirror/addon/fold/xml-fold.js"></script>
-	<script src="scripts/codemirror/addon/fold/markdown-fold.js"></script>
-	<script src="scripts/codemirror/addon/fold/comment-fold.js"></script>
-	
-	<!-- 查找
-	<script src="scripts/codemirror/addon/dialog/dialog.js"></script>
-	<link href="scripts/codemirror/addon/dialog/dialog.css" rel="stylesheet" />
-	<script src="scripts/codemirror/addon/search/searchcursor.js"></script>
-	<script src="scripts/codemirror/addon/search/search.js"></script>
-	<script src="scripts/codemirror/addon/scroll/annotatescrollbar.js"></script>
-	<script src="scripts/codemirror/addon/search/matchesonscrollbar.js"></script>
-	-->
-
-	<!-- vim-->
-	<script src="scripts/codemirror/addon/dialog/dialog.js"></script>
-	<script src="scripts/codemirror/addon/search/searchcursor.js"></script>
-	<script src="scripts/codemirror/mode/clike/clike.js"></script>
-	<script src="scripts/codemirror/addon/edit/matchbrackets.js"></script>
-	<script src="scripts/codemirror/keymap/vim.js"></script>
-
-	<!-- Html-->
-	<script src="scripts/codemirror/addon/edit/closetag.js"></script>
-	<!--
-	<script src="scripts/codemirror/addon/selection/active-line.js"></script>
-	-->
-	<script src="scripts/codemirror/mode/xml/xml.js"></script>
-	<!--JS-->
-	<script src="scripts/codemirror/mode/javascript/javascript.js"></script>
-	<!--css-->
-	<script src="scripts/codemirror/mode/css/css.js"></script>
-	<!--Html 混合模式-->
-	<script src="scripts/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-	<!--markdown-->
-	<script src="scripts/codemirror/addon/edit/continuelist.js"></script>
-	<script src="scripts/codemirror/mode/markdown/markdown.js"></script>
-
+    <link href="/scripts/codemirror/lib/codemirror.css" rel="stylesheet" />
+    <link href="/scripts/codemirror/theme/3024-night.css" rel="stylesheet" />
+	<link href="/scripts/codemirror/addon/fold/foldgutter.css" rel="stylesheet" />
+	<script src="/scripts/codemirror/lib/codemirror.js"></script>
+	<script src="/scripts/codemirror/lib/codemirror-plugins.js"></script>
 	<!--menu-->
-    <link href="styles/menu.css" rel="stylesheet" />
-	<script src="scripts/AjaxUtil.js"></script>
-
+    <link href="/styles/menu.css" rel="stylesheet" />
+	<script src="/scripts/AjaxUtil.js"></script>
 	<!--contentmenu-->
-    <link href="styles/contextmenu.css" rel="stylesheet" />
-
+    <link href="/styles/contextmenu.css" rel="stylesheet" />
 	<!--login-->
-    <link href="styles/login.css" rel="stylesheet" />
-
+    <link href="/styles/login.css" rel="stylesheet" />
 	<!--dialog-->
-    <link href="styles/dialog.css" rel="stylesheet" />
-	<script src="scripts/dialog.js"></script>
-
+    <link href="/styles/dialog.css" rel="stylesheet" />
+	<script src="/scripts/dialog.js"></script>
 	<!--layout-->
-    <link href="styles/layout.css" rel="stylesheet" />
-
+    <link href="/styles/layout.css" rel="stylesheet" />
 	<!--download-->
-    <script src="scripts/download.js"></script>
-
+    <script src="/scripts/download.js"></script>
 	<!-- template.js -->
-	<script src="article/35?type=js&min=false"></script>
-
+	<script src="/src/JunTemplate.js"></script>
 	<!--zjselect-->
-    <link href="styles/zjSelect.css" rel="stylesheet" />
-	<script src="scripts/zjSelect.js"></script>
+    <link href="/styles/zjSelect.css" rel="stylesheet" />
+	<script src="/scripts/zjSelect.js"></script>
 </head>
 <body>
 	<div id="edit" class="page slidedown">
@@ -84,9 +37,7 @@
 		<p class="progress"></p>
 		<div id="frame" class="frame"></div>
 		<div id="userInfo" class="userInfo">
-			<div class="noLogin">
-				<a href="#login">登录</a>
-			</div>
+			<div class="noLogin"><a href="/login">登录</a></div>
 			<div class="login">
 				<a href="javascript:void(0)"></a>
 				<ul id="userInfoUl" class="userInfoUl">
@@ -212,6 +163,6 @@
 		</div>
 	</script>
 
-	<script src="scripts/edit.js"></script>
+	<script src="/scripts/edit.js"></script>
 </body>
 </html>

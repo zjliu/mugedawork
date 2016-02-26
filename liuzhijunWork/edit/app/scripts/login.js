@@ -33,7 +33,7 @@
 					localStorage[tokenFiled] = data.token;
 					localStorage.userName = name;
 					notify('用户登录',data.success?'用户登录成功！':data.message);
-					window.location.href='main.html';
+					window.location.href='/main';
 				}
 				else pwdEl.focus();
 			}

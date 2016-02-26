@@ -145,6 +145,7 @@
 	-webkit-box-sizing:border-box;
 	-webkit-transition: box-shadow 0.30s ease-in-out;
 	transition: box-shadow 0.30s ease-in-out;
+	text-align:center;
 }
 .dialog .container input[type="text"]:focus{
 	outline:none;

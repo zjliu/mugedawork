@@ -2,6 +2,7 @@ var express=require('express');
 var app=express();
 var jwt = require('jwt-simple');
 var moment = require('moment');
+var Q = require('./server/do');
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json({limit: '50mb'}));
@@ -17,7 +18,9 @@ app.use(express.static(staticPath));
 var routeGetArray = [
 	{"key":"/","path":"/login.html"},
 	{"key":"/login","path":"/login.html"},
-	{"key":"/editor","path":"/editor.html"}
+	{"key":"/editor","path":"/editor.html"},
+	{"key":"/editor/:aid","path":"/editor.html"},
+	{"key":"/main","path":"/main.html"}
 ];
 
 routeGetArray.forEach(obj=>{
@@ -68,22 +71,19 @@ var tokenError = {'success':false,'message':'access_token error or expired!'};
 app.post('/login',function(req,res){
 	var name = req.body.name;
 	var pwd = req.body.pwd;
-	var Q = require('./server/do');
-	Q.login(name,pwd,function(data){
+	Q.doLogin(name,pwd,function(data){
 		var result = {'success':!!data.length,'token':createToken(data)};
 		res.json(result);
 	});
 });
 
 app.get('/categoryList',function(req,res){
-	var Q = require('./server/do');
 	Q.getCategoryList(function(data){
 		res.json(data);
 	});
 });
 
 app.get('/category',function(req,res){
-	var Q = require('./server/do');
 	Q.getArticleList(function(data){
 		res.json(data);
 	});
@@ -91,26 +91,25 @@ app.get('/category',function(req,res){
 
 app.param('aid',/^\d+$/);
 app.get('/article/:aid',function(req,res){
-	var Q = require('./server/do');
 	Q.getArticle(req.params.aid,function(data){
 		res.json(data);
 	},req.query,res);
 });
 
+app.param('filename',/^[a-zA-Z0-9_]+(?:\.[a-zA-Z0-9]+)?$/);
+app.get('/src/:filename',function(req,res){
+	Q.getSrc(req.params.filename,function(data){
+		res.send(null);
+	},res);
+});
+
 app.post('/article/add',function(req,res){
 	var tokenObj = checkToken(req);
-	if(!tokenObj){
-		res.json(tokenError);
-		return;
-	}
-	var Q = require('./server/do');
+	if(!tokenObj){ res.json(tokenError); return; }
 	var cid = req.body.cid;
 	var title = req.body.title;
 	var content = req.body.content;
-	if(!cid || !title || !content) {
-		res.json({'success':false,'message':'参数不足'});
-		return;
-	}
+	if(!cid || !title || !content) { res.json({'success':false,'message':'参数不足'}); return; }
 	var uid = tokenObj.iss;
 	Q.addArticle(uid,req.body,function(success,data){
 		res.json({'success':success,'data':data});
@@ -118,38 +117,21 @@ app.post('/article/add',function(req,res){
 });
 
 app.post('/article/save',function(req,res){
-	if(!checkToken(req)){
-		res.json(tokenError);
-		return;
-	}
-	var Q = require('./server/do');
+	if(!checkToken(req)){ res.json(tokenError); return; }
 	var aid = req.body.aid;
 	var title = req.body.title;
 	var content = req.body.content;
-	if(!aid) {
-		res.json({'success':false,'message':'参数aid不足'});
-		return;
-	}
-	if(!title && !content){
-		res.json({'success':false,'message':'参数title及content至少有一个'});
-		return;
-	}
+	if(!aid) { res.json({'success':false,'message':'参数aid不足'}); return; }
+	if(!title && !content){ res.json({'success':false,'message':'参数title及content至少有一个'}); return; }
 	Q.saveArticle(aid,title,content,function(success){
 		res.json({'success':success});
 	});
 });
 
 app.get('/article/delete',function(req,res){
-	if(!checkToken(req)){
-		res.json(tokenError);
-		return;
-	}
-	var Q = require('./server/do');
+	if(!checkToken(req)){ res.json(tokenError); return; }
 	var aid = req.query.aid;
-	if(!aid){
-		res.json({'success':false,'message':'参数aid不足'});
-		return;
-	}
+	if(!aid){ res.json({'success':false,'message':'参数aid不足'}); return; }
 	Q.deleteArticle(aid,function(success){
 		res.json({'success':success});
 	});
@@ -157,11 +139,7 @@ app.get('/article/delete',function(req,res){
 
 app.post('/pen/add',function(req,res){
 	var tokenObj = checkToken(req);
-	if(!tokenObj){
-		res.json(tokenError);
-		return;
-	}
-	var Q = require('./server/do');
+	if(!tokenObj){ res.json(tokenError); return; }
 	var uid = tokenObj.iss;
 	Q.addPen(uid,req.body,function(success,data){
 		res.json({'success':success,'data':data});
@@ -170,11 +148,7 @@ app.post('/pen/add',function(req,res){
 
 app.post('/pen/update',function(req,res){
 	var tokenObj = checkToken(req);
-	if(!tokenObj){
-		res.json(tokenError);
-		return;
-	}
-	var Q = require('./server/do');
+	if(!tokenObj){ res.json(tokenError); return; }
 	var uid = tokenObj.iss;
 	Q.updatePen(uid,req.body,function(success,data){
 		res.json({'success':success,'data':data});
@@ -183,11 +157,7 @@ app.post('/pen/update',function(req,res){
 
 app.post('/pen/delete',function(req,res){
 	var tokenObj = checkToken(req);
-	if(!tokenObj){
-		res.json(tokenError);
-		return;
-	}
-	var Q = require('./server/do');
+	if(!tokenObj){ res.json(tokenError); return; }
 	var uid = tokenObj.iss;
 	Q.deletePen(uid,req.body.pid,function(success,data){
 		res.json({'success':success,'data':data});
@@ -196,11 +166,7 @@ app.post('/pen/delete',function(req,res){
 
 app.get('/pen/list',function(req,res){
 	var tokenObj = checkToken(req);
-	if(!tokenObj){
-		res.json(tokenError);
-		return;
-	}
-	var Q = require('./server/do');
+	if(!tokenObj){ res.json(tokenError); return; }
 	var uid = tokenObj.iss;
 	Q.getPenList(uid,function(data){
 		res.json(data);
@@ -209,7 +175,6 @@ app.get('/pen/list',function(req,res){
 
 app.param('pid',/^\d+$/);
 app.get('/pen/:pid',function(req,res){
-	var Q = require('./server/do');
 	var pid = req.params.pid;
 	Q.getPen(pid,res,req.query);
 });
@@ -229,7 +194,6 @@ var routeArr = [
 ];
 
 !function reqfun(routeArr,app){
-	var Q = require('./server/do');
 	routeArr.forEach(obj=>{
 		var method = obj.method.toLowerCase();
 		app[method](obj.url,(req,res)=>{

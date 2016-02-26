@@ -4,7 +4,6 @@ function Q(selector,dom){
 var toggleClass = 'slideleft';
 var listMenuEl = G('listMenu');
 
-
 var firstPageSelector = "#page1";
 var orgHash = location.hash;
 function hashchange(){

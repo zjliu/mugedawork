@@ -24,6 +24,12 @@
 	}
 
 	function registerListMenu(){
+		window.menuData=[
+			{"href":"#page1","value":"作品列表","active":true},
+			{"href":"#page2","value":"个人信息"},
+			{"href":"#page3","value":"统计信息"},
+			{"href":"#page4","value":"表管理"}
+		];
 		var listmenu_temp = G('listMenuTemplate');
 		var pro={
 			attachedCallback:function(){
@@ -35,8 +41,7 @@
 				var aEls = this.shadowRoot.querySelectorAll('a');
 				Array.prototype.forEach.call(aEls,function(dom){ dom.onclick=aclick; });
 			},
-			attributeChangedCallback:function(attrName, oldVal, newVal){
-			}
+			attributeChangedCallback:function(attrName, oldVal, newVal){ }
 		}
 		register('list-menu',{template:listmenu_temp, prototype:pro});
 	}

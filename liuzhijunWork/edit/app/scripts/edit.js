@@ -226,11 +226,11 @@ function notify(title,body){
 			data.forEach(function(item){
 				var cid = item.cid;
 				if(!obj[cid]){
-					var cObj = {'text':item.cname,'url':''};
+					var cObj = {'text':item.cname,'url':'javascript:void(0);'};
 					cObj.children=[];
 					obj[cid]=cObj;
 				}
-				obj[cid].children.push({'text':item.title, 'url':'/editor?aid='+item.aid});
+				obj[cid].children.push({'text':item.title, 'url':'/editor/'+item.aid});
 			});
 			for(var key in obj) arr.push(obj[key]);
 			applyTemplate(arr,'tree_template',containner);
@@ -281,7 +281,7 @@ function notify(title,body){
 		maskEl.classList.add('active');
 	}
 
-	var aid = getParam('aid');
+	var aid = getAid() || getParam('aid');
 	initArticle(aid);
 	unMask();
 	init();
@@ -541,10 +541,10 @@ function notify(title,body){
 		exit:function(){
 			delete localStorage[tokenFiled];
 			delete localStorage.userName;
-			win.location.href="index.html#login";
+			win.location.href="/login";
 		},
 		admin:function(){
-			win.location.href="main.html";
+			win.location.href="/main";
 		}
 	}
 
