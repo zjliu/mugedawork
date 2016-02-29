@@ -91,7 +91,7 @@ function notify(title,body){
 		Notification.requestPermission();
 	}
 	if(Notification.permission === "granted"){
-		var option = {'dir':'rtl','icon':'images/notify.png','body':body};
+		var option = {'dir':'rtl','icon':'/images/notify.png','body':body};
 		window.currentNotify = new Notification(title,option);
 		setTimeout(function(){
 			window.currentNotify.close();

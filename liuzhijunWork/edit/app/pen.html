@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head lang="zh_cn">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+    <link href="/src/reset.css" rel="stylesheet" />
+    <link href="/styles/list.css" rel="stylesheet" />
+	<!-- AjaxUtile.js -->
+	<script src="/src/AjaxUtil.js"></script>
+	<!-- template.js -->
+	<script src="/src/JunTemplate.js"></script>
+	<!-- HTMLElement.js-->
+	<script src="/src/HTMLElement.js"></script>
+</head>
+<body>
+	<div class="header">
+		<pen-btn id="createBtn" data-value="新建作品"></pen-btn>
+		<pen-btn data-href="/editor" data-value="新建文件"></pen-btn>
+	</div>
+	<article class="codepenList">
+		<div class="group">
+			<div id="articleList" class="articleList"></div>
+		<div>
+		<nav class="page-nav"></nav>
+	</article>
+	<script type="text/template" id="articleTemplate">
+		<%data.forEach(function(item,index){%>
+			<section>
+				<div class="iframe-wrap">
+					<a href="/pen/<%=item.pid%>" class="cover-link"></a>
+					<iframe src="/pen/<%=item.pid%>?type=iframe" frameborder="0" scrolling="no"></iframe>
+					<div class="meta-title">
+						<h2><%=item.title%></h2>
+						<p><%=item.desc%></p>
+					</div>
+					<div class="meta-menu">
+						<input type="checkbox" class="hidden" id="clickMenu" />
+						<label class="meta_menu_thumb" for="clickMenu"><div></div></label>
+						<ul class="hidden">
+							<li><a href="index.html?aid=<%=item.htmlId%>" target="_blank">编辑 Html</a></li>
+							<li><a href="index.html?aid=<%=item.cssId%>" target="_blank">编辑 Css</a></li>
+							<li><a href="index.html?aid=<%=item.jsId%>" target="_blank">编辑 Js</a></li>
+							<li><a href="javascript:void(0)" onclick="penModify(<%=item.pid%>,this)">修改作品</a></li>
+							<li><a href="javascript:void(0)" onclick="penDrop(<%=item.pid%>,this)">删除作品</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="meta">
+					<div class="user"><%=localStorage.userName%></div>
+					<div class="lastupdate"><%=item.udate%></div>
+				</div>
+				<input class="itemData" type="hidden" value="<%=escape(JSON.stringify(item))%>" />
+			</section>
+		<%});%>
+	</script>
+	<script type="text/template" id="createArticleTemplate">
+		<div class="commonContent confirmContent saveAsContent">
+			<form class="addArticleForm">
+				<h3>添加作品</h3>
+				<label>标题：</label> <input type="text" name="title" class="article_title" value="<%=data.title||''%>" /> <br/>
+				<label>描述：</label> <input type="text" name="desc" class="article_desc" value="<%=data.desc||''%>"  /> <br/>
+				<label>HTML ID：</label> <input type="text" name="htmlId" class="article_html" value="<%=data.htmlId||''%>"  /> <br/>
+				<label>CSS ID：</label> <input type="text" name="cssId" class="article_css" value="<%=data.cssId||''%>"  /> <br/>
+				<label>JS ID：</label> <input type="text" name="jsId" class="article_js" value="<%=data.jsId||''%>"  /> 
+			</form>
+			<div data-type="ok" class="commonbtn confirmbtn close"><%=data.ok%></div>
+			<div data-type="cancel" class="commonbtn confirmbtn close"><%=data.cancel%></div>
+		</div>
+	</script>
+</body>
+</html>
+<script>
+
+function loadPenList(){
+
+	var createBtn = G('createBtn');
+	AjaxUtil.ajax({
+		url:'/pen/list',
+		type:'get',
+		dataType:'json',
+		success:function(data){
+			if(data && data.success === false){
+				window.location.href="index.html#login";
+			}
+			applyTemplate(data,'articleTemplate',G('articleList'),true);
+		},
+		error:function(info){
+			console.log(info);
+		}
+	});
+
+	function openPenDialog(callback,mdata){
+		var data = mdata || {};
+		data.ok = "确定";
+		data.cancel = "取消";
+		dialog.openFromTemplate(data,'createArticleTemplate',350,250,callback);
+	}
+
+	function createPen(){
+		openPenDialog(function(result){
+			if(!result) return;
+			var form = dialogEl.querySelector('form');
+			var mdata = form.serialize();
+			AjaxUtil.ajax({
+				url:'/pen/add',
+				type:'post',
+				data:mdata,
+				dataType:'json',
+				success:function(data){
+					if(data.success){
+						window.location.reload();
+					}
+				},
+				error:function(info){
+					console.log(info);
+				}
+			});
+		});
+	}
+
+	createBtn.onclick=function(){
+		createPen();
+	}
+
+	function penModify(pid,el){
+		var penEl = el.closest(function(dom){
+			return dom.tagName.toLowerCase()==='section';
+		});
+		if(!penEl) return;
+		var dataEl = penEl.querySelector('.itemData');
+		if(!dataEl) return;
+		var data = JSON.parse(unescape(dataEl.value));
+
+		openPenDialog(function(result){
+			if(!result) return;
+			var form = dialogEl.querySelector('form');
+			var mdata = form.serialize();
+			mdata.pid = pid;
+			AjaxUtil.ajax({
+				url:'/pen/update',
+				type:'post',
+				data:mdata,
+				dataType:'json',
+				success:function(data){
+					if(data.success){
+						window.location.reload();
+					}
+				},
+				error:function(info){
+					console.log(info);
+				}
+			});
+		},data);
+	}
+	window.penModify=penModify;
+
+	function penDrop(pid,el){
+		openConfirm('是否删除此作品？',function(result){
+			if(!result) return;
+			var mdata = {'pid':pid};
+			AjaxUtil.ajax({
+				url:'/pen/delete',
+				type:'post',
+				data:mdata,
+				dataType:'json',
+				success:function(data){
+					if(data.success){
+						window.location.reload();
+					}
+				},
+				error:function(info){
+					console.log(info);
+				}
+			});
+		});
+	}
+	window.penDrop=penDrop;
+	this.loaded=true;
+}
+loadPenList();
+</script>

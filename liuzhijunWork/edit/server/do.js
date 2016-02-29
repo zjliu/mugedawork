@@ -96,14 +96,17 @@ function doArticle(type,min,value,articleData,res){
 		break;
 		case 'markdown':
 		case 'md':
-			if(blog){
-				try{
-					var md = require('markdown').markdown;
-					value = md.toHTML(value);
-					value = createBlog(articleData.title,value,articleData.cdate,articleData.udate);
-				}catch(e){
-					console.log(e.message);
-				}
+			try{
+				/*
+				var md = require('markdown').markdown;
+				value = md.toHTML(value);
+				*/
+				var MarkdownIt = require('markdown-it'),
+					md = new MarkdownIt();
+					value = md.render(value);
+				value = createBlog(articleData.title,value,articleData.cdate,articleData.udate);
+			}catch(e){
+				console.log(e.message);
 			}
 			contentValue =  'text/html';
 		break;
@@ -167,8 +170,6 @@ function addArticle(uid,params,callback){
 		for(var i=0,l=arr.length;i<l;i++) if(arr[i][2]===params.cid) params.cid=i;
 		var sql = getInsertSql('article',params,fileds);
 		exec(sql,function(error){
-			callback(false);
-			return;
 			if(!callback) return;
 			if(error===null){
 				var sql = "select max(aid) aid from article";
@@ -193,6 +194,7 @@ function saveArticle(aid,title,content,callback){
 
 function deleteArticle(aid,callback){ 
 	var sql = 'delete from article where aid='+aid;
+	console.log(sql);
 	exec(sql,function(error){
 		callback && callback(error===null);
 	});
@@ -301,10 +303,10 @@ function createBlog(title,content,cdate,udate){
 	var menuTemplate = `
 		<%var getIndex=name=>name && parseInt(/^h(\d)$/.exec(name)[1]);%>
 		<ul class="menu">
-			<li class="root"><a href="#h0"><%=data[0].children[0].data%></a></li>
+			<%if(data.length){%><li class="root"><a href="#h0"><%=data[0].children[0].data%></a></li><%}%>
 			<%for(var i=1,l=data.length;i<l;i++){%>
 				<%var item=data[i],nItem=data[i+1],ic=item && ~~item.name[1],nc=nItem && ~~nItem.name[1];%>
-				<li><a href="#h<%=i%>"><%=item.children[0].data%></a>
+				<li><a href="#h<%=i%>" target="_self"><%=item.children[0].data%></a>
 					<%if(nc && ic<nc){%><ul><%}%>
 					<%if(nc && ic>nc){%></ul><%}%>
 				</li>
@@ -320,7 +322,7 @@ function createBlog(title,content,cdate,udate){
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
 				<!--markdown.css-->
-				<link href="/article/63?type=css&min=true" rel="stylesheet">
+				<link href="/src/github-markdown.css" rel="stylesheet">
 			</head>
 			<body>
 				<div id="top"></div>
@@ -333,7 +335,7 @@ function createBlog(title,content,cdate,udate){
 				</article>
 				<a class="toTopBtn" href="#top" title="返回顶部"></a>
 			</body>
-			<script src="/article/65?type=js&min=true"></script>
+			<script src="/src/markdown_blog.js"></script>
 		</html>
 	`;
 	return template(htmlTemplate)({title,content,cdate,udate,menu});
@@ -343,6 +345,13 @@ function getPenList(uid,callback){
 	var sql = 'select * from codepen where userId='+uid;
 	query(sql,function(data){
 		callback && callback(data);
+	});
+}
+
+function getBlogList(params,callback){
+	var sql = 'select aid,title,udate from article where cid=3 and type=0 order by udate desc';
+	query(sql,function(data){
+		callback && callback(true,data);
 	});
 }
 
@@ -718,7 +727,7 @@ var funsObj={
 	addPen,getPenList,getPen,updatePen,deletePen,
 	createDBTable,updateDBTable,updateDBTableStct,updateDBTableAll,
 	getDBTableByName,queryTableList,getDBTableStct,queryObjDBData,getDBTable,
-	getSrc
+	getSrc,getBlogList
 };
 
 for(var key in funsObj) exports[key]=funsObj[key];

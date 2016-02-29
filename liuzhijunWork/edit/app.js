@@ -96,7 +96,7 @@ app.get('/article/:aid',function(req,res){
 	},req.query,res);
 });
 
-app.param('filename',/^[a-zA-Z0-9_]+(?:\.[a-zA-Z0-9]+)?$/);
+app.param('filename',/^[a-zA-Z0-9_\-]+(?:\.[a-zA-Z0-9]+)?$/);
 app.get('/src/:filename',function(req,res){
 	Q.getSrc(req.params.filename,function(data){
 		res.send(null);
@@ -190,7 +190,8 @@ var routeArr = [
 	{"url":"/db/updateTb",	"method":"post",	"fun":"updateDBTableAll"	},
 	{"url":"/db/tblist",	"method":"post",	"fun":"queryTableList"		},
 	{"url":"/db/updateStct","method":"post",	"fun":"updateDBTableStct"	},
-	{"url":"/db/getObjData","method":"post",	"fun":"queryObjDBData"		}
+	{"url":"/db/getObjData","method":"post",	"fun":"queryObjDBData"		},
+	{"url":"/blog/list",	"method":"post",	"fun":"getBlogList"			}
 ];
 
 !function reqfun(routeArr,app){

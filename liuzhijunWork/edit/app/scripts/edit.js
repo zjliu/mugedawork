@@ -50,7 +50,7 @@ function notify(title,body){
 		Notification.requestPermission();
 	}
 	if(Notification.permission === "granted"){
-		var option = {'dir':'rtl','icon':'images/notify.png','body':body};
+		var option = {'dir':'rtl','icon':'/images/notify.png','body':body};
 		window.currentNotify = new Notification(title,option);
 		setTimeout(function(){
 			window.currentNotify.close();
@@ -417,8 +417,11 @@ function notify(title,body){
 					dataType:'json',
 					success:function(data){
 						hideContextMenu();
-						notify('另存文件',data.success?'文件另存成功！':data.message);
-						data.success && (win.location.href='/editor?aid='+data.data.aid);
+						notify('另存文件',data.success?'文件保存成功！':'文件保存失败！');
+						if(data.success) {
+							aid = data.data.aid;
+							win.history.pushState({},document.title,`/editor/${data.data.aid}`);
+						}
 					}
 				});
 			});
