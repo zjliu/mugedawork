@@ -20,7 +20,8 @@ var routeGetArray = [
 	{"key":"/login","path":"/login.html"},
 	{"key":"/editor","path":"/editor.html"},
 	{"key":"/editor/:aid","path":"/editor.html"},
-	{"key":"/main","path":"/main.html"}
+	{"key":"/main","path":"/main.html"},
+	{"key":"/articles","path":"/article.html"}
 ];
 
 routeGetArray.forEach(obj=>{
