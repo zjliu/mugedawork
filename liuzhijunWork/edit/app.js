@@ -21,6 +21,7 @@ var routeGetArray = [
 	{"key":"/editor","path":"/editor.html"},
 	{"key":"/editor/:aid","path":"/editor.html"},
 	{"key":"/main","path":"/main.html"},
+	{"key":"/home","path":"/house.html"},
 	{"key":"/articles","path":"/article.html"}
 ];
 
