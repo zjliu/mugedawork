@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.set('jwtTokenSecret', 'liuzhijunToken9527@beijing');
 
-app.use(bodyParser());
+app.use(bodyParser.json());
 
 var staticPath = __dirname + '/app';
 app.use(express.static(staticPath));
