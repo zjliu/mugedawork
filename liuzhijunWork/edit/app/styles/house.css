@@ -22,6 +22,7 @@ body{
 	transform:scale(0.9);
 	-webkit-transform:scale(0.7);
 	transform-origin:100% 100%;
+	-webkit-transform-origin:100% 100%;
 }
 .computer{ position:relative; width:200px; margin:auto; z-index:2; }
 .computer .computer-face{
@@ -126,7 +127,9 @@ body{
 	height:150px;
 	background:#000;
 	transform:rotate(-30deg);
+	-webkit-transform:rotate(-30deg);
 	transform-origin:0 0;
+	-webkit-transform-origin:0 0;
 	background:-webkit-linear-gradient(right,#2C2F31,#333);
 	border-radius:20px 10px;
 }
@@ -135,6 +138,7 @@ body{
 	top:-14px;
 	right:0;
 	transform:rotate(30deg);
+	-webkit-transform:rotate(30deg);
 	box-shadow:5px 0 8px #000 inset;
 }
 
@@ -173,6 +177,7 @@ body{
 	box-shadow: 0 4px 0 #d8dbe1;
 	z-index: 2;
 	transform:scale(.6);
+	-webkit-transform:scale(.6);
 }
 .keyboard:before, .keyboard:after {
 	content: ""; 
@@ -321,18 +326,22 @@ body{
 @keyframes raise-up{
 	0%{
 		transform:translateY(0);
+		-webkit-transform:translateY(0);
 	}
 	100%{
 		transform:translateY(-20px);
+		-webkit-transform:translateY(-20px);
 	}
 }
 
 @-webkit-keyframes raise-up{
 	0%{
 		transform:translateY(0);
+		-webkit-transform:translateY(0);
 	}
 	100%{
 		transform:translateY(-20px);
+		-webkit-transform:translateY(-20px);
 	}
 }
 
@@ -352,18 +361,22 @@ body{
 @-webkit-keyframes frotate{
 	0%{
 		transform:rotate(0deg);
+		-webkit-transform:rotate(0deg);
 	}
 	100%{
 		transform:rotate(360deg);
+		-webkit-transform:rotate(360deg);
 	}
 }
 
 @keyframes frotate{
 	0%{
 		transform:rotate(0deg);
+		-webkit-transform:rotate(0deg);
 	}
 	100%{
 		transform:rotate(360deg);
+		-webkit-transform:rotate(360deg);
 	}
 }
 
@@ -390,14 +403,38 @@ body{
 	list-style:none;
 }
 
-.flower .flower-leaf li:nth-child(1){ transform:rotate(0deg)    translate(0px,-45px); }
-.flower .flower-leaf li:nth-child(2){ transform:rotate(45deg)   translate(0px,-45px); }
-.flower .flower-leaf li:nth-child(3){ transform:rotate(90deg)   translate(0px,-45px); }
-.flower .flower-leaf li:nth-child(4){ transform:rotate(135deg)  translate(0px,-45px); }
-.flower .flower-leaf li:nth-child(5){ transform:rotate(180deg)  translate(0px,-45px); }
-.flower .flower-leaf li:nth-child(6){ transform:rotate(-135deg) translate(0px,-45px); }
-.flower .flower-leaf li:nth-child(7){ transform:rotate(-90deg)  translate(0px,-45px); }
-.flower .flower-leaf li:nth-child(8){ transform:rotate(-45deg)  translate(0px,-45px); }
+.flower .flower-leaf li:nth-child(1){ 
+	transform:rotate(0deg)    translate(0px,-45px); 
+	-webkit-transform:rotate(0deg)    translate(0px,-45px); 
+}
+.flower .flower-leaf li:nth-child(2){ 
+	transform:rotate(45deg)   translate(0px,-45px);
+	-webkit-transform:rotate(45deg)   translate(0px,-45px);
+}
+.flower .flower-leaf li:nth-child(3){ 
+	transform:rotate(90deg)   translate(0px,-45px);
+	-webkit-transform:rotate(90deg)   translate(0px,-45px);
+}
+.flower .flower-leaf li:nth-child(4){ 
+	transform:rotate(135deg)  translate(0px,-45px); 
+	-webkit-transform:rotate(135deg)  translate(0px,-45px); 
+}
+.flower .flower-leaf li:nth-child(5){ 
+	transform:rotate(180deg)  translate(0px,-45px);
+	-webkit-transform:rotate(180deg)  translate(0px,-45px);
+}
+.flower .flower-leaf li:nth-child(6){ 
+	transform:rotate(-135deg) translate(0px,-45px); 
+	-webkit-transform:rotate(-135deg) translate(0px,-45px); 
+}
+.flower .flower-leaf li:nth-child(7){ 
+	transform:rotate(-90deg)  translate(0px,-45px);
+	-webkit-transform:rotate(-90deg)  translate(0px,-45px);
+}
+.flower .flower-leaf li:nth-child(8){ 
+	transform:rotate(-45deg)  translate(0px,-45px);
+	-webkit-transform:rotate(-45deg)  translate(0px,-45px);
+}
 
 .flower .flower-branch{
 	position:relative;
@@ -561,12 +598,35 @@ body{
 	width:3px;height:15px;
 	background:#e91e63;
 	transform:rotate(122deg);
+	-webkit-transform:rotate(122deg);
 	transform-origin:50% 0;
+	-webkit-transform-origin:50% 0;
+
+	transition:all ease 0.5s;
+
 }
 
 .clock .clock-pointer-minute{
 	height:18px;
 	transform:rotate(-100deg);
+	-webkit-transform:rotate(-100deg);
+
+	animation:pointer_hour_roll 60s linear infinite;
+}
+
+@keyframes pointer_hour_roll{
+	0%{
+		transform:rotate(-100deg);
+		-webkit-transform:rotate(-100deg);
+	}
+	50%{
+		transform:rotate(80deg);
+		-webkit-transform:rotate(80deg);
+	}
+	100%{
+		transform:rotate(260deg);
+		-webkit-transform:rotate(260deg);
+	}
 }
 
 .myhouse .lamp{z-index:2;}
@@ -931,18 +991,90 @@ body{
 
 .chair .iphone5{
 	position:absolute;
-	/*
-	top:80px;
-	left:20px;
-	width:15px;
-	height:30px;
-	*/
-	top:-20px;
+	top:-43px;
 	width:80px;
 	height:160px;
 	border-radius:10px;
-
 	background:#fff;
 	z-index:2;
+	color:rgba(0,0,0,0.7);
+	transform:scale(0.25) rotate(40deg);
+	-webkit-transform:scale(0.25) rotate(40deg);
+	transform-origin:100% 100%;
+	-webkit-transform-origin:100% 100%;
+	transition:all ease 0.5s;
+	-webkit-transition:all ease 0.5s;
+	cursor:pointer;
 }
+
+#iphone5_ck{ display:none; }
+
+#iphone5_ck:checked~.iphone5{
+	transform:scale(1);
+	-webkit-transform:scale(1);
+}
+
+.chair .iphone5>div{
+	position:absolute;
+	margin:auto;
+}
+.chair .iphone5:before{
+	content:'';
+	position:absolute;
+	width:5px;
+	height:5px;
+	border-radius:5px;
+	background-color:#777;
+	left:0;right:0;
+	top:7px;
+	margin:auto;
+}
+.chair .iphone5-receiver{
+	width:25px;
+	height:4px;
+	background-color:#aaa;
+	border-radius:4px;
+	top:18px;
+	left:0;right:0;
+}
+
+.chair .iphone5-receiver:before{
+	content:'';
+	position:absolute;
+	width:3px;
+	height:3px;
+	border-radius:3px;
+	background-color:#777;
+	left:-7px;
+}
+
+.chair .iphone5-window{
+	top:30px;
+	bottom:25px;
+	left:5px;
+	right:5px;
+	border:1px solid currentColor; 
+	border-radius:2px;
+	background:#111;
+}
+
+.chair .iphone5-home{
+	left:0;right:0;
+	bottom:5px;
+	width:15px;
+	height:15px;
+	border-radius:20px;
+	border:1px solid currentColor;
+}
+
+.chair .iphone5-home:before{
+	content:'';
+	position:absolute;
+	top:0;right:0;left:0;bottom:0;margin:auto;
+	border:1px solid currentColor;
+	width:5px;
+	height:5px;
+	border-radius:1px;
+}
+
 
