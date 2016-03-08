@@ -214,6 +214,7 @@ function addPen(uid,params,callback){
 		'type':false, 'sortcode':false,
 		'cdate':false, 'udate':false
 	};
+	console.log(params);
 	var sql = getInsertSql('codepen',params,fileds);
 	exec(sql,function(error){
 		if(!callback) return;
@@ -341,8 +342,8 @@ function createBlog(title,content,cdate,udate){
 	return template(htmlTemplate)({title,content,cdate,udate,menu});
 }
 
-function getPenList(uid,callback){
-	var sql = 'select * from codepen where userId='+uid;
+function getPenList(callback){
+	var sql = 'select * from codepen where userId=1';
 	query(sql,function(data){
 		callback && callback(data);
 	});
@@ -369,7 +370,7 @@ function getPen(pid,res,params){
 		var cssText = '<link class="csslink" href="/article/'+cssId+'?type=css&min=true" rel="stylesheet">';
 		var jsId = obj.jsId;
 		var jsText = '<script class="jsscriptlink" src="/article/'+jsId+'?type=js&min=true"></script>';
-		var stopJs = '<script class="noscriptlink" src="/article/45?type=js&min=true"></script>';
+		var stopJs = '<script class="noscriptlink" src="/src/StopIframe.js?min=true"></script>';
 		
 		var cheerio = require('cheerio');
 		var $ = cheerio.load(html);

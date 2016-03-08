@@ -22,6 +22,7 @@ var routeGetArray = [
 	{"key":"/editor/:aid","path":"/editor.html"},
 	{"key":"/main","path":"/main.html"},
 	{"key":"/home","path":"/house.html"},
+	{"key":"/works","path":"/works.html"},
 	{"key":"/articles","path":"/article.html"}
 ];
 
@@ -167,10 +168,12 @@ app.post('/pen/delete',function(req,res){
 });
 
 app.get('/pen/list',function(req,res){
+	/*
 	var tokenObj = checkToken(req);
 	if(!tokenObj){ res.json(tokenError); return; }
 	var uid = tokenObj.iss;
-	Q.getPenList(uid,function(data){
+	*/
+	Q.getPenList(function(data){
 		res.json(data);
 	});
 });

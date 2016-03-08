@@ -68,9 +68,9 @@
 								<input type="checkbox" class="hidden" id="clickMenu" />
 								<label class="meta_menu_thumb" for="clickMenu"><div></div></label>
 								<ul class="hidden">
-									<li><a href="index.html?aid=<%=item.htmlId%>" target="_blank">编辑 Html</a></li>
-									<li><a href="index.html?aid=<%=item.cssId%>" target="_blank">编辑 Css</a></li>
-									<li><a href="index.html?aid=<%=item.jsId%>" target="_blank">编辑 Js</a></li>
+									<li><a href="/editor/<%=item.htmlId%>" target="_blank">编辑 Html</a></li>
+									<li><a href="/editor/<%=item.cssId%>" target="_blank">编辑 Css</a></li>
+									<li><a href="/editor/<%=item.jsId%>" target="_blank">编辑 Js</a></li>
 									<li><a href="javascript:void(0)" onclick="penModify(<%=item.pid%>,this)">修改作品</a></li>
 									<li><a href="javascript:void(0)" onclick="penDrop(<%=item.pid%>,this)">删除作品</a></li>
 								</ul>
