@@ -196,10 +196,13 @@
 			if(!isOk) return;
 			var dePro = ajax({url:'/article/delete',type:'get',data:{aid},tokenField:tokenField});
 			dePro.then(function(data){
-				notify('删除文件',data.success?'文件删除成功！':data.message);
+				notify('删除文件',data.success?'文件删除成功！':'删除失败！请登陆后再删除');
 				if(data.success){
 					var liEl = el.closest('.article_list>li');
 					if(liEl) liEl.parentNode.removeChild(liEl);
+				}
+				else{
+					window.location.href="/login";
 				}
 			});
 		});

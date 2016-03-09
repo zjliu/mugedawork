@@ -194,7 +194,6 @@ function saveArticle(aid,title,content,callback){
 
 function deleteArticle(aid,callback){ 
 	var sql = 'delete from article where aid='+aid;
-	console.log(sql);
 	exec(sql,function(error){
 		callback && callback(error===null);
 	});
@@ -319,7 +318,7 @@ function createBlog(title,content,cdate,udate){
 		<!DOCTYPE html>
 		<html>
 			<head>
-				<title>小鱼空间--<%=data.title%></title>
+				<title><%=data.title%>--小鱼空间</title>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=320, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
 				<!--markdown.css-->
@@ -342,10 +341,16 @@ function createBlog(title,content,cdate,udate){
 	return template(htmlTemplate)({title,content,cdate,udate,menu});
 }
 
-function getPenList(callback){
-	var sql = 'select * from codepen where userId=1';
-	query(sql,function(data){
-		callback && callback(data);
+function getPenList(param,callback){
+	var index = ~~param.index || 0;
+	var pageSize = 6;
+	query('select count(*) count from codepen where userId=1',function(data){
+		var obj = {page_count:data[0].count,page_size:pageSize};
+		var sql = `select * from codepen where userId=1 limit ${pageSize} offset ${pageSize*index}`;
+		query(sql,function(data){
+			obj.data = data;
+			callback && callback(obj);
+		});
 	});
 }
 

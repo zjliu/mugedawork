@@ -23,6 +23,7 @@ var routeGetArray = [
 	{"key":"/main","path":"/main.html"},
 	{"key":"/home","path":"/house.html"},
 	{"key":"/works","path":"/works.html"},
+	{"key":"/works/:id","path":"/works.html"},
 	{"key":"/articles","path":"/article.html"}
 ];
 
@@ -173,7 +174,7 @@ app.get('/pen/list',function(req,res){
 	if(!tokenObj){ res.json(tokenError); return; }
 	var uid = tokenObj.iss;
 	*/
-	Q.getPenList(function(data){
+	Q.getPenList(req.query,function(data){
 		res.json(data);
 	});
 });
