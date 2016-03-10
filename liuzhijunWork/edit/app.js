@@ -16,15 +16,15 @@ var staticPath = __dirname + '/app';
 app.use(express.static(staticPath));
 
 var routeGetArray = [
-	{"key":"/","path":"/login.html"},
-	{"key":"/login","path":"/login.html"},
-	{"key":"/editor","path":"/editor.html"},
-	{"key":"/editor/:aid","path":"/editor.html"},
-	{"key":"/main","path":"/main.html"},
-	{"key":"/home","path":"/house.html"},
-	{"key":"/works","path":"/works.html"},
-	{"key":"/works/:id","path":"/works.html"},
-	{"key":"/articles","path":"/article.html"}
+	{"key":"/",				"path":"/views/login.html"},
+	{"key":"/login",		"path":"/views/login.html"},
+	{"key":"/editor",		"path":"/views/editor.html"},
+	{"key":"/editor/:aid",	"path":"/views/editor.html"},
+	{"key":"/main",			"path":"/views/main.html"},
+	{"key":"/home",			"path":"/views/house.html"},
+	{"key":"/works",		"path":"/views/works.html"},
+	{"key":"/works/:id",	"path":"/views/works.html"},
+	{"key":"/articles",		"path":"/views/article.html"}
 ];
 
 routeGetArray.forEach(obj=>{
